@@ -5,7 +5,7 @@ import {symbol} from './symbol';
 export function breakpoint() {}
 
 // also change the version in the package.json file
-export const version = '1.3.1';
+export const version = '2.0.0';
 
 const SELFTEST = 1;
 
