@@ -21,7 +21,9 @@ import {
   cddr,
   cdr,
   CONS,
+  Cons,
   DOUBLE,
+  Double,
   isadd,
   iscons,
   isdouble,
@@ -34,9 +36,13 @@ import {
   issymbol,
   istensor,
   NUM,
+  Num,
   STR,
+  Str,
   SYM,
+  Sym,
   TENSOR,
+  Tensor,
   version,
   cadar,
   cddar,
@@ -135,11 +141,17 @@ $.istensor = istensor;
 $.issymbol = issymbol;
 $.iskeyword = iskeyword;
 $.CONS = CONS;
+$.Cons = Cons;
 $.NUM = NUM;
+$.Num = Num;
 $.DOUBLE = DOUBLE;
+$.Double = Double;
 $.STR = STR;
+$.Str = Str;
 $.TENSOR = TENSOR;
+$.Tensor = Tensor;
 $.SYM = SYM;
+$.Sym = Sym;
 $.approxRadicals = approxRadicals;
 $.approxRationalsOfLogs = approxRationalsOfLogs;
 $.approxAll = approxAll;

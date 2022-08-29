@@ -17632,7 +17632,7 @@ FACTOR=${p8}`);
       function breakpoint() {
       }
       exports.breakpoint = breakpoint;
-      exports.version = "2.0.0";
+      exports.version = "2.0.1";
       exports.NSYM = 1e3;
       exports.DEBUG = false;
       exports.PRINTOUTRESULT = false;
@@ -18398,11 +18398,17 @@ FACTOR=${p8}`);
       $.issymbol = defs_1.issymbol;
       $.iskeyword = symbol_1.iskeyword;
       $.CONS = defs_1.CONS;
+      $.Cons = defs_1.Cons;
       $.NUM = defs_1.NUM;
+      $.Num = defs_1.Num;
       $.DOUBLE = defs_1.DOUBLE;
+      $.Double = defs_1.Double;
       $.STR = defs_1.STR;
+      $.Str = defs_1.Str;
       $.TENSOR = defs_1.TENSOR;
+      $.Tensor = defs_1.Tensor;
       $.SYM = defs_1.SYM;
+      $.Sym = defs_1.Sym;
       $.approxRadicals = approxratio_1.approxRadicals;
       $.approxRationalsOfLogs = approxratio_1.approxRationalsOfLogs;
       $.approxAll = approxratio_1.approxAll;
