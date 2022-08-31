@@ -1,11 +1,8 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Eval_defint = void 0;
-const defs_1 = require("../runtime/defs");
-const add_1 = require("./add");
-const eval_1 = require("./eval");
-const integral_1 = require("./integral");
-const subst_1 = require("./subst");
+import { cadr, car, cddr, cdr, iscons } from '../runtime/defs';
+import { subtract } from './add';
+import { Eval } from './eval';
+import { integral } from './integral';
+import { subst } from './subst';
 /* defint =====================================================================
 
 Tags
@@ -25,29 +22,29 @@ example a volume under a surface), or a triple integral, etc. For
 example, defint(f,x,a,b,y,c,d).
 
 */
-function Eval_defint(p1) {
-    let F = eval_1.Eval(defs_1.cadr(p1));
-    p1 = defs_1.cddr(p1);
+export function Eval_defint(p1) {
+    let F = Eval(cadr(p1));
+    p1 = cddr(p1);
     // defint can handle multiple
     // integrals, so we loop over the
     // multiple integrals here
-    while (defs_1.iscons(p1)) {
-        const X = eval_1.Eval(defs_1.car(p1));
-        p1 = defs_1.cdr(p1);
-        const A = eval_1.Eval(defs_1.car(p1));
-        p1 = defs_1.cdr(p1);
-        const B = eval_1.Eval(defs_1.car(p1));
-        p1 = defs_1.cdr(p1);
+    while (iscons(p1)) {
+        const X = Eval(car(p1));
+        p1 = cdr(p1);
+        const A = Eval(car(p1));
+        p1 = cdr(p1);
+        const B = Eval(car(p1));
+        p1 = cdr(p1);
         // obtain the primitive of F against the
         // specified variable X
         // note that the primitive changes over
         // the calculation of the multiple
         // integrals.
-        F = integral_1.integral(F, X); // contains the antiderivative of F
+        F = integral(F, X); // contains the antiderivative of F
         // evaluate the integral in A
-        const arg1 = eval_1.Eval(subst_1.subst(F, X, B));
+        const arg1 = Eval(subst(F, X, B));
         // evaluate the integral in B
-        const arg2 = eval_1.Eval(subst_1.subst(F, X, A));
+        const arg2 = Eval(subst(F, X, A));
         // integral between B and A is the
         // subtraction. Note that this could
         // be a number but also a function.
@@ -55,8 +52,7 @@ function Eval_defint(p1) {
         // number/function again doing the while
         // loop again if this is a multiple
         // integral.
-        F = add_1.subtract(arg1, arg2);
+        F = subtract(arg1, arg2);
     }
     return F;
 }
-exports.Eval_defint = Eval_defint;

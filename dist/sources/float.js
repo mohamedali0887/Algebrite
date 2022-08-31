@@ -1,27 +1,23 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.yyfloat = exports.zzfloat = exports.Eval_float = void 0;
-const count_1 = require("../runtime/count");
-const defs_1 = require("../runtime/defs");
-const run_1 = require("../runtime/run");
-const symbol_1 = require("../runtime/symbol");
-const bignum_1 = require("./bignum");
-const eval_1 = require("./eval");
-const list_1 = require("./list");
-const tensor_1 = require("./tensor");
-function Eval_float(p1) {
-    return defs_1.evalFloats(() => {
-        return eval_1.Eval(yyfloat(eval_1.Eval(defs_1.cadr(p1))));
+import { countOccurrencesOfSymbol } from '../runtime/count';
+import { ADD, cadr, Constants, DEBUG, E, evalFloats, iscons, isrational, istensor, MULTIPLY, PI, POWER } from '../runtime/defs';
+import { stop } from '../runtime/run';
+import { symbol } from "../runtime/symbol";
+import { bignum_float, double } from './bignum';
+import { Eval } from './eval';
+import { makeList } from './list';
+import { copy_tensor } from './tensor';
+export function Eval_float(p1) {
+    return evalFloats(() => {
+        return Eval(yyfloat(Eval(cadr(p1))));
     });
 }
-exports.Eval_float = Eval_float;
 function checkFloatHasWorkedOutCompletely(nodeToCheck) {
-    const numberOfPowers = count_1.countOccurrencesOfSymbol(symbol_1.symbol(defs_1.POWER), nodeToCheck);
-    const numberOfPIs = count_1.countOccurrencesOfSymbol(symbol_1.symbol(defs_1.PI), nodeToCheck);
-    const numberOfEs = count_1.countOccurrencesOfSymbol(symbol_1.symbol(defs_1.E), nodeToCheck);
-    const numberOfMults = count_1.countOccurrencesOfSymbol(symbol_1.symbol(defs_1.MULTIPLY), nodeToCheck);
-    const numberOfSums = count_1.countOccurrencesOfSymbol(symbol_1.symbol(defs_1.ADD), nodeToCheck);
-    if (defs_1.DEBUG) {
+    const numberOfPowers = countOccurrencesOfSymbol(symbol(POWER), nodeToCheck);
+    const numberOfPIs = countOccurrencesOfSymbol(symbol(PI), nodeToCheck);
+    const numberOfEs = countOccurrencesOfSymbol(symbol(E), nodeToCheck);
+    const numberOfMults = countOccurrencesOfSymbol(symbol(MULTIPLY), nodeToCheck);
+    const numberOfSums = countOccurrencesOfSymbol(symbol(ADD), nodeToCheck);
+    if (DEBUG) {
         console.log(`     ... numberOfPowers: ${numberOfPowers}`);
         console.log(`     ... numberOfPIs: ${numberOfPIs}`);
         console.log(`     ... numberOfEs: ${numberOfEs}`);
@@ -33,48 +29,46 @@ function checkFloatHasWorkedOutCompletely(nodeToCheck) {
         numberOfEs > 0 ||
         numberOfMults > 1 ||
         numberOfSums > 1) {
-        return run_1.stop('float: some unevalued parts in ' + nodeToCheck);
+        return stop('float: some unevalued parts in ' + nodeToCheck);
     }
 }
-function zzfloat(p1) {
-    defs_1.evalFloats(() => {
+export function zzfloat(p1) {
+    evalFloats(() => {
         //p1 = pop()
         //push(cadr(p1))
         //push(p1)
-        p1 = eval_1.Eval(p1);
+        p1 = Eval(p1);
         p1 = yyfloat(p1);
-        p1 = eval_1.Eval(p1); // normalize
+        p1 = Eval(p1); // normalize
     });
     return p1;
 }
-exports.zzfloat = zzfloat;
 // zzfloat doesn't necessarily result in a double
 // , for example if there are variables. But
 // in many of the tests there should be indeed
 // a float, this line comes handy to highlight
 // when that doesn't happen for those tests.
 //checkFloatHasWorkedOutCompletely(stack[tos-1])
-function yyfloat(p1) {
-    return defs_1.evalFloats(yyfloat_, p1);
+export function yyfloat(p1) {
+    return evalFloats(yyfloat_, p1);
 }
-exports.yyfloat = yyfloat;
 function yyfloat_(p1) {
-    if (defs_1.iscons(p1)) {
-        return list_1.makeList(...p1.map(yyfloat_));
+    if (iscons(p1)) {
+        return makeList(...p1.map(yyfloat_));
     }
-    if (defs_1.istensor(p1)) {
-        p1 = tensor_1.copy_tensor(p1);
+    if (istensor(p1)) {
+        p1 = copy_tensor(p1);
         p1.tensor.elem = p1.tensor.elem.map(yyfloat_);
         return p1;
     }
-    if (defs_1.isrational(p1)) {
-        return bignum_1.bignum_float(p1);
+    if (isrational(p1)) {
+        return bignum_float(p1);
     }
-    if (p1 === symbol_1.symbol(defs_1.PI)) {
-        return defs_1.Constants.piAsDouble;
+    if (p1 === symbol(PI)) {
+        return Constants.piAsDouble;
     }
-    if (p1 === symbol_1.symbol(defs_1.E)) {
-        return bignum_1.double(Math.E);
+    if (p1 === symbol(E)) {
+        return double(Math.E);
     }
     return p1;
 }

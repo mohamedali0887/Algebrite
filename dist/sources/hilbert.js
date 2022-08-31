@@ -1,12 +1,9 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.hilbert = void 0;
-const defs_1 = require("../runtime/defs");
-const misc_1 = require("../sources/misc");
-const bignum_1 = require("./bignum");
-const list_1 = require("./list");
-const multiply_1 = require("./multiply");
-const symbol_1 = require("../runtime/symbol");
+import { HILBERT } from '../runtime/defs';
+import { zero_matrix } from '../sources/misc';
+import { integer, nativeInt } from './bignum';
+import { makeList } from './list';
+import { inverse } from './multiply';
+import { symbol } from "../runtime/symbol";
 //-----------------------------------------------------------------------------
 //
 //  Create a Hilbert matrix
@@ -22,17 +19,16 @@ const symbol_1 = require("../runtime/symbol");
 //
 //-----------------------------------------------------------------------------
 //define AELEM(i, j) A->u.tensor->elem[i * n + j]
-function hilbert(N) {
-    const n = bignum_1.nativeInt(N);
+export function hilbert(N) {
+    const n = nativeInt(N);
     if (n < 2) {
-        return list_1.makeList(symbol_1.symbol(defs_1.HILBERT), N);
+        return makeList(symbol(HILBERT), N);
     }
-    const A = misc_1.zero_matrix(n, n);
+    const A = zero_matrix(n, n);
     for (let i = 0; i < n; i++) {
         for (let j = 0; j < n; j++) {
-            A.tensor.elem[i * n + j] = multiply_1.inverse(bignum_1.integer(i + j + 1));
+            A.tensor.elem[i * n + j] = inverse(integer(i + j + 1));
         }
     }
     return A;
 }
-exports.hilbert = hilbert;

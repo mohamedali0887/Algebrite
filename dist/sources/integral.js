@@ -1,23 +1,20 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.make_hashed_itab = exports.integral = exports.Eval_integral = void 0;
-const defs_1 = require("../runtime/defs");
-const find_1 = require("../runtime/find");
-const run_1 = require("../runtime/run");
-const symbol_1 = require("../runtime/symbol");
-const misc_1 = require("../sources/misc");
-const add_1 = require("./add");
-const bignum_1 = require("./bignum");
-const derivative_1 = require("./derivative");
-const eval_1 = require("./eval");
-const guess_1 = require("./guess");
-const is_1 = require("./is");
-const list_1 = require("./list");
-const multiply_1 = require("./multiply");
-const partition_1 = require("./partition");
-const scan_1 = require("./scan");
-const simplify_1 = require("./simplify");
-const transform_1 = require("./transform");
+import { ADD, caddr, cadr, car, cdr, E, EXP, INTEGRAL, isadd, iscons, ismultiply, isNumericAtom, issymbol, METAX, MULTIPLY, NIL, POWER, SQRT } from '../runtime/defs';
+import { Find } from '../runtime/find';
+import { stop } from '../runtime/run';
+import { symbol } from '../runtime/symbol';
+import { equal } from '../sources/misc';
+import { add } from './add';
+import { double, nativeInt } from './bignum';
+import { derivative } from './derivative';
+import { Eval } from './eval';
+import { guess } from './guess';
+import { equalq, isminusone, isminusoneovertwo, isoneovertwo } from './is';
+import { makeList } from './list';
+import { multiply } from './multiply';
+import { partition } from './partition';
+import { scan_meta } from './scan';
+import { simplify } from './simplify';
+import { transform } from './transform';
 /*
  Table of integrals
 
@@ -365,11 +362,11 @@ const itab = [
     'f(x^3*exp(a*x),exp(a*x)*x^3/a-3/a*integral(x^2*exp(a*x),x))',
     'f(x^3*exp(a*x+b),exp(a*x+b)*x^3/a-3/a*integral(x^2*exp(a*x+b),x))',
 ];
-function Eval_integral(p1) {
+export function Eval_integral(p1) {
     let n = 0;
     // evaluate 1st arg to get function F
-    p1 = defs_1.cdr(p1);
-    let F = eval_1.Eval(defs_1.car(p1));
+    p1 = cdr(p1);
+    let F = Eval(car(p1));
     // evaluate 2nd arg and then...
     // example    result of 2nd arg  what to do
     //
@@ -378,28 +375,28 @@ function Eval_integral(p1) {
     // integral(f,x)  x      X = x, N = nil
     // integral(f,x,2)  x      X = x, N = 2
     // integral(f,x,y)  x      X = x, N = y
-    p1 = defs_1.cdr(p1);
-    const p2 = eval_1.Eval(defs_1.car(p1));
+    p1 = cdr(p1);
+    const p2 = Eval(car(p1));
     let N, X;
-    if (p2 === symbol_1.symbol(defs_1.NIL)) {
-        X = guess_1.guess(F);
-        N = symbol_1.symbol(defs_1.NIL);
+    if (p2 === symbol(NIL)) {
+        X = guess(F);
+        N = symbol(NIL);
     }
-    else if (defs_1.isNumericAtom(p2)) {
-        X = guess_1.guess(F);
+    else if (isNumericAtom(p2)) {
+        X = guess(F);
         N = p2;
     }
     else {
         X = p2;
-        p1 = defs_1.cdr(p1);
-        N = eval_1.Eval(defs_1.car(p1));
+        p1 = cdr(p1);
+        N = Eval(car(p1));
     }
     while (true) {
         // N might be a symbol instead of a number
-        if (defs_1.isNumericAtom(N)) {
-            n = bignum_1.nativeInt(N);
+        if (isNumericAtom(N)) {
+            n = nativeInt(N);
             if (isNaN(n)) {
-                run_1.stop('nth integral: check n');
+                stop('nth integral: check n');
             }
         }
         else {
@@ -414,12 +411,12 @@ function Eval_integral(p1) {
         else {
             n = -n;
             for (let i = 0; i < n; i++) {
-                temp = derivative_1.derivative(temp, X);
+                temp = derivative(temp, X);
             }
         }
         F = temp;
         // if N is nil then arglist is exhausted
-        if (N === symbol_1.symbol(defs_1.NIL)) {
+        if (N === symbol(NIL)) {
             break;
         }
         // otherwise...
@@ -432,56 +429,54 @@ function Eval_integral(p1) {
         // symbol  nil    X = N, N = nil, continue
         // symbol  number    X = N, N = arg1, continue
         // symbol  symbol    X = N, N = arg1, continue
-        if (defs_1.isNumericAtom(N)) {
-            p1 = defs_1.cdr(p1);
-            N = eval_1.Eval(defs_1.car(p1));
-            if (N === symbol_1.symbol(defs_1.NIL)) {
+        if (isNumericAtom(N)) {
+            p1 = cdr(p1);
+            N = Eval(car(p1));
+            if (N === symbol(NIL)) {
                 break; // arglist exhausted
             }
-            if (!defs_1.isNumericAtom(N)) {
+            if (!isNumericAtom(N)) {
                 X = N;
-                p1 = defs_1.cdr(p1);
-                N = eval_1.Eval(defs_1.car(p1));
+                p1 = cdr(p1);
+                N = Eval(car(p1));
             }
         }
         else {
             X = N;
-            p1 = defs_1.cdr(p1);
-            N = eval_1.Eval(defs_1.car(p1));
+            p1 = cdr(p1);
+            N = Eval(car(p1));
         }
     }
     return F;
 }
-exports.Eval_integral = Eval_integral;
-function integral(F, X) {
+export function integral(F, X) {
     let integ;
-    if (defs_1.isadd(F)) {
+    if (isadd(F)) {
         integ = integral_of_sum(F, X);
     }
-    else if (defs_1.ismultiply(F)) {
+    else if (ismultiply(F)) {
         integ = integral_of_product(F, X);
     }
     else {
         integ = integral_of_form(F, X);
     }
-    if (find_1.Find(integ, symbol_1.symbol(defs_1.INTEGRAL))) {
-        run_1.stop('integral: sorry, could not find a solution');
+    if (Find(integ, symbol(INTEGRAL))) {
+        stop('integral: sorry, could not find a solution');
     }
     // polish then normalize
-    return eval_1.Eval(simplify_1.simplify(integ));
+    return Eval(simplify(integ));
 }
-exports.integral = integral;
 function integral_of_sum(F, X) {
-    F = defs_1.cdr(F);
-    let result = integral(defs_1.car(F), X);
-    if (defs_1.iscons(F)) {
-        result = F.tail().reduce((acc, b) => add_1.add(acc, integral(b, X)), result);
+    F = cdr(F);
+    let result = integral(car(F), X);
+    if (iscons(F)) {
+        result = F.tail().reduce((acc, b) => add(acc, integral(b, X)), result);
     }
     return result;
 }
 function integral_of_product(F, X) {
-    const [constantExpr, variableExpr] = partition_1.partition(F, X);
-    return multiply_1.multiply(constantExpr, integral_of_form(variableExpr, X)); // multiply constant part
+    const [constantExpr, variableExpr] = partition(F, X);
+    return multiply(constantExpr, integral_of_form(variableExpr, X)); // multiply constant part
 }
 function integral_of_form(F, X) {
     const hc = italu_hashcode(F, X).toFixed(6);
@@ -490,11 +485,11 @@ function integral_of_form(F, X) {
     if (!tab) {
         // breakpoint
         // italu_hashcode(p1, p2)
-        return list_1.makeList(symbol_1.symbol(defs_1.INTEGRAL), F, X);
+        return makeList(symbol(INTEGRAL), F, X);
     }
-    const [p3, _] = transform_1.transform(F, X, tab, false);
-    if (p3 === symbol_1.symbol(defs_1.NIL)) {
-        return list_1.makeList(symbol_1.symbol(defs_1.INTEGRAL), F, X);
+    const [p3, _] = transform(F, X, tab, false);
+    if (p3 === symbol(NIL)) {
+        return makeList(symbol(INTEGRAL), F, X);
     }
     return p3;
 }
@@ -521,28 +516,28 @@ const hashcode_values = {
     'erf': 1.0825269225702916,
 };
 function italu_hashcode(u, x) {
-    if (defs_1.issymbol(u)) {
-        if (misc_1.equal(u, x)) {
+    if (issymbol(u)) {
+        if (equal(u, x)) {
             return hashcode_values.x;
         }
         else {
             return hashcode_values.constant;
         }
     }
-    else if (defs_1.iscons(u)) {
-        const sym = defs_1.car(u);
-        switch (defs_1.issymbol(sym) && sym.printname) {
-            case defs_1.ADD:
-                return hash_addition(defs_1.cdr(u), x);
-            case defs_1.MULTIPLY:
-                return hash_multiplication(defs_1.cdr(u), x);
-            case defs_1.POWER:
-                return hash_power(defs_1.cadr(u), defs_1.caddr(u), x);
-            case defs_1.EXP:
-                return hash_power(symbol_1.symbol(defs_1.E), defs_1.cadr(u), x);
-            case defs_1.SQRT:
-                var half = bignum_1.double(0.5);
-                return hash_power(defs_1.cadr(u), half, x);
+    else if (iscons(u)) {
+        const sym = car(u);
+        switch (issymbol(sym) && sym.printname) {
+            case ADD:
+                return hash_addition(cdr(u), x);
+            case MULTIPLY:
+                return hash_multiplication(cdr(u), x);
+            case POWER:
+                return hash_power(cadr(u), caddr(u), x);
+            case EXP:
+                return hash_power(symbol(E), cadr(u), x);
+            case SQRT:
+                var half = double(0.5);
+                return hash_power(cadr(u), half, x);
             default:
                 return hash_function(u, x);
         }
@@ -550,11 +545,11 @@ function italu_hashcode(u, x) {
     return hashcode_values.constant;
 }
 function hash_function(u, x) {
-    if (!find_1.Find(defs_1.cadr(u), x)) {
+    if (!Find(cadr(u), x)) {
         return hashcode_values.constant;
     }
-    const name = defs_1.car(u);
-    const arg_hash = italu_hashcode(defs_1.cadr(u), x);
+    const name = car(u);
+    const arg_hash = italu_hashcode(cadr(u), x);
     const base = hashcode_values[name.printname];
     if (!base) {
         throw new Error('Unsupported function ' + name.printname);
@@ -563,11 +558,11 @@ function hash_function(u, x) {
 }
 function hash_addition(terms, x) {
     const term_set = {};
-    while (defs_1.iscons(terms)) {
-        const term = defs_1.car(terms);
-        terms = defs_1.cdr(terms);
+    while (iscons(terms)) {
+        const term = car(terms);
+        terms = cdr(terms);
         let term_hash = 0;
-        if (find_1.Find(term, x)) {
+        if (Find(term, x)) {
             term_hash = italu_hashcode(term, x);
         }
         else {
@@ -587,9 +582,9 @@ function hash_addition(terms, x) {
 }
 function hash_multiplication(terms, x) {
     let product = 1;
-    if (defs_1.iscons(terms)) {
+    if (iscons(terms)) {
         [...terms].forEach((term) => {
-            if (find_1.Find(term, x)) {
+            if (Find(term, x)) {
                 product = product * italu_hashcode(term, x);
             }
         });
@@ -599,10 +594,10 @@ function hash_multiplication(terms, x) {
 function hash_power(base, power, x) {
     let base_hash = hashcode_values.constant;
     let exp_hash = hashcode_values.constexp;
-    if (find_1.Find(base, x)) {
+    if (Find(base, x)) {
         base_hash = italu_hashcode(base, x);
     }
-    if (find_1.Find(power, x)) {
+    if (Find(power, x)) {
         exp_hash = italu_hashcode(power, x);
     }
     else {
@@ -610,30 +605,30 @@ function hash_power(base, power, x) {
         if (base_hash === hashcode_values.constant) {
             return hashcode_values.constant;
         }
-        if (is_1.isminusone(power)) {
+        if (isminusone(power)) {
             exp_hash = -1;
         }
-        else if (is_1.isoneovertwo(power)) {
+        else if (isoneovertwo(power)) {
             exp_hash = 0.5;
         }
-        else if (is_1.isminusoneovertwo(power)) {
+        else if (isminusoneovertwo(power)) {
             exp_hash = -0.5;
         }
-        else if (is_1.equalq(power, 2, 1)) {
+        else if (equalq(power, 2, 1)) {
             exp_hash = 2;
         }
-        else if (is_1.equalq(power, -2, 1)) {
+        else if (equalq(power, -2, 1)) {
             exp_hash = -2;
         }
     }
     return Math.pow(base_hash, exp_hash);
 }
-function make_hashed_itab() {
+export function make_hashed_itab() {
     const tab = {};
     for (let s of Array.from(itab)) {
-        const f = scan_1.scan_meta(s);
-        const u = defs_1.cadr(f);
-        const h = italu_hashcode(u, symbol_1.symbol(defs_1.METAX));
+        const f = scan_meta(s);
+        const u = cadr(f);
+        const h = italu_hashcode(u, symbol(METAX));
         const key = h.toFixed(6);
         if (!tab[key]) {
             tab[key] = [];
@@ -643,7 +638,6 @@ function make_hashed_itab() {
     console.log(`hashed_itab = ${JSON.stringify(tab, null, 2)}`);
     return tab;
 }
-exports.make_hashed_itab = make_hashed_itab;
 // pre-calculated hashed integral table.
 // in case the integral table is changed, use this
 //   Algebrite.make_hashed_itab()

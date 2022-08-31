@@ -1,18 +1,15 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.negate_noexpand = exports.negate = exports.reciprocate = exports.inverse = exports.divide = exports.multiply_all_noexpand = exports.multiply_all = exports.multiply_noexpand = exports.multiply = exports.Eval_multiply = void 0;
-const defs_1 = require("../runtime/defs");
-const otherCFunctions_1 = require("../runtime/otherCFunctions");
-const run_1 = require("../runtime/run");
-const symbol_1 = require("../runtime/symbol");
-const misc_1 = require("../sources/misc");
-const add_1 = require("./add");
-const bignum_1 = require("./bignum");
-const eval_1 = require("./eval");
-const is_1 = require("./is");
-const list_1 = require("./list");
-const power_1 = require("./power");
-const tensor_1 = require("./tensor");
+import { caar, caddr, cadr, car, cdar, cdddr, cddr, cdr, Cons, Constants, defs, dontCreateNewRadicalsInDenominatorWhenEvalingMultiplication, isadd, iscons, isdouble, ismultiply, isNumericAtom, ispower, isrational, istensor, MULTIPLY, NIL, noexpand, OPERATOR, POWER } from '../runtime/defs';
+import { append } from '../runtime/otherCFunctions';
+import { stop } from '../runtime/run';
+import { symbol } from '../runtime/symbol';
+import { cmp_expr } from '../sources/misc';
+import { add, subtract } from './add';
+import { divide_numbers, invert_number, mp_denominator, mp_numerator, multiply_numbers, negate_number } from './bignum';
+import { Eval } from './eval';
+import { equaln, isfraction, isinteger, isminusone, isnegativenumber, isplusone, isZeroAtom } from './is';
+import { makeList } from './list';
+import { power } from './power';
+import { scalar_times_tensor, tensor_times_scalar } from './tensor';
 // Symbolic multiplication
 // multiplication is commutative, so it can't be used
 // e.g. on two matrices.
@@ -23,114 +20,112 @@ const tensor_1 = require("./tensor");
 //static void parse_p1(void)
 //static void parse_p2(void)
 //static void __normalize_radical_factors(int)
-function Eval_multiply(p1) {
-    let temp = eval_1.Eval(defs_1.cadr(p1));
-    p1 = defs_1.cddr(p1);
-    if (defs_1.iscons(p1)) {
-        temp = [...p1].reduce((acc, p) => multiply(acc, eval_1.Eval(p)), temp);
+export function Eval_multiply(p1) {
+    let temp = Eval(cadr(p1));
+    p1 = cddr(p1);
+    if (iscons(p1)) {
+        temp = [...p1].reduce((acc, p) => multiply(acc, Eval(p)), temp);
     }
     return temp;
 }
-exports.Eval_multiply = Eval_multiply;
 // this one doesn't eval the factors,
 // so you pass i*(-1)^(1/2), it wouldnt't
 // give -1, because i is not evalled
-function multiply(arg1, arg2) {
-    if (defs_1.defs.esc_flag) {
-        run_1.stop('escape key stop');
+export function multiply(arg1, arg2) {
+    if (defs.esc_flag) {
+        stop('escape key stop');
     }
-    if (defs_1.isNumericAtom(arg1) && defs_1.isNumericAtom(arg2)) {
-        return bignum_1.multiply_numbers(arg1, arg2);
+    if (isNumericAtom(arg1) && isNumericAtom(arg2)) {
+        return multiply_numbers(arg1, arg2);
     }
     return yymultiply(arg1, arg2);
 }
-exports.multiply = multiply;
 function yymultiply(p1, p2) {
     // is either operand zero?
-    if (is_1.isZeroAtom(p1) || is_1.isZeroAtom(p2)) {
-        return defs_1.Constants.Zero();
+    if (isZeroAtom(p1) || isZeroAtom(p2)) {
+        return Constants.Zero();
     }
     // is either operand a sum?
     //console.log("yymultiply: expanding: " + expanding)
-    if (defs_1.defs.expanding && defs_1.isadd(p1)) {
+    if (defs.expanding && isadd(p1)) {
         return p1
             .tail()
-            .reduce((a, b) => add_1.add(a, multiply(b, p2)), defs_1.Constants.Zero());
+            .reduce((a, b) => add(a, multiply(b, p2)), Constants.Zero());
     }
-    if (defs_1.defs.expanding && defs_1.isadd(p2)) {
+    if (defs.expanding && isadd(p2)) {
         return p2
             .tail()
-            .reduce((a, b) => add_1.add(a, multiply(p1, b)), defs_1.Constants.Zero());
+            .reduce((a, b) => add(a, multiply(p1, b)), Constants.Zero());
     }
     // scalar times tensor?
-    if (!defs_1.istensor(p1) && defs_1.istensor(p2)) {
-        return tensor_1.scalar_times_tensor(p1, p2);
+    if (!istensor(p1) && istensor(p2)) {
+        return scalar_times_tensor(p1, p2);
     }
     // tensor times scalar?
-    if (defs_1.istensor(p1) && !defs_1.istensor(p2)) {
-        return tensor_1.tensor_times_scalar(p1, p2);
+    if (istensor(p1) && !istensor(p2)) {
+        return tensor_times_scalar(p1, p2);
     }
     // adjust operands
-    p1 = defs_1.ismultiply(p1) ? defs_1.cdr(p1) : list_1.makeList(p1);
-    p2 = defs_1.ismultiply(p2) ? defs_1.cdr(p2) : list_1.makeList(p2);
+    p1 = ismultiply(p1) ? cdr(p1) : makeList(p1);
+    p2 = ismultiply(p2) ? cdr(p2) : makeList(p2);
     const factors = [];
     // handle numerical coefficients
-    if (defs_1.isNumericAtom(defs_1.car(p1)) && defs_1.isNumericAtom(defs_1.car(p2))) {
-        const arg1 = defs_1.car(p1);
-        const arg2 = defs_1.car(p2);
-        factors.push(bignum_1.multiply_numbers(arg1, arg2));
-        p1 = defs_1.cdr(p1);
-        p2 = defs_1.cdr(p2);
+    if (isNumericAtom(car(p1)) && isNumericAtom(car(p2))) {
+        const arg1 = car(p1);
+        const arg2 = car(p2);
+        factors.push(multiply_numbers(arg1, arg2));
+        p1 = cdr(p1);
+        p2 = cdr(p2);
     }
-    else if (defs_1.isNumericAtom(defs_1.car(p1))) {
-        factors.push(defs_1.car(p1));
-        p1 = defs_1.cdr(p1);
+    else if (isNumericAtom(car(p1))) {
+        factors.push(car(p1));
+        p1 = cdr(p1);
     }
-    else if (defs_1.isNumericAtom(defs_1.car(p2))) {
-        factors.push(defs_1.car(p2));
-        p2 = defs_1.cdr(p2);
+    else if (isNumericAtom(car(p2))) {
+        factors.push(car(p2));
+        p2 = cdr(p2);
     }
     else {
-        factors.push(defs_1.Constants.One());
+        factors.push(Constants.One());
     }
     let [p3, p5] = parse_p1(p1);
     let [p4, p6] = parse_p2(p2);
-    while (defs_1.iscons(p1) && defs_1.iscons(p2)) {
-        if (defs_1.caar(p1) === symbol_1.symbol(defs_1.OPERATOR) && defs_1.caar(p2) === symbol_1.symbol(defs_1.OPERATOR)) {
-            factors.push(new defs_1.Cons(symbol_1.symbol(defs_1.OPERATOR), otherCFunctions_1.append(defs_1.cdar(p1), defs_1.cdar(p2))));
-            p1 = defs_1.cdr(p1);
-            p2 = defs_1.cdr(p2);
+    while (iscons(p1) && iscons(p2)) {
+        if (caar(p1) === symbol(OPERATOR) && caar(p2) === symbol(OPERATOR)) {
+            factors.push(new Cons(symbol(OPERATOR), append(cdar(p1), cdar(p2))));
+            p1 = cdr(p1);
+            p2 = cdr(p2);
             [p3, p5] = parse_p1(p1);
             [p4, p6] = parse_p2(p2);
             continue;
         }
-        switch (misc_1.cmp_expr(p3, p4)) {
+        switch (cmp_expr(p3, p4)) {
             case -1:
-                factors.push(defs_1.car(p1));
-                p1 = defs_1.cdr(p1);
+                factors.push(car(p1));
+                p1 = cdr(p1);
                 [p3, p5] = parse_p1(p1);
                 break;
             case 1:
-                factors.push(defs_1.car(p2));
-                p2 = defs_1.cdr(p2);
+                factors.push(car(p2));
+                p2 = cdr(p2);
                 [p4, p6] = parse_p2(p2);
                 break;
             case 0:
                 combine_factors(factors, p4, p5, p6);
-                p1 = defs_1.cdr(p1);
-                p2 = defs_1.cdr(p2);
+                p1 = cdr(p1);
+                p2 = cdr(p2);
                 [p3, p5] = parse_p1(p1);
                 [p4, p6] = parse_p2(p2);
                 break;
             default:
-                run_1.stop('internal error 2');
+                stop('internal error 2');
         }
     }
     // push remaining factors, if any
-    if (defs_1.iscons(p1)) {
+    if (iscons(p1)) {
         factors.push(...p1);
     }
-    if (defs_1.iscons(p2)) {
+    if (iscons(p2)) {
         factors.push(...p2);
     }
     // normalize radical factors
@@ -145,9 +140,9 @@ function yymultiply(p1, p2) {
     //    return
     //  }
     //}
-    if (defs_1.defs.expanding) {
+    if (defs.expanding) {
         for (let i = 0; i < factors.length; i++) {
-            if (defs_1.isadd(factors[i])) {
+            if (isadd(factors[i])) {
                 return multiply_all(factors);
             }
         }
@@ -158,17 +153,17 @@ function yymultiply(p1, p2) {
         return factors.pop();
     }
     // discard integer 1
-    if (defs_1.isrational(factors[0]) && is_1.equaln(factors[0], 1)) {
+    if (isrational(factors[0]) && equaln(factors[0], 1)) {
         if (n === 2) {
             const p7 = factors.pop();
             return p7;
         }
         else {
-            factors[0] = symbol_1.symbol(defs_1.MULTIPLY);
-            return list_1.makeList(...factors);
+            factors[0] = symbol(MULTIPLY);
+            return makeList(...factors);
         }
     }
-    return new defs_1.Cons(symbol_1.symbol(defs_1.MULTIPLY), list_1.makeList(...factors));
+    return new Cons(symbol(MULTIPLY), makeList(...factors));
 }
 // Decompose a factor into base and power.
 //
@@ -177,11 +172,11 @@ function yymultiply(p1, p2) {
 // output:  p3    factor's base
 //          p5    factor's power (possibly 1)
 function parse_p1(p1) {
-    let p3 = defs_1.car(p1);
-    let p5 = defs_1.Constants.One();
-    if (defs_1.ispower(p3)) {
-        p5 = defs_1.caddr(p3);
-        p3 = defs_1.cadr(p3);
+    let p3 = car(p1);
+    let p5 = Constants.One();
+    if (ispower(p3)) {
+        p5 = caddr(p3);
+        p3 = cadr(p3);
     }
     return [p3, p5];
 }
@@ -192,27 +187,27 @@ function parse_p1(p1) {
 // output:  p4    factor's base
 //          p6    factor's power (possibly 1)
 function parse_p2(p2) {
-    let p4 = defs_1.car(p2);
-    let p6 = defs_1.Constants.One();
-    if (defs_1.ispower(p4)) {
-        p6 = defs_1.caddr(p4);
-        p4 = defs_1.cadr(p4);
+    let p4 = car(p2);
+    let p6 = Constants.One();
+    if (ispower(p4)) {
+        p6 = caddr(p4);
+        p4 = cadr(p4);
     }
     return [p4, p6];
 }
 // h an integer
 function combine_factors(factors, p4, p5, p6) {
-    let p7 = power_1.power(p4, add_1.add(p5, p6));
-    if (defs_1.isNumericAtom(p7)) {
-        factors[0] = bignum_1.multiply_numbers(factors[0], p7);
+    let p7 = power(p4, add(p5, p6));
+    if (isNumericAtom(p7)) {
+        factors[0] = multiply_numbers(factors[0], p7);
     }
-    else if (defs_1.ismultiply(p7)) {
+    else if (ismultiply(p7)) {
         // power can return number * factor (i.e. -1 * i)
-        if (defs_1.isNumericAtom(defs_1.cadr(p7)) && defs_1.cdddr(p7) === symbol_1.symbol(defs_1.NIL)) {
+        if (isNumericAtom(cadr(p7)) && cdddr(p7) === symbol(NIL)) {
             const arg1 = factors[0];
-            const arg2 = defs_1.cadr(p7);
-            factors[0] = bignum_1.multiply_numbers(arg1, arg2);
-            factors.push(defs_1.caddr(p7));
+            const arg2 = cadr(p7);
+            factors[0] = multiply_numbers(arg1, arg2);
+            factors.push(caddr(p7));
         }
         else {
             factors.push(p7);
@@ -246,18 +241,17 @@ const gp = [
 // e.g. if you factored x^2 + 3x + 2 into (x+1)(x+2)
 // and you want to divide by (x+1) , i.e. you multiply by (x-1)^-1,
 // then there is no need to expand.
-function multiply_noexpand(arg1, arg2) {
-    return defs_1.noexpand(multiply, arg1, arg2);
+export function multiply_noexpand(arg1, arg2) {
+    return noexpand(multiply, arg1, arg2);
 }
-exports.multiply_noexpand = multiply_noexpand;
 // multiply n factors on stack
 // n an integer
-function multiply_all(n) {
+export function multiply_all(n) {
     if (n.length === 1) {
         return n[0];
     }
     if (n.length === 0) {
-        return defs_1.Constants.One();
+        return Constants.One();
     }
     let temp = n[0];
     for (let i = 1; i < n.length; i++) {
@@ -265,12 +259,10 @@ function multiply_all(n) {
     }
     return temp;
 }
-exports.multiply_all = multiply_all;
 // n an integer
-function multiply_all_noexpand(arr) {
-    return defs_1.noexpand(multiply_all, arr);
+export function multiply_all_noexpand(arr) {
+    return noexpand(multiply_all, arr);
 }
-exports.multiply_all_noexpand = multiply_all_noexpand;
 //-----------------------------------------------------------------------------
 //
 //  Symbolic division, or numeric division if doubles are found.
@@ -280,42 +272,37 @@ exports.multiply_all_noexpand = multiply_all_noexpand;
 //  Output:    Quotient on stack
 //
 //-----------------------------------------------------------------------------
-function divide(p1, p2) {
-    if (defs_1.isNumericAtom(p1) && defs_1.isNumericAtom(p2)) {
-        return bignum_1.divide_numbers(p1, p2);
+export function divide(p1, p2) {
+    if (isNumericAtom(p1) && isNumericAtom(p2)) {
+        return divide_numbers(p1, p2);
     }
     else {
         return multiply(p1, inverse(p2));
     }
 }
-exports.divide = divide;
 // this is different from inverse of a matrix (inv)!
-function inverse(p1) {
-    if (defs_1.isNumericAtom(p1)) {
-        return bignum_1.invert_number(p1);
+export function inverse(p1) {
+    if (isNumericAtom(p1)) {
+        return invert_number(p1);
     }
     else {
-        return power_1.power(p1, defs_1.Constants.negOne);
+        return power(p1, Constants.negOne);
     }
 }
-exports.inverse = inverse;
-function reciprocate(p1) {
+export function reciprocate(p1) {
     return inverse(p1);
 }
-exports.reciprocate = reciprocate;
-function negate(p1) {
-    if (defs_1.isNumericAtom(p1)) {
-        return bignum_1.negate_number(p1);
+export function negate(p1) {
+    if (isNumericAtom(p1)) {
+        return negate_number(p1);
     }
     else {
-        return multiply(p1, defs_1.Constants.NegOne());
+        return multiply(p1, Constants.NegOne());
     }
 }
-exports.negate = negate;
-function negate_noexpand(p1) {
-    return defs_1.noexpand(negate, p1);
+export function negate_noexpand(p1) {
+    return noexpand(negate, p1);
 }
-exports.negate_noexpand = negate_noexpand;
 //-----------------------------------------------------------------------------
 //
 //  Normalize radical factors
@@ -342,9 +329,9 @@ exports.negate_noexpand = negate_noexpand;
 function __normalize_radical_factors(factors) {
     let i = 0;
     // if coeff is 1 or floating then don't bother
-    if (is_1.isplusone(factors[0]) ||
-        is_1.isminusone(factors[0]) ||
-        defs_1.isdouble(factors[0])) {
+    if (isplusone(factors[0]) ||
+        isminusone(factors[0]) ||
+        isdouble(factors[0])) {
         return;
     }
     // if no radicals then don't bother
@@ -357,50 +344,50 @@ function __normalize_radical_factors(factors) {
         return;
     }
     // numerator
-    let A = bignum_1.mp_numerator(factors[0]);
+    let A = mp_numerator(factors[0]);
     //console.log("__normalize_radical_factors numerator: " + stack[tos-1])
     for (let i = 1; i < factors.length; i++) {
-        if (is_1.isplusone(A) || is_1.isminusone(A)) {
+        if (isplusone(A) || isminusone(A)) {
             break;
         }
         if (!__is_radical_number(factors[i])) {
             continue;
         }
-        const BASE = defs_1.cadr(factors[i]);
-        const EXPO = defs_1.caddr(factors[i]);
+        const BASE = cadr(factors[i]);
+        const EXPO = caddr(factors[i]);
         // exponent must be negative
-        if (!is_1.isnegativenumber(EXPO)) {
+        if (!isnegativenumber(EXPO)) {
             continue;
         }
         // numerator divisible by base?
         const TMP = divide(A, BASE);
-        if (!is_1.isinteger(TMP)) {
+        if (!isinteger(TMP)) {
             continue;
         }
         // reduce numerator
         A = TMP;
         // invert radical
-        factors[i] = list_1.makeList(symbol_1.symbol(defs_1.POWER), BASE, add_1.add(defs_1.Constants.One(), EXPO));
+        factors[i] = makeList(symbol(POWER), BASE, add(Constants.One(), EXPO));
     }
     // denominator
-    let B = bignum_1.mp_denominator(factors[0]);
+    let B = mp_denominator(factors[0]);
     //console.log("__normalize_radical_factors denominator: " + stack[tos-1])
     for (let i = 1; i < factors.length; i++) {
-        if (is_1.isplusone(B)) {
+        if (isplusone(B)) {
             break;
         }
         if (!__is_radical_number(factors[i])) {
             continue;
         }
-        const BASE = defs_1.cadr(factors[i]);
-        const EXPO = defs_1.caddr(factors[i]);
+        const BASE = cadr(factors[i]);
+        const EXPO = caddr(factors[i]);
         // exponent must be positive
-        if (is_1.isnegativenumber(EXPO)) {
+        if (isnegativenumber(EXPO)) {
             continue;
         }
         // denominator divisible by BASE?
         const TMP = divide(B, BASE);
-        if (!is_1.isinteger(TMP)) {
+        if (!isinteger(TMP)) {
             continue;
         }
         //console.log("__new radical TMP: " + TMP.toString())
@@ -409,11 +396,11 @@ function __normalize_radical_factors(factors) {
         B = TMP;
         //console.log("__new radical BASE: " + BASE.toString())
         //console.log("__new radical EXPO: " + EXPO.toString())
-        const subtracted = add_1.subtract(EXPO, defs_1.Constants.one);
-        if (defs_1.dontCreateNewRadicalsInDenominatorWhenEvalingMultiplication) {
-            if (is_1.isinteger(BASE) &&
-                !is_1.isinteger(subtracted) &&
-                is_1.isnegativenumber(subtracted)) {
+        const subtracted = subtract(EXPO, Constants.one);
+        if (dontCreateNewRadicalsInDenominatorWhenEvalingMultiplication) {
+            if (isinteger(BASE) &&
+                !isinteger(subtracted) &&
+                isnegativenumber(subtracted)) {
                 // bail out,
                 // we want to avoid going ahead with the subtraction of
                 // the exponents, because that would turn a perfectly good
@@ -427,7 +414,7 @@ function __normalize_radical_factors(factors) {
         }
         //console.log("__new radical exponent: " + stack[tos-1])
         // invert radical
-        factors[i] = list_1.makeList(symbol_1.symbol(defs_1.POWER), BASE, subtracted);
+        factors[i] = makeList(symbol(POWER), BASE, subtracted);
     }
     // reconstitute the coefficient
     factors[0] = divide(A, B);
@@ -435,10 +422,10 @@ function __normalize_radical_factors(factors) {
 // don't include i
 function __is_radical_number(p) {
     // don't use i
-    return (defs_1.ispower(p) &&
-        defs_1.isNumericAtom(defs_1.cadr(p)) &&
-        is_1.isfraction(defs_1.caddr(p)) &&
-        !is_1.isminusone(defs_1.cadr(p)));
+    return (ispower(p) &&
+        isNumericAtom(cadr(p)) &&
+        isfraction(caddr(p)) &&
+        !isminusone(cadr(p)));
 }
 //-----------------------------------------------------------------------------
 //

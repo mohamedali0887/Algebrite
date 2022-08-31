@@ -1,14 +1,11 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Eval_contract = void 0;
-const alloc_1 = require("../runtime/alloc");
-const defs_1 = require("../runtime/defs");
-const run_1 = require("../runtime/run");
-const symbol_1 = require("../runtime/symbol");
-const add_1 = require("./add");
-const bignum_1 = require("./bignum");
-const eval_1 = require("./eval");
-const is_1 = require("./is");
+import { alloc_tensor } from '../runtime/alloc';
+import { cadddr, caddr, cadr, cddr, Constants, istensor, NIL } from '../runtime/defs';
+import { stop } from '../runtime/run';
+import { symbol } from "../runtime/symbol";
+import { add } from './add';
+import { integer, nativeInt } from './bignum';
+import { Eval } from './eval';
+import { isZeroAtomOrTensor } from './is';
 /* contract =====================================================================
 
 Tags
@@ -26,31 +23,30 @@ If i and j are omitted then 1 and 2 are used.
 contract(m) is equivalent to the trace of matrix m.
 
 */
-function Eval_contract(p1) {
-    const p1_prime = eval_1.Eval(defs_1.cadr(p1));
+export function Eval_contract(p1) {
+    const p1_prime = Eval(cadr(p1));
     let p2, p3;
-    if (defs_1.cddr(p1) === symbol_1.symbol(defs_1.NIL)) {
-        p2 = defs_1.Constants.one;
-        p3 = bignum_1.integer(2);
+    if (cddr(p1) === symbol(NIL)) {
+        p2 = Constants.one;
+        p3 = integer(2);
     }
     else {
-        p2 = eval_1.Eval(defs_1.caddr(p1));
-        p3 = eval_1.Eval(defs_1.cadddr(p1));
+        p2 = Eval(caddr(p1));
+        p3 = Eval(cadddr(p1));
     }
     return contract(p1_prime, p2, p3);
 }
-exports.Eval_contract = Eval_contract;
 function contract(p1, p2, p3) {
     const ai = [];
     const an = [];
-    if (!defs_1.istensor(p1)) {
-        if (!is_1.isZeroAtomOrTensor(p1)) {
-            run_1.stop('contract: tensor expected, 1st arg is not a tensor');
+    if (!istensor(p1)) {
+        if (!isZeroAtomOrTensor(p1)) {
+            stop('contract: tensor expected, 1st arg is not a tensor');
         }
-        return defs_1.Constants.zero;
+        return Constants.zero;
     }
-    let l = bignum_1.nativeInt(p2);
-    let m = bignum_1.nativeInt(p3);
+    let l = nativeInt(p2);
+    let m = nativeInt(p3);
     const { ndim } = p1.tensor;
     if (l < 1 ||
         l > ndim ||
@@ -58,7 +54,7 @@ function contract(p1, p2, p3) {
         m > ndim ||
         l === m ||
         p1.tensor.dim[l - 1] !== p1.tensor.dim[m - 1]) {
-        run_1.stop('contract: index out of range');
+        stop('contract: index out of range');
     }
     l--;
     m--;
@@ -70,7 +66,7 @@ function contract(p1, p2, p3) {
             nelem *= p1.tensor.dim[i];
         }
     }
-    p2 = alloc_1.alloc_tensor(nelem);
+    p2 = alloc_tensor(nelem);
     p2.tensor.ndim = ndim - 2;
     let j = 0;
     for (let i = 0; i < ndim; i++) {
@@ -85,7 +81,7 @@ function contract(p1, p2, p3) {
         an[i] = p1.tensor.dim[i];
     }
     for (let i = 0; i < nelem; i++) {
-        let temp = defs_1.Constants.zero;
+        let temp = Constants.zero;
         for (let j = 0; j < n; j++) {
             ai[l] = j;
             ai[m] = j;
@@ -94,7 +90,7 @@ function contract(p1, p2, p3) {
                 h = h * an[k] + ai[k];
             }
             //console.log "a[h]: " + a[h]
-            temp = add_1.add(temp, a[h]);
+            temp = add(temp, a[h]);
         }
         //console.log "tos: " + stack[tos-1]
         b[i] = temp;

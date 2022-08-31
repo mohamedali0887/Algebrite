@@ -1,13 +1,10 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.print2dascii = void 0;
-const defs_1 = require("../runtime/defs");
-const otherCFunctions_1 = require("../runtime/otherCFunctions");
-const symbol_1 = require("../runtime/symbol");
-const abs_1 = require("./abs");
-const bignum_1 = require("./bignum");
-const is_1 = require("./is");
-const print_1 = require("./print");
+import { ADD, breakpoint, caar, caddr, cadr, car, cdr, Constants, DERIVATIVE, DOUBLE, E, FACTORIAL, INDEX, isadd, iscons, isdouble, isfactorial, ismultiply, isNumericAtom, ispower, isrational, isstr, issymbol, istensor, MULTIPLY, NUM, POWER, SETQ, } from '../runtime/defs';
+import { doubleToReasonableString } from '../runtime/otherCFunctions';
+import { get_printname, symbol } from '../runtime/symbol';
+import { absval } from './abs';
+import { mp_denominator, mp_numerator } from './bignum';
+import { isfraction, isminusone, isnegativenumber, isplusone } from './is';
+import { printline } from './print';
 /*
 
 Prints in "2d", e.g. instead of 1/(x+1)^2 :
@@ -75,7 +72,7 @@ function printchar_nowrap(character) {
 function printchar(character) {
     return printchar_nowrap(character);
 }
-function print2dascii(p) {
+export function print2dascii(p) {
     yindex = 0;
     level = 0;
     emit_x = 0;
@@ -83,21 +80,20 @@ function print2dascii(p) {
     // if too wide then print flat
     const [h, w, y] = Array.from(get_size(0, yindex));
     if (w > 100) {
-        print_1.printline(p);
+        printline(p);
         return;
     }
     const beenPrinted = print_glyphs();
     return beenPrinted;
 }
-exports.print2dascii = print2dascii;
 function emit_top_expr(p) {
-    if (defs_1.car(p) === symbol_1.symbol(defs_1.SETQ)) {
-        emit_expr(defs_1.cadr(p));
+    if (car(p) === symbol(SETQ)) {
+        emit_expr(cadr(p));
         __emit_str(' = ');
-        emit_expr(defs_1.caddr(p));
+        emit_expr(caddr(p));
         return;
     }
-    if (defs_1.istensor(p)) {
+    if (istensor(p)) {
         emit_tensor(p);
     }
     else {
@@ -108,20 +104,20 @@ function will_be_displayed_as_fraction(p) {
     if (level > 0) {
         return false;
     }
-    if (is_1.isfraction(p)) {
+    if (isfraction(p)) {
         return true;
     }
-    if (!defs_1.ismultiply(p)) {
+    if (!ismultiply(p)) {
         return false;
     }
-    if (is_1.isfraction(defs_1.cadr(p))) {
+    if (isfraction(cadr(p))) {
         return true;
     }
-    while (defs_1.iscons(p)) {
-        if (isdenominator(defs_1.car(p))) {
+    while (iscons(p)) {
+        if (isdenominator(car(p))) {
             return true;
         }
-        p = defs_1.cdr(p);
+        p = cdr(p);
     }
     return false;
 }
@@ -131,18 +127,18 @@ function emit_expr(p) {
     //    return
     //  }
     expr_level++;
-    if (defs_1.isadd(p)) {
-        p = defs_1.cdr(p);
-        if (__is_negative(defs_1.car(p))) {
+    if (isadd(p)) {
+        p = cdr(p);
+        if (__is_negative(car(p))) {
             __emit_char('-');
-            if (will_be_displayed_as_fraction(defs_1.car(p))) {
+            if (will_be_displayed_as_fraction(car(p))) {
                 __emit_char(' ');
             }
         }
-        emit_term(defs_1.car(p));
-        p = defs_1.cdr(p);
-        while (defs_1.iscons(p)) {
-            if (__is_negative(defs_1.car(p))) {
+        emit_term(car(p));
+        p = cdr(p);
+        while (iscons(p)) {
+            if (__is_negative(car(p))) {
                 __emit_char(' ');
                 __emit_char('-');
                 __emit_char(' ');
@@ -152,8 +148,8 @@ function emit_expr(p) {
                 __emit_char('+');
                 __emit_char(' ');
             }
-            emit_term(defs_1.car(p));
-            p = defs_1.cdr(p);
+            emit_term(car(p));
+            p = cdr(p);
         }
     }
     else {
@@ -168,14 +164,14 @@ function emit_expr(p) {
     expr_level--;
 }
 function emit_unsigned_expr(p) {
-    if (defs_1.isadd(p)) {
-        p = defs_1.cdr(p);
+    if (isadd(p)) {
+        p = cdr(p);
         //    if (__is_negative(car(p)))
         //      __emit_char('-')
-        emit_term(defs_1.car(p));
-        p = defs_1.cdr(p);
-        while (defs_1.iscons(p)) {
-            if (__is_negative(defs_1.car(p))) {
+        emit_term(car(p));
+        p = cdr(p);
+        while (iscons(p)) {
+            if (__is_negative(car(p))) {
                 __emit_char(' ');
                 __emit_char('-');
                 __emit_char(' ');
@@ -185,8 +181,8 @@ function emit_unsigned_expr(p) {
                 __emit_char('+');
                 __emit_char(' ');
             }
-            emit_term(defs_1.car(p));
-            p = defs_1.cdr(p);
+            emit_term(car(p));
+            p = cdr(p);
         }
     }
     else {
@@ -196,16 +192,16 @@ function emit_unsigned_expr(p) {
     }
 }
 function __is_negative(p) {
-    if (is_1.isnegativenumber(p)) {
+    if (isnegativenumber(p)) {
         return true;
     }
-    if (defs_1.ismultiply(p) && is_1.isnegativenumber(defs_1.cadr(p))) {
+    if (ismultiply(p) && isnegativenumber(cadr(p))) {
         return true;
     }
     return false;
 }
 function emit_term(p) {
-    if (defs_1.ismultiply(p)) {
+    if (ismultiply(p)) {
         const n = count_denominators(p);
         if (n && level === 0) {
             emit_fraction(p, n);
@@ -219,44 +215,44 @@ function emit_term(p) {
     }
 }
 function isdenominator(p) {
-    return defs_1.ispower(p) && defs_1.cadr(p) !== symbol_1.symbol(defs_1.E) && __is_negative(defs_1.caddr(p));
+    return ispower(p) && cadr(p) !== symbol(E) && __is_negative(caddr(p));
 }
 function count_denominators(p) {
     let count = 0;
-    p = defs_1.cdr(p);
+    p = cdr(p);
     //  if (isfraction(car(p))) {
     //    count++
     //    p = cdr(p)
     //  }
-    while (defs_1.iscons(p)) {
-        const q = defs_1.car(p);
+    while (iscons(p)) {
+        const q = car(p);
         if (isdenominator(q)) {
             count++;
         }
-        p = defs_1.cdr(p);
+        p = cdr(p);
     }
     return count;
 }
 // n is the number of denominators, not counting a fraction like 1/2
 function emit_multiply(p, n) {
     if (n === 0) {
-        p = defs_1.cdr(p);
-        if (is_1.isplusone(defs_1.car(p)) || is_1.isminusone(defs_1.car(p))) {
-            p = defs_1.cdr(p);
+        p = cdr(p);
+        if (isplusone(car(p)) || isminusone(car(p))) {
+            p = cdr(p);
         }
-        emit_factor(defs_1.car(p));
-        p = defs_1.cdr(p);
-        while (defs_1.iscons(p)) {
+        emit_factor(car(p));
+        p = cdr(p);
+        while (iscons(p)) {
             __emit_char(' ');
-            emit_factor(defs_1.car(p));
-            p = defs_1.cdr(p);
+            emit_factor(car(p));
+            p = cdr(p);
         }
     }
     else {
         emit_numerators(p);
         __emit_char('/');
         // need grouping if more than one denominator
-        if (n > 1 || is_1.isfraction(defs_1.cadr(p))) {
+        if (n > 1 || isfraction(cadr(p))) {
             __emit_char('(');
             emit_denominators(p);
             __emit_char(')');
@@ -274,47 +270,47 @@ function emit_fraction(p, d) {
     let k2 = 0;
     let n = 0;
     let x = 0;
-    let A = defs_1.Constants.one;
-    let B = defs_1.Constants.one;
+    let A = Constants.one;
+    let B = Constants.one;
     // handle numerical coefficient
-    if (defs_1.isrational(defs_1.cadr(p))) {
-        A = abs_1.absval(bignum_1.mp_numerator(defs_1.cadr(p)));
-        B = bignum_1.mp_denominator(defs_1.cadr(p));
+    if (isrational(cadr(p))) {
+        A = absval(mp_numerator(cadr(p)));
+        B = mp_denominator(cadr(p));
     }
-    if (defs_1.isdouble(defs_1.cadr(p))) {
-        A = abs_1.absval(defs_1.cadr(p));
+    if (isdouble(cadr(p))) {
+        A = absval(cadr(p));
     }
     // count numerators
-    n = is_1.isplusone(A) ? 0 : 1;
-    p1 = defs_1.cdr(p);
-    if (defs_1.isNumericAtom(defs_1.car(p1))) {
-        p1 = defs_1.cdr(p1);
+    n = isplusone(A) ? 0 : 1;
+    p1 = cdr(p);
+    if (isNumericAtom(car(p1))) {
+        p1 = cdr(p1);
     }
-    while (defs_1.iscons(p1)) {
-        p2 = defs_1.car(p1);
+    while (iscons(p1)) {
+        p2 = car(p1);
         if (!isdenominator(p2)) {
             n++;
         }
-        p1 = defs_1.cdr(p1);
+        p1 = cdr(p1);
     }
     // emit numerators
     x = emit_x;
     k1 = yindex;
     count = 0;
     // emit numerical coefficient
-    if (!is_1.isplusone(A)) {
+    if (!isplusone(A)) {
         // p3 is A
         emit_number(A, 0); // p3 is A
         count++;
     }
     // skip over "multiply"
-    p1 = defs_1.cdr(p);
+    p1 = cdr(p);
     // skip over numerical coefficient, already handled
-    if (defs_1.isNumericAtom(defs_1.car(p1))) {
-        p1 = defs_1.cdr(p1);
+    if (isNumericAtom(car(p1))) {
+        p1 = cdr(p1);
     }
-    while (defs_1.iscons(p1)) {
-        p2 = defs_1.car(p1);
+    while (iscons(p1)) {
+        p2 = car(p1);
         if (!isdenominator(p2)) {
             if (count > 0) {
                 __emit_char(' ');
@@ -327,7 +323,7 @@ function emit_fraction(p, d) {
             }
             count++;
         }
-        p1 = defs_1.cdr(p1);
+        p1 = cdr(p1);
     }
     if (count === 0) {
         __emit_char('1');
@@ -335,17 +331,17 @@ function emit_fraction(p, d) {
     // emit denominators
     k2 = yindex;
     count = 0;
-    if (!is_1.isplusone(B)) {
+    if (!isplusone(B)) {
         emit_number(B, 0);
         count++;
         d++;
     }
-    p1 = defs_1.cdr(p);
-    if (defs_1.isrational(defs_1.car(p1))) {
-        p1 = defs_1.cdr(p1);
+    p1 = cdr(p);
+    if (isrational(car(p1))) {
+        p1 = cdr(p1);
     }
-    while (defs_1.iscons(p1)) {
-        p2 = defs_1.car(p1);
+    while (iscons(p1)) {
+        p2 = car(p1);
         if (isdenominator(p2)) {
             if (count > 0) {
                 __emit_char(' ');
@@ -353,36 +349,36 @@ function emit_fraction(p, d) {
             emit_denominator(p2, d);
             count++;
         }
-        p1 = defs_1.cdr(p1);
+        p1 = cdr(p1);
     }
     fixup_fraction(x, k1, k2);
 }
 // p points to a multiply
 function emit_numerators(p) {
-    let p1 = defs_1.Constants.one;
-    p = defs_1.cdr(p);
-    if (defs_1.isrational(defs_1.car(p))) {
-        p1 = abs_1.absval(bignum_1.mp_numerator(defs_1.car(p)));
-        p = defs_1.cdr(p);
+    let p1 = Constants.one;
+    p = cdr(p);
+    if (isrational(car(p))) {
+        p1 = absval(mp_numerator(car(p)));
+        p = cdr(p);
     }
-    else if (defs_1.isdouble(defs_1.car(p))) {
-        p1 = abs_1.absval(defs_1.car(p));
-        p = defs_1.cdr(p);
+    else if (isdouble(car(p))) {
+        p1 = absval(car(p));
+        p = cdr(p);
     }
     let n = 0;
-    if (!is_1.isplusone(p1)) {
+    if (!isplusone(p1)) {
         emit_number(p1, 0);
         n++;
     }
-    while (defs_1.iscons(p)) {
-        if (!isdenominator(defs_1.car(p))) {
+    while (iscons(p)) {
+        if (!isdenominator(car(p))) {
             if (n > 0) {
                 __emit_char(' ');
             }
-            emit_factor(defs_1.car(p));
+            emit_factor(car(p));
             n++;
         }
-        p = defs_1.cdr(p);
+        p = cdr(p);
     }
     if (n === 0) {
         __emit_char('1');
@@ -391,26 +387,26 @@ function emit_numerators(p) {
 // p points to a multiply
 function emit_denominators(p) {
     let n = 0;
-    p = defs_1.cdr(p);
-    if (is_1.isfraction(defs_1.car(p))) {
-        const p1 = bignum_1.mp_denominator(defs_1.car(p));
+    p = cdr(p);
+    if (isfraction(car(p))) {
+        const p1 = mp_denominator(car(p));
         emit_number(p1, 0);
         n++;
-        p = defs_1.cdr(p);
+        p = cdr(p);
     }
-    while (defs_1.iscons(p)) {
-        if (isdenominator(defs_1.car(p))) {
+    while (iscons(p)) {
+        if (isdenominator(car(p))) {
             if (n > 0) {
                 __emit_char(' ');
             }
-            emit_denominator(defs_1.car(p), 0);
+            emit_denominator(car(p), 0);
             n++;
         }
-        p = defs_1.cdr(p);
+        p = cdr(p);
     }
 }
 function emit_factor(p) {
-    if (defs_1.istensor(p)) {
+    if (istensor(p)) {
         if (level === 0) {
             //emit_tensor(p)
             emit_flat_tensor(p);
@@ -420,26 +416,26 @@ function emit_factor(p) {
         }
         return;
     }
-    if (defs_1.isdouble(p)) {
+    if (isdouble(p)) {
         emit_number(p, 0);
         return;
     }
-    if (defs_1.isadd(p) || defs_1.ismultiply(p)) {
+    if (isadd(p) || ismultiply(p)) {
         emit_subexpr(p);
         return;
     }
-    if (defs_1.ispower(p)) {
+    if (ispower(p)) {
         emit_power(p);
         return;
     }
-    if (defs_1.iscons(p)) {
+    if (iscons(p)) {
         //if (car(p) == symbol(FORMAL) && cadr(p).k == SYM)
         //  emit_symbol(cadr(p))
         //else
         emit_function(p);
         return;
     }
-    if (defs_1.isNumericAtom(p)) {
+    if (isNumericAtom(p)) {
         if (level === 0) {
             emit_numerical_fraction(p);
         }
@@ -448,18 +444,18 @@ function emit_factor(p) {
         }
         return;
     }
-    if (defs_1.issymbol(p)) {
+    if (issymbol(p)) {
         emit_symbol(p);
         return;
     }
-    if (defs_1.isstr(p)) {
+    if (isstr(p)) {
         emit_string(p);
     }
 }
 function emit_numerical_fraction(p) {
-    const A = abs_1.absval(bignum_1.mp_numerator(p));
-    const B = bignum_1.mp_denominator(p);
-    if (is_1.isplusone(B)) {
+    const A = absval(mp_numerator(p));
+    const B = mp_denominator(p);
+    if (isplusone(B)) {
         emit_number(A, 0);
         return;
     }
@@ -472,19 +468,19 @@ function emit_numerical_fraction(p) {
 }
 // if it's a factor then it doesn't need parens around it, i.e. 1/sin(theta)^2
 function isfactor(p) {
-    if (defs_1.iscons(p) && !defs_1.isadd(p) && !defs_1.ismultiply(p) && !defs_1.ispower(p)) {
+    if (iscons(p) && !isadd(p) && !ismultiply(p) && !ispower(p)) {
         return true;
     }
-    if (defs_1.issymbol(p)) {
+    if (issymbol(p)) {
         return true;
     }
-    if (is_1.isfraction(p)) {
+    if (isfraction(p)) {
         return false;
     }
-    if (is_1.isnegativenumber(p)) {
+    if (isnegativenumber(p)) {
         return false;
     }
-    if (defs_1.isNumericAtom(p)) {
+    if (isNumericAtom(p)) {
         return true;
     }
     return false;
@@ -493,42 +489,42 @@ function emit_power(p) {
     let k1 = 0;
     let k2 = 0;
     let x = 0;
-    if (defs_1.cadr(p) === symbol_1.symbol(defs_1.E)) {
+    if (cadr(p) === symbol(E)) {
         __emit_str('exp(');
-        emit_expr(defs_1.caddr(p));
+        emit_expr(caddr(p));
         __emit_char(')');
         return;
     }
     if (level > 0) {
-        if (is_1.isminusone(defs_1.caddr(p))) {
+        if (isminusone(caddr(p))) {
             __emit_char('1');
             __emit_char('/');
-            if (isfactor(defs_1.cadr(p))) {
-                emit_factor(defs_1.cadr(p));
+            if (isfactor(cadr(p))) {
+                emit_factor(cadr(p));
             }
             else {
-                emit_subexpr(defs_1.cadr(p));
+                emit_subexpr(cadr(p));
             }
         }
         else {
-            if (isfactor(defs_1.cadr(p))) {
-                emit_factor(defs_1.cadr(p));
+            if (isfactor(cadr(p))) {
+                emit_factor(cadr(p));
             }
             else {
-                emit_subexpr(defs_1.cadr(p));
+                emit_subexpr(cadr(p));
             }
             __emit_char('^');
-            if (isfactor(defs_1.caddr(p))) {
-                emit_factor(defs_1.caddr(p));
+            if (isfactor(caddr(p))) {
+                emit_factor(caddr(p));
             }
             else {
-                emit_subexpr(defs_1.caddr(p));
+                emit_subexpr(caddr(p));
             }
         }
         return;
     }
     // special case: 1 over something
-    if (__is_negative(defs_1.caddr(p))) {
+    if (__is_negative(caddr(p))) {
         x = emit_x;
         k1 = yindex;
         __emit_char('1');
@@ -540,15 +536,15 @@ function emit_power(p) {
         return;
     }
     k1 = yindex;
-    if (isfactor(defs_1.cadr(p))) {
-        emit_factor(defs_1.cadr(p));
+    if (isfactor(cadr(p))) {
+        emit_factor(cadr(p));
     }
     else {
-        emit_subexpr(defs_1.cadr(p));
+        emit_subexpr(cadr(p));
     }
     k2 = yindex;
     level++;
-    emit_expr(defs_1.caddr(p));
+    emit_expr(caddr(p));
     level--;
     fixup_power(k1, k2);
 }
@@ -558,90 +554,90 @@ function emit_denominator(p, n) {
     let k1 = 0;
     let k2 = 0;
     // special case: 1 over something
-    if (is_1.isminusone(defs_1.caddr(p))) {
+    if (isminusone(caddr(p))) {
         if (n === 1) {
-            emit_expr(defs_1.cadr(p));
+            emit_expr(cadr(p));
         }
         else {
-            emit_factor(defs_1.cadr(p));
+            emit_factor(cadr(p));
         }
         return;
     }
     k1 = yindex;
     // emit base
-    if (isfactor(defs_1.cadr(p))) {
-        emit_factor(defs_1.cadr(p));
+    if (isfactor(cadr(p))) {
+        emit_factor(cadr(p));
     }
     else {
-        emit_subexpr(defs_1.cadr(p));
+        emit_subexpr(cadr(p));
     }
     k2 = yindex;
     // emit exponent, don't emit minus sign
     level++;
-    emit_unsigned_expr(defs_1.caddr(p));
+    emit_unsigned_expr(caddr(p));
     level--;
     fixup_power(k1, k2);
 }
 function emit_function(p) {
-    if (defs_1.car(p) === symbol_1.symbol(defs_1.INDEX) && defs_1.issymbol(defs_1.cadr(p))) {
+    if (car(p) === symbol(INDEX) && issymbol(cadr(p))) {
         emit_index_function(p);
         return;
     }
-    if (defs_1.isfactorial(p)) {
+    if (isfactorial(p)) {
         emit_factorial_function(p);
         return;
     }
-    if (defs_1.car(p) === symbol_1.symbol(defs_1.DERIVATIVE)) {
+    if (car(p) === symbol(DERIVATIVE)) {
         __emit_char('d');
     }
     else {
-        emit_symbol(defs_1.car(p));
+        emit_symbol(car(p));
     }
     __emit_char('(');
-    p = defs_1.cdr(p);
-    if (defs_1.iscons(p)) {
-        emit_expr(defs_1.car(p));
-        p = defs_1.cdr(p);
-        while (defs_1.iscons(p)) {
+    p = cdr(p);
+    if (iscons(p)) {
+        emit_expr(car(p));
+        p = cdr(p);
+        while (iscons(p)) {
             __emit_char(',');
             //__emit_char(' ')
-            emit_expr(defs_1.car(p));
-            p = defs_1.cdr(p);
+            emit_expr(car(p));
+            p = cdr(p);
         }
     }
     __emit_char(')');
 }
 function emit_index_function(p) {
-    p = defs_1.cdr(p);
-    if (defs_1.caar(p) === symbol_1.symbol(defs_1.ADD) ||
-        defs_1.caar(p) === symbol_1.symbol(defs_1.MULTIPLY) ||
-        defs_1.caar(p) === symbol_1.symbol(defs_1.POWER) ||
-        defs_1.caar(p) === symbol_1.symbol(defs_1.FACTORIAL)) {
-        emit_subexpr(defs_1.car(p));
+    p = cdr(p);
+    if (caar(p) === symbol(ADD) ||
+        caar(p) === symbol(MULTIPLY) ||
+        caar(p) === symbol(POWER) ||
+        caar(p) === symbol(FACTORIAL)) {
+        emit_subexpr(car(p));
     }
     else {
-        emit_expr(defs_1.car(p));
+        emit_expr(car(p));
     }
     __emit_char('[');
-    p = defs_1.cdr(p);
-    if (defs_1.iscons(p)) {
-        emit_expr(defs_1.car(p));
-        p = defs_1.cdr(p);
-        while (defs_1.iscons(p)) {
+    p = cdr(p);
+    if (iscons(p)) {
+        emit_expr(car(p));
+        p = cdr(p);
+        while (iscons(p)) {
             __emit_char(',');
-            emit_expr(defs_1.car(p));
-            p = defs_1.cdr(p);
+            emit_expr(car(p));
+            p = cdr(p);
         }
     }
     __emit_char(']');
 }
 function emit_factorial_function(p) {
-    p = defs_1.cadr(p);
-    if (is_1.isfraction(p) ||
-        defs_1.isadd(p) ||
-        defs_1.ismultiply(p) ||
-        defs_1.ispower(p) ||
-        defs_1.isfactorial(p)) {
+    p = cadr(p);
+    if (isfraction(p) ||
+        isadd(p) ||
+        ismultiply(p) ||
+        ispower(p) ||
+        isfactorial(p)) {
         emit_subexpr(p);
     }
     else {
@@ -655,11 +651,11 @@ function emit_subexpr(p) {
     __emit_char(')');
 }
 function emit_symbol(p) {
-    if (p === symbol_1.symbol(defs_1.E)) {
+    if (p === symbol(E)) {
         __emit_str('exp(1)');
         return;
     }
-    const pPrintName = symbol_1.get_printname(p);
+    const pPrintName = get_printname(p);
     for (let i = 0; i < pPrintName.length; i++) {
         __emit_char(pPrintName[i]);
     }
@@ -762,7 +758,7 @@ function __emit_char(c) {
         return;
     }
     if (chartab[yindex] == null) {
-        defs_1.breakpoint;
+        breakpoint;
     }
     chartab[yindex].c = c;
     chartab[yindex].x = emit_x;
@@ -778,7 +774,7 @@ function __emit_str(s) {
 function emit_number(p, emit_sign) {
     let tmpString = '';
     switch (p.k) {
-        case defs_1.NUM:
+        case NUM:
             tmpString = p.q.a.toString();
             if (tmpString[0] === '-' && emit_sign === 0) {
                 tmpString = tmpString.substring(1);
@@ -795,8 +791,8 @@ function emit_number(p, emit_sign) {
                 __emit_char(tmpString[i]);
             }
             break;
-        case defs_1.DOUBLE:
-            tmpString = otherCFunctions_1.doubleToReasonableString(p.d);
+        case DOUBLE:
+            tmpString = doubleToReasonableString(p.d);
             if (tmpString[0] === '-' && emit_sign === 0) {
                 tmpString = tmpString.substring(1);
             }

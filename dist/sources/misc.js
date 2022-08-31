@@ -1,37 +1,31 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.sort = exports.square = exports.exponential = exports.yyexpand = exports.length = exports.cmp_expr = exports.sign = exports.lessp = exports.equal = exports.zero_matrix = void 0;
-const alloc_1 = require("../runtime/alloc");
-const defs_1 = require("../runtime/defs");
-const otherCFunctions_1 = require("../runtime/otherCFunctions");
-const symbol_1 = require("../runtime/symbol");
-const bignum_1 = require("./bignum");
-const eval_1 = require("./eval");
-const power_1 = require("./power");
-const tensor_1 = require("./tensor");
+import { alloc_tensor } from '../runtime/alloc';
+import { car, cdr, doexpand, E, iscons, isNumericAtom, isstr, issymbol, istensor, NIL } from '../runtime/defs';
+import { strcmp } from '../runtime/otherCFunctions';
+import { get_printname, symbol } from '../runtime/symbol';
+import { compare_numbers, integer } from './bignum';
+import { Eval } from './eval';
+import { power } from './power';
+import { compare_tensors } from './tensor';
 // both ints
-function zero_matrix(i, j) {
-    const m = alloc_1.alloc_tensor(i * j);
+export function zero_matrix(i, j) {
+    const m = alloc_tensor(i * j);
     m.ndim = 2;
     m.dim[0] = i;
     m.dim[1] = j;
     return m;
 }
-exports.zero_matrix = zero_matrix;
 // see cmp_expr definition, this
 // function alone just does simple structure comparison
 // or compares numbers (either rationals or integers or doubles)
 // but can't be used alone to test
 // more complex mathematical equalities...
-function equal(p1, p2) {
+export function equal(p1, p2) {
     return cmp_expr(p1, p2) === 0;
 }
-exports.equal = equal;
-function lessp(p1, p2) {
+export function lessp(p1, p2) {
     return cmp_expr(p1, p2) < 0;
 }
-exports.lessp = lessp;
-function sign(n) {
+export function sign(n) {
     if (n < 0) {
         return -1;
     }
@@ -42,7 +36,6 @@ function sign(n) {
         return 0;
     }
 }
-exports.sign = sign;
 // compares whether two expressions
 // have the same structure.
 // For example this method alone
@@ -56,89 +49,87 @@ exports.sign = sign;
 // though... a simplification of both sides
 // would then help. And even that might not
 // cut it in some cases...
-function cmp_expr(p1, p2) {
+export function cmp_expr(p1, p2) {
     let n = 0;
     if (p1 === p2) {
         return 0;
     }
-    if (p1 === symbol_1.symbol(defs_1.NIL)) {
+    if (p1 === symbol(NIL)) {
         return -1;
     }
-    if (p2 === symbol_1.symbol(defs_1.NIL)) {
+    if (p2 === symbol(NIL)) {
         return 1;
     }
-    if (defs_1.isNumericAtom(p1) && defs_1.isNumericAtom(p2)) {
-        return sign(bignum_1.compare_numbers(p1, p2));
+    if (isNumericAtom(p1) && isNumericAtom(p2)) {
+        return sign(compare_numbers(p1, p2));
     }
-    if (defs_1.isNumericAtom(p1)) {
+    if (isNumericAtom(p1)) {
         return -1;
     }
-    if (defs_1.isNumericAtom(p2)) {
+    if (isNumericAtom(p2)) {
         return 1;
     }
-    if (defs_1.isstr(p1) && defs_1.isstr(p2)) {
-        return sign(otherCFunctions_1.strcmp(p1.str, p2.str));
+    if (isstr(p1) && isstr(p2)) {
+        return sign(strcmp(p1.str, p2.str));
     }
-    if (defs_1.isstr(p1)) {
+    if (isstr(p1)) {
         return -1;
     }
-    if (defs_1.isstr(p2)) {
+    if (isstr(p2)) {
         return 1;
     }
-    if (defs_1.issymbol(p1) && defs_1.issymbol(p2)) {
-        return sign(otherCFunctions_1.strcmp(symbol_1.get_printname(p1), symbol_1.get_printname(p2)));
+    if (issymbol(p1) && issymbol(p2)) {
+        return sign(strcmp(get_printname(p1), get_printname(p2)));
     }
-    if (defs_1.issymbol(p1)) {
+    if (issymbol(p1)) {
         return -1;
     }
-    if (defs_1.issymbol(p2)) {
+    if (issymbol(p2)) {
         return 1;
     }
-    if (defs_1.istensor(p1) && defs_1.istensor(p2)) {
-        return tensor_1.compare_tensors(p1, p2);
+    if (istensor(p1) && istensor(p2)) {
+        return compare_tensors(p1, p2);
     }
-    if (defs_1.istensor(p1)) {
+    if (istensor(p1)) {
         return -1;
     }
-    if (defs_1.istensor(p2)) {
+    if (istensor(p2)) {
         return 1;
     }
     // recursion here
-    while (defs_1.iscons(p1) && defs_1.iscons(p2)) {
-        n = cmp_expr(defs_1.car(p1), defs_1.car(p2));
+    while (iscons(p1) && iscons(p2)) {
+        n = cmp_expr(car(p1), car(p2));
         if (n !== 0) {
             return n;
         }
-        p1 = defs_1.cdr(p1);
-        p2 = defs_1.cdr(p2);
+        p1 = cdr(p1);
+        p2 = cdr(p2);
     }
-    if (defs_1.iscons(p2)) {
+    if (iscons(p2)) {
         return -1;
     }
-    if (defs_1.iscons(p1)) {
+    if (iscons(p1)) {
         return 1;
     }
     return 0;
 }
-exports.cmp_expr = cmp_expr;
-function length(p) {
-    const n = defs_1.iscons(p) ? [...p].length : 0;
+export function length(p) {
+    const n = iscons(p) ? [...p].length : 0;
     return n;
 }
-exports.length = length;
 function unique(p) {
-    let p1 = symbol_1.symbol(defs_1.NIL);
-    const p2 = symbol_1.symbol(defs_1.NIL);
+    let p1 = symbol(NIL);
+    const p2 = symbol(NIL);
     unique_f(p, p1, p2);
-    if (p2 !== symbol_1.symbol(defs_1.NIL)) {
-        p1 = symbol_1.symbol(defs_1.NIL);
+    if (p2 !== symbol(NIL)) {
+        p1 = symbol(NIL);
     }
     p = p1;
     return p;
 }
 function unique_f(p, p1, p2) {
-    if (defs_1.isstr(p)) {
-        if (p1 === symbol_1.symbol(defs_1.NIL)) {
+    if (isstr(p)) {
+        if (p1 === symbol(NIL)) {
             p1 = p;
         }
         else if (p !== p1) {
@@ -146,27 +137,23 @@ function unique_f(p, p1, p2) {
         }
         return;
     }
-    while (defs_1.iscons(p)) {
-        unique_f(defs_1.car(p), p1, p2);
-        if (p2 !== symbol_1.symbol(defs_1.NIL)) {
+    while (iscons(p)) {
+        unique_f(car(p), p1, p2);
+        if (p2 !== symbol(NIL)) {
             return;
         }
-        p = defs_1.cdr(p);
+        p = cdr(p);
     }
 }
-function yyexpand(p1) {
-    return defs_1.doexpand(eval_1.Eval, p1);
+export function yyexpand(p1) {
+    return doexpand(Eval, p1);
 }
-exports.yyexpand = yyexpand;
-function exponential(p1) {
-    return power_1.power(symbol_1.symbol(defs_1.E), p1);
+export function exponential(p1) {
+    return power(symbol(E), p1);
 }
-exports.exponential = exponential;
-function square(p1) {
-    return power_1.power(p1, bignum_1.integer(2));
+export function square(p1) {
+    return power(p1, integer(2));
 }
-exports.square = square;
-function sort(arr) {
+export function sort(arr) {
     arr.sort(cmp_expr);
 }
-exports.sort = sort;

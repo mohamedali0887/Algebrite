@@ -1,14 +1,11 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.quickpower = exports.quickfactor = void 0;
-const defs_1 = require("../runtime/defs");
-const add_1 = require("./add");
-const bignum_1 = require("./bignum");
-const factor_1 = require("./factor");
-const is_1 = require("./is");
-const list_1 = require("./list");
-const multiply_1 = require("./multiply");
-const symbol_1 = require("../runtime/symbol");
+import { POWER } from '../runtime/defs';
+import { subtract } from './add';
+import { bignum_power_number, bignum_truncate, nativeInt } from './bignum';
+import { factor_small_number } from './factor';
+import { isZeroAtomOrTensor } from './is';
+import { makeList } from './list';
+import { multiply, multiply_all } from './multiply';
+import { symbol } from "../runtime/symbol";
 //-----------------------------------------------------------------------------
 //
 //  Factor small numerical powers
@@ -19,37 +16,35 @@ const symbol_1 = require("../runtime/symbol");
 //  Output:    Expr
 //
 //-----------------------------------------------------------------------------
-function quickfactor(BASE, EXPO) {
-    const arr = factor_1.factor_small_number(bignum_1.nativeInt(BASE));
+export function quickfactor(BASE, EXPO) {
+    const arr = factor_small_number(nativeInt(BASE));
     const n = arr.length;
     for (let i = 0; i < n; i += 2) {
-        arr.push(...quickpower(arr[i], multiply_1.multiply(arr[i + 1], EXPO))); // factored base, factored exponent * EXPO
+        arr.push(...quickpower(arr[i], multiply(arr[i + 1], EXPO))); // factored base, factored exponent * EXPO
     }
     // arr0 has n results from factor_number_raw()
     // on top of that are all the expressions from quickpower()
     // multiply the quickpower() results
-    return multiply_1.multiply_all(arr.slice(n));
+    return multiply_all(arr.slice(n));
 }
-exports.quickfactor = quickfactor;
 // BASE is a prime number so power is simpler
-function quickpower(BASE, EXPO) {
-    const p3 = bignum_1.bignum_truncate(EXPO);
-    const p4 = add_1.subtract(EXPO, p3);
+export function quickpower(BASE, EXPO) {
+    const p3 = bignum_truncate(EXPO);
+    const p4 = subtract(EXPO, p3);
     let fractionalPart;
     // fractional part of EXPO
-    if (!is_1.isZeroAtomOrTensor(p4)) {
-        fractionalPart = list_1.makeList(symbol_1.symbol(defs_1.POWER), BASE, p4);
+    if (!isZeroAtomOrTensor(p4)) {
+        fractionalPart = makeList(symbol(POWER), BASE, p4);
     }
-    const expo = bignum_1.nativeInt(p3);
+    const expo = nativeInt(p3);
     if (isNaN(expo)) {
-        const result = list_1.makeList(symbol_1.symbol(defs_1.POWER), BASE, p3);
+        const result = makeList(symbol(POWER), BASE, p3);
         return fractionalPart ? [fractionalPart, result] : [result];
     }
     if (expo === 0) {
         return [fractionalPart];
     }
-    const result = bignum_1.bignum_power_number(BASE, expo);
+    const result = bignum_power_number(BASE, expo);
     return fractionalPart ? [fractionalPart, result] : [result];
 }
-exports.quickpower = quickpower;
 //if SELFTEST

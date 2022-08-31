@@ -1,21 +1,18 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Eval_nroots = void 0;
-const alloc_1 = require("../runtime/alloc");
-const defs_1 = require("../runtime/defs");
-const run_1 = require("../runtime/run");
-const symbol_1 = require("../runtime/symbol");
-const misc_1 = require("../sources/misc");
-const add_1 = require("./add");
-const bignum_1 = require("./bignum");
-const coeff_1 = require("./coeff");
-const eval_1 = require("./eval");
-const float_1 = require("./float");
-const guess_1 = require("./guess");
-const imag_1 = require("./imag");
-const is_1 = require("./is");
-const multiply_1 = require("./multiply");
-const real_1 = require("./real");
+import { alloc_tensor } from '../runtime/alloc';
+import { caddr, cadr, Constants, DEBUG, isdouble, NIL } from '../runtime/defs';
+import { stop } from '../runtime/run';
+import { symbol } from "../runtime/symbol";
+import { cmp_expr } from '../sources/misc';
+import { add } from './add';
+import { double } from './bignum';
+import { coeff } from './coeff';
+import { Eval } from './eval';
+import { yyfloat } from './float';
+import { guess } from './guess';
+import { imag } from './imag';
+import { ispolyexpandedform } from './is';
+import { multiply } from './multiply';
+import { real } from './real';
 // find the roots of a polynomial numerically
 const NROOTS_YMAX = 101;
 const NROOTS_DELTA = 1.0e-6;
@@ -48,25 +45,25 @@ const nroots_c = [];
 for (let initNRoots = 0; initNRoots < NROOTS_YMAX; initNRoots++) {
     nroots_c[initNRoots] = new numericRootOfPolynomial();
 }
-function Eval_nroots(p1) {
-    let p2 = eval_1.Eval(defs_1.caddr(p1));
-    p1 = eval_1.Eval(defs_1.cadr(p1));
-    p2 = p2 === symbol_1.symbol(defs_1.NIL) ? guess_1.guess(p1) : p2;
-    if (!is_1.ispolyexpandedform(p1, p2)) {
-        run_1.stop('nroots: polynomial?');
+export function Eval_nroots(p1) {
+    let p2 = Eval(caddr(p1));
+    p1 = Eval(cadr(p1));
+    p2 = p2 === symbol(NIL) ? guess(p1) : p2;
+    if (!ispolyexpandedform(p1, p2)) {
+        stop('nroots: polynomial?');
     }
     // get the coefficients
-    const cs = coeff_1.coeff(p1, p2);
+    const cs = coeff(p1, p2);
     let n = cs.length;
     if (n > NROOTS_YMAX) {
-        run_1.stop('nroots: degree?');
+        stop('nroots: degree?');
     }
     // convert the coefficients to real and imaginary doubles
     for (let i = 0; i < n; i++) {
-        p1 = eval_1.Eval(float_1.yyfloat(real_1.real(cs[i])));
-        p2 = eval_1.Eval(float_1.yyfloat(imag_1.imag(cs[i])));
-        if (!defs_1.isdouble(p1) || !defs_1.isdouble(p2)) {
-            run_1.stop('nroots: coefficients?');
+        p1 = Eval(yyfloat(real(cs[i])));
+        p2 = Eval(yyfloat(imag(cs[i])));
+        if (!isdouble(p1) || !isdouble(p2)) {
+            stop('nroots: coefficients?');
         }
         nroots_c[i].r = p1.d;
         nroots_c[i].i = p2.d;
@@ -82,7 +79,7 @@ function Eval_nroots(p1) {
         if (Math.abs(nroots_a.i) < NROOTS_DELTA) {
             nroots_a.i = 0.0;
         }
-        roots.push(add_1.add(bignum_1.double(nroots_a.r), multiply_1.multiply(bignum_1.double(nroots_a.i), defs_1.Constants.imaginaryunit)));
+        roots.push(add(double(nroots_a.r), multiply(double(nroots_a.i), Constants.imaginaryunit)));
         NROOTS_divpoly(k);
     }
     // now make n equal to the number of roots
@@ -91,15 +88,14 @@ function Eval_nroots(p1) {
         return roots[0];
     }
     else if (n > 1) {
-        roots.sort(misc_1.cmp_expr);
-        p1 = alloc_1.alloc_tensor(n);
+        roots.sort(cmp_expr);
+        p1 = alloc_tensor(n);
         p1.tensor.ndim = 1;
         p1.tensor.dim[0] = n;
         p1.tensor.elem = roots;
         return p1;
     }
 }
-exports.Eval_nroots = Eval_nroots;
 // divide the polynomial by its leading coefficient
 function monic(n) {
     nroots_y.r = nroots_c[n - 1].r;
@@ -134,7 +130,7 @@ function findroot(n) {
         for (let k = 0; k < 1000; k++) {
             compute_fa(n);
             const nrabs = NROOTS_ABS(nroots_fa);
-            if (defs_1.DEBUG) {
+            if (DEBUG) {
                 console.log(`nrabs: ${nrabs}`);
             }
             if (nrabs < NROOTS_EPSILON) {
@@ -174,7 +170,7 @@ function findroot(n) {
                 nroots_b.i - (nroots_y.r * nroots_fb.i + nroots_y.i * nroots_fb.r);
         }
     }
-    run_1.stop('nroots: convergence error');
+    stop('nroots: convergence error');
 }
 function compute_fa(n) {
     // x = a
@@ -204,7 +200,7 @@ function NROOTS_divpoly(n) {
             nroots_c[k].i * nroots_a.r + nroots_c[k].r * nroots_a.i;
     }
     if (NROOTS_ABS(nroots_c[0]) > NROOTS_DELTA) {
-        run_1.stop('nroots: residual error');
+        stop('nroots: residual error');
     }
     for (let k = 0; k < n - 1; k++) {
         nroots_c[k].r = nroots_c[k + 1].r;

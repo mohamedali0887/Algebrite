@@ -1,10 +1,4 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.mgcd = void 0;
-const big_integer_1 = __importDefault(require("big-integer"));
+import bigInt from 'big-integer';
 //-----------------------------------------------------------------------------
 //
 //  Bignum GCD
@@ -22,8 +16,7 @@ const big_integer_1 = __importDefault(require("big-integer"));
 //  mgcd(0, v) = |v|
 //
 //-----------------------------------------------------------------------------
-function mgcd(u, v) {
-    return big_integer_1.default.gcd(u, v);
+export function mgcd(u, v) {
+    return bigInt.gcd(u, v);
 }
-exports.mgcd = mgcd;
 //if SELFTEST

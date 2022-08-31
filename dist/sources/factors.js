@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.factors = void 0;
-const defs_1 = require("../runtime/defs");
+import { isadd, ismultiply } from '../runtime/defs';
 // Push expression factors onto the stack. For example...
 //
 // Input
@@ -18,9 +15,9 @@ const defs_1 = require("../runtime/defs");
 //     [  1  ]
 //
 // but not necessarily in that order. Returns the number of factors.
-function factors(p) {
+export function factors(p) {
     const result = [];
-    if (defs_1.isadd(p)) {
+    if (isadd(p)) {
         p.tail().forEach((el) => result.push(...term_factors(el)));
     }
     else {
@@ -28,9 +25,8 @@ function factors(p) {
     }
     return result;
 }
-exports.factors = factors;
 function term_factors(p) {
-    if (defs_1.ismultiply(p)) {
+    if (ismultiply(p)) {
         return p.tail();
     }
     return [p];

@@ -1,43 +1,39 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Eval_mod = void 0;
-const defs_1 = require("../runtime/defs");
-const run_1 = require("../runtime/run");
-const symbol_1 = require("../runtime/symbol");
-const bignum_1 = require("./bignum");
-const eval_1 = require("./eval");
-const is_1 = require("./is");
-const list_1 = require("./list");
-const mmul_1 = require("./mmul");
-function Eval_mod(p1) {
-    const arg1 = eval_1.Eval(defs_1.cadr(p1));
-    let arg2 = eval_1.Eval(defs_1.caddr(p1));
+import { caddr, cadr, isdouble, isNumericAtom, MOD, Num } from '../runtime/defs';
+import { stop } from '../runtime/run';
+import { symbol } from "../runtime/symbol";
+import { integer, nativeInt } from './bignum';
+import { Eval } from './eval';
+import { isinteger, isZeroAtomOrTensor } from './is';
+import { makeList } from './list';
+import { mmod } from './mmul';
+export function Eval_mod(p1) {
+    const arg1 = Eval(cadr(p1));
+    let arg2 = Eval(caddr(p1));
     return mod(arg1, arg2);
 }
-exports.Eval_mod = Eval_mod;
 function mod(p1, p2) {
-    if (is_1.isZeroAtomOrTensor(p2)) {
-        run_1.stop('mod function: divide by zero');
+    if (isZeroAtomOrTensor(p2)) {
+        stop('mod function: divide by zero');
     }
-    if (!defs_1.isNumericAtom(p1) || !defs_1.isNumericAtom(p2)) {
-        return list_1.makeList(symbol_1.symbol(defs_1.MOD), p1, p2);
+    if (!isNumericAtom(p1) || !isNumericAtom(p2)) {
+        return makeList(symbol(MOD), p1, p2);
     }
-    if (defs_1.isdouble(p1)) {
-        const n = bignum_1.nativeInt(p1);
+    if (isdouble(p1)) {
+        const n = nativeInt(p1);
         if (isNaN(n)) {
-            run_1.stop('mod function: cannot convert float value to integer');
+            stop('mod function: cannot convert float value to integer');
         }
-        p1 = bignum_1.integer(n);
+        p1 = integer(n);
     }
-    if (defs_1.isdouble(p2)) {
-        const n = bignum_1.nativeInt(p2);
+    if (isdouble(p2)) {
+        const n = nativeInt(p2);
         if (isNaN(n)) {
-            run_1.stop('mod function: cannot convert float value to integer');
+            stop('mod function: cannot convert float value to integer');
         }
-        p2 = bignum_1.integer(n);
+        p2 = integer(n);
     }
-    if (!is_1.isinteger(p1) || !is_1.isinteger(p2)) {
-        run_1.stop('mod function: integer arguments expected');
+    if (!isinteger(p1) || !isinteger(p2)) {
+        stop('mod function: integer arguments expected');
     }
-    return new defs_1.Num(mmul_1.mmod(p1.q.a, p2.q.a));
+    return new Num(mmod(p1.q.a, p2.q.a));
 }

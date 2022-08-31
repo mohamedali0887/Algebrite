@@ -1,12 +1,9 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Eval_binomial = void 0;
-const defs_1 = require("../runtime/defs");
-const misc_1 = require("../sources/misc");
-const add_1 = require("./add");
-const eval_1 = require("./eval");
-const factorial_1 = require("./factorial");
-const multiply_1 = require("./multiply");
+import { caddr, cadr, Constants, isNumericAtom } from '../runtime/defs';
+import { lessp } from '../sources/misc';
+import { subtract } from './add';
+import { Eval } from './eval';
+import { factorial } from './factorial';
+import { divide } from './multiply';
 //  Binomial coefficient
 //
 //  Input:    tos-2    n
@@ -18,29 +15,28 @@ const multiply_1 = require("./multiply");
 //  binomial(n, k) = n! / k! / (n - k)!
 //
 //  The binomial coefficient vanishes for k < 0 or k > n. (A=B, p. 19)
-function Eval_binomial(p1) {
-    const N = eval_1.Eval(defs_1.cadr(p1));
-    const K = eval_1.Eval(defs_1.caddr(p1));
+export function Eval_binomial(p1) {
+    const N = Eval(cadr(p1));
+    const K = Eval(caddr(p1));
     return binomial(N, K);
 }
-exports.Eval_binomial = Eval_binomial;
 function binomial(N, K) {
     return ybinomial(N, K);
 }
 function ybinomial(N, K) {
     if (!BINOM_check_args(N, K)) {
-        return defs_1.Constants.zero;
+        return Constants.zero;
     }
-    return multiply_1.divide(multiply_1.divide(factorial_1.factorial(N), factorial_1.factorial(K)), factorial_1.factorial(add_1.subtract(N, K)));
+    return divide(divide(factorial(N), factorial(K)), factorial(subtract(N, K)));
 }
 function BINOM_check_args(N, K) {
-    if (defs_1.isNumericAtom(N) && misc_1.lessp(N, defs_1.Constants.zero)) {
+    if (isNumericAtom(N) && lessp(N, Constants.zero)) {
         return false;
     }
-    else if (defs_1.isNumericAtom(K) && misc_1.lessp(K, defs_1.Constants.zero)) {
+    else if (isNumericAtom(K) && lessp(K, Constants.zero)) {
         return false;
     }
-    else if (defs_1.isNumericAtom(N) && defs_1.isNumericAtom(K) && misc_1.lessp(N, K)) {
+    else if (isNumericAtom(N) && isNumericAtom(K) && lessp(N, K)) {
         return false;
     }
     else {

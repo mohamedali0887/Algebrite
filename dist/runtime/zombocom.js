@@ -1,28 +1,25 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.exec = exports.parse = void 0;
-const run_1 = require("./run");
-const bignum_1 = require("../sources/bignum");
-const list_1 = require("../sources/list");
-const scan_1 = require("../sources/scan");
-const defs_1 = require("./defs");
-const init_1 = require("./init");
-const symbol_1 = require("./symbol");
-if (!defs_1.defs.inited) {
-    defs_1.defs.inited = true;
-    init_1.init();
+import { check_stack, top_level_eval } from './run';
+import { double, integer } from '../sources/bignum';
+import { makeList } from '../sources/list';
+import { scan } from '../sources/scan';
+import { defs, NIL, reset_after_error } from './defs';
+import { init } from './init';
+import { get_binding, symbol, usr_symbol } from './symbol';
+if (!defs.inited) {
+    defs.inited = true;
+    init();
 }
 function parse_internal(argu) {
     if (typeof argu === 'string') {
-        const [, u] = scan_1.scan(argu);
+        const [, u] = scan(argu);
         return u;
     }
     else if (typeof argu === 'number') {
         if (argu % 1 === 0) {
-            return bignum_1.integer(argu);
+            return integer(argu);
         }
         else {
-            return bignum_1.double(argu);
+            return double(argu);
         }
     }
     else if (typeof argu.k === 'number') {
@@ -31,38 +28,36 @@ function parse_internal(argu) {
     }
     else {
         console.warn('unknown argument type', argu);
-        return symbol_1.symbol(defs_1.NIL);
+        return symbol(NIL);
     }
 }
-function parse(argu) {
+export function parse(argu) {
     let data;
     try {
         data = parse_internal(argu);
-        run_1.check_stack();
+        check_stack();
     }
     catch (error) {
-        defs_1.reset_after_error();
+        reset_after_error();
         throw error;
     }
     return data;
 }
-exports.parse = parse;
 // exec handles the running ia JS of all the algebrite
 // functions. The function name is passed in "name" and
 // the corresponding function is pushed at the top of the stack
-function exec(name, ...argus) {
+export function exec(name, ...argus) {
     let result;
-    const fn = symbol_1.get_binding(symbol_1.usr_symbol(name));
-    run_1.check_stack();
-    const p1 = list_1.makeList(fn, ...argus.map(parse_internal));
+    const fn = get_binding(usr_symbol(name));
+    check_stack();
+    const p1 = makeList(fn, ...argus.map(parse_internal));
     try {
-        result = run_1.top_level_eval(p1);
-        run_1.check_stack();
+        result = top_level_eval(p1);
+        check_stack();
     }
     catch (error) {
-        defs_1.reset_after_error();
+        reset_after_error();
         throw error;
     }
     return result;
 }
-exports.exec = exec;
