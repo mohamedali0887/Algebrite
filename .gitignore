@@ -9,6 +9,7 @@ dist/*
 !dist/algebrite.bundle-for-browser-min.js
 !dist/algebrite.bundle-for-browser.js
 !dist/index.js
+!dist/index.d.ts
 
 !dist/runtime
 !dist/sources
