@@ -1,7 +1,10 @@
-import { cadr, MAXPRIMETAB, primetab } from '../runtime/defs';
-import { stop } from '../runtime/run';
-import { integer, nativeInt } from './bignum';
-import { Eval } from './eval';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Eval_prime = void 0;
+const defs_1 = require("../runtime/defs");
+const run_1 = require("../runtime/run");
+const bignum_1 = require("./bignum");
+const eval_1 = require("./eval");
 //-----------------------------------------------------------------------------
 //
 //  Look up the nth prime
@@ -11,14 +14,15 @@ import { Eval } from './eval';
 //  Output:    nth prime
 //
 //-----------------------------------------------------------------------------
-export function Eval_prime(p1) {
-    return prime(Eval(cadr(p1)));
+function Eval_prime(p1) {
+    return prime(eval_1.Eval(defs_1.cadr(p1)));
 }
+exports.Eval_prime = Eval_prime;
 function prime(p1) {
-    let n = nativeInt(p1);
-    if (n < 1 || n > MAXPRIMETAB) {
-        stop('prime: Argument out of range.');
+    let n = bignum_1.nativeInt(p1);
+    if (n < 1 || n > defs_1.MAXPRIMETAB) {
+        run_1.stop('prime: Argument out of range.');
     }
-    n = primetab[n - 1];
-    return integer(n);
+    n = defs_1.primetab[n - 1];
+    return bignum_1.integer(n);
 }

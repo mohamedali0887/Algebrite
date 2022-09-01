@@ -1,16 +1,19 @@
-import { cadddr, caddr, cadr, car, Constants, COS, issymbol, LEGENDRE, NIL, SECRETX, SIN } from '../runtime/defs';
-import { symbol } from "../runtime/symbol";
-import { square } from '../sources/misc';
-import { subtract } from './add';
-import { integer, nativeInt, rational } from './bignum';
-import { cosine } from './cos';
-import { derivative } from './derivative';
-import { Eval } from './eval';
-import { makeList } from './list';
-import { divide, multiply, negate } from './multiply';
-import { power } from './power';
-import { sine } from './sin';
-import { subst } from './subst';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Eval_legendre = void 0;
+const defs_1 = require("../runtime/defs");
+const symbol_1 = require("../runtime/symbol");
+const misc_1 = require("../sources/misc");
+const add_1 = require("./add");
+const bignum_1 = require("./bignum");
+const cos_1 = require("./cos");
+const derivative_1 = require("./derivative");
+const eval_1 = require("./eval");
+const list_1 = require("./list");
+const multiply_1 = require("./multiply");
+const power_1 = require("./power");
+const sin_1 = require("./sin");
+const subst_1 = require("./subst");
 /*
  Legendre function
 
@@ -40,36 +43,37 @@ For m > 0
 
   P(x,n,m) = (-1)^m * (1-x^2)^(m/2) * d^m/dx^m P(x,n)
 */
-export function Eval_legendre(p1) {
-    const X = Eval(cadr(p1));
-    const N = Eval(caddr(p1));
-    const p2 = Eval(cadddr(p1));
-    const M = p2 === symbol(NIL) ? Constants.zero : p2;
+function Eval_legendre(p1) {
+    const X = eval_1.Eval(defs_1.cadr(p1));
+    const N = eval_1.Eval(defs_1.caddr(p1));
+    const p2 = eval_1.Eval(defs_1.cadddr(p1));
+    const M = p2 === symbol_1.symbol(defs_1.NIL) ? defs_1.Constants.zero : p2;
     return legendre(X, N, M);
 }
+exports.Eval_legendre = Eval_legendre;
 function legendre(X, N, M) {
     return __legendre(X, N, M);
 }
 function __legendre(X, N, M) {
-    let n = nativeInt(N);
-    let m = nativeInt(M);
+    let n = bignum_1.nativeInt(N);
+    let m = bignum_1.nativeInt(M);
     if (n < 0 || isNaN(n) || m < 0 || isNaN(m)) {
-        return makeList(symbol(LEGENDRE), X, N, M);
+        return list_1.makeList(symbol_1.symbol(defs_1.LEGENDRE), X, N, M);
     }
     let result;
-    if (issymbol(X)) {
+    if (defs_1.issymbol(X)) {
         result = __legendre2(n, m, X);
     }
     else {
-        const expr = __legendre2(n, m, symbol(SECRETX));
-        result = Eval(subst(expr, symbol(SECRETX), X));
+        const expr = __legendre2(n, m, symbol_1.symbol(defs_1.SECRETX));
+        result = eval_1.Eval(subst_1.subst(expr, symbol_1.symbol(defs_1.SECRETX), X));
     }
     result = __legendre3(result, m, X) || result;
     return result;
 }
 function __legendre2(n, m, X) {
-    let Y0 = Constants.zero;
-    let Y1 = Constants.one;
+    let Y0 = defs_1.Constants.zero;
+    let Y1 = defs_1.Constants.one;
     //  i=1  Y0 = 0
     //    Y1 = 1
     //    ((2*i+1)*x*Y1 - i*Y0) / i = x
@@ -82,12 +86,12 @@ function __legendre2(n, m, X) {
     //    Y1 = -1/2 + 3/2*x^2
     //    ((2*i+1)*x*Y1 - i*Y0) / i = -3/2*x + 5/2*x^3
     for (let i = 0; i < n; i++) {
-        const divided = divide(subtract(multiply(multiply(integer(2 * i + 1), X), Y1), multiply(integer(i), Y0)), integer(i + 1));
+        const divided = multiply_1.divide(add_1.subtract(multiply_1.multiply(multiply_1.multiply(bignum_1.integer(2 * i + 1), X), Y1), multiply_1.multiply(bignum_1.integer(i), Y0)), bignum_1.integer(i + 1));
         Y0 = Y1;
         Y1 = divided;
     }
     for (let i = 0; i < m; i++) {
-        Y1 = derivative(Y1, X);
+        Y1 = derivative_1.derivative(Y1, X);
     }
     return Y1;
 }
@@ -96,16 +100,16 @@ function __legendre3(p1, m, X) {
     if (m === 0) {
         return;
     }
-    let base = subtract(Constants.one, square(X));
-    if (car(X) === symbol(COS)) {
-        base = square(sine(cadr(X)));
+    let base = add_1.subtract(defs_1.Constants.one, misc_1.square(X));
+    if (defs_1.car(X) === symbol_1.symbol(defs_1.COS)) {
+        base = misc_1.square(sin_1.sine(defs_1.cadr(X)));
     }
-    else if (car(X) === symbol(SIN)) {
-        base = square(cosine(cadr(X)));
+    else if (defs_1.car(X) === symbol_1.symbol(defs_1.SIN)) {
+        base = misc_1.square(cos_1.cosine(defs_1.cadr(X)));
     }
-    let result = multiply(p1, power(base, multiply(integer(m), rational(1, 2))));
+    let result = multiply_1.multiply(p1, power_1.power(base, multiply_1.multiply(bignum_1.integer(m), bignum_1.rational(1, 2))));
     if (m % 2) {
-        result = negate(result);
+        result = multiply_1.negate(result);
     }
     return result;
 }

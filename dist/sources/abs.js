@@ -1,24 +1,27 @@
-import { ABS, caddr, cadr, car, Constants, defs, E, isadd, ismultiply, ispower, istensor, PI } from '../runtime/defs';
-import { Find, findPossibleClockForm, findPossibleExponentialForm } from '../runtime/find';
-import { stop } from '../runtime/run';
-import { symbol } from "../runtime/symbol";
-import { exponential } from '../sources/misc';
-import { add } from './add';
-import { integer, rational } from './bignum';
-import { conjugate } from './conj';
-import { denominator } from './denominator';
-import { Eval } from './eval';
-import { zzfloat } from './float';
-import { imag } from './imag';
-import { inner } from './inner';
-import { equaln, isnegativenumber, isnegativeterm, ispositivenumber, isZeroAtomOrTensor } from './is';
-import { makeList } from './list';
-import { divide, multiply, negate } from './multiply';
-import { numerator } from './numerator';
-import { power } from './power';
-import { real } from './real';
-import { rect } from './rect';
-import { simplify, simplify_trig } from './simplify';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.absval = exports.abs = exports.absValFloat = exports.Eval_abs = void 0;
+const defs_1 = require("../runtime/defs");
+const find_1 = require("../runtime/find");
+const run_1 = require("../runtime/run");
+const symbol_1 = require("../runtime/symbol");
+const misc_1 = require("../sources/misc");
+const add_1 = require("./add");
+const bignum_1 = require("./bignum");
+const conj_1 = require("./conj");
+const denominator_1 = require("./denominator");
+const eval_1 = require("./eval");
+const float_1 = require("./float");
+const imag_1 = require("./imag");
+const inner_1 = require("./inner");
+const is_1 = require("./is");
+const list_1 = require("./list");
+const multiply_1 = require("./multiply");
+const numerator_1 = require("./numerator");
+const power_1 = require("./power");
+const real_1 = require("./real");
+const rect_1 = require("./rect");
+const simplify_1 = require("./simplify");
 //(docs are generated from top-level comments, keep an eye on the formatting!)
 /* abs =====================================================================
 
@@ -65,12 +68,14 @@ Notes
      automatic.
 */
 const DEBUG_ABS = false;
-export function Eval_abs(p1) {
-    return abs(Eval(cadr(p1)));
+function Eval_abs(p1) {
+    return abs(eval_1.Eval(defs_1.cadr(p1)));
 }
-export function absValFloat(p1) {
-    return zzfloat(Eval(absval(Eval(p1))));
+exports.Eval_abs = Eval_abs;
+function absValFloat(p1) {
+    return float_1.zzfloat(eval_1.Eval(absval(eval_1.Eval(p1))));
 }
+exports.absValFloat = absValFloat;
 // zzfloat of an abs doesn't necessarily result in a double
 // , for example if there are variables. But
 // in many of the tests there should be indeed
@@ -78,12 +83,12 @@ export function absValFloat(p1) {
 // when that doesn't happen for those tests.
 //if !isdouble(stack[tos-1])
 //  stop("absValFloat should return a double and instead got: " + stack[tos-1])
-export function abs(p1) {
-    const numer = numerator(p1);
+function abs(p1) {
+    const numer = numerator_1.numerator(p1);
     const absNumer = absval(numer);
-    const denom = denominator(p1);
+    const denom = denominator_1.denominator(p1);
     const absDenom = absval(denom);
-    const result = divide(absNumer, absDenom);
+    const result = multiply_1.divide(absNumer, absDenom);
     if (DEBUG_ABS) {
         console.trace('>>>>  ABS of ' + p1);
         console.log(`ABS numerator ${numer}`);
@@ -95,33 +100,34 @@ export function abs(p1) {
     }
     return result;
 }
-export function absval(p1) {
+exports.abs = abs;
+function absval(p1) {
     const input = p1;
     if (DEBUG_ABS) {
         console.log(`ABS of ${p1}`);
     }
     // handle all the "number" cases first -----------------------------------------
-    if (isZeroAtomOrTensor(p1)) {
+    if (is_1.isZeroAtomOrTensor(p1)) {
         if (DEBUG_ABS) {
             console.log(` abs: ${p1} just zero`);
-            console.log(' --> ABS of ' + input + ' : ' + Constants.zero);
+            console.log(' --> ABS of ' + input + ' : ' + defs_1.Constants.zero);
         }
-        return Constants.zero;
+        return defs_1.Constants.zero;
     }
-    if (isnegativenumber(p1)) {
+    if (is_1.isnegativenumber(p1)) {
         if (DEBUG_ABS) {
             console.log(` abs: ${p1} just a negative`);
         }
-        return negate(p1);
+        return multiply_1.negate(p1);
     }
-    if (ispositivenumber(p1)) {
+    if (is_1.ispositivenumber(p1)) {
         if (DEBUG_ABS) {
             console.log(` abs: ${p1} just a positive`);
             console.log(` --> ABS of ${input} : ${p1}`);
         }
         return p1;
     }
-    if (p1 === symbol(PI)) {
+    if (p1 === symbol_1.symbol(defs_1.PI)) {
         if (DEBUG_ABS) {
             console.log(` abs: ${p1} of PI`);
             console.log(` --> ABS of ${input} : ${p1}`);
@@ -137,30 +143,30 @@ export function absval(p1) {
     // Note that for this routine to give a correct result, this
     // must be a sum where a complex number appears.
     // If we apply this to "a+b", we get an incorrect result.
-    if (isadd(p1) &&
-        (findPossibleClockForm(p1, p1) ||
-            findPossibleExponentialForm(p1) ||
-            Find(p1, Constants.imaginaryunit))) {
+    if (defs_1.isadd(p1) &&
+        (find_1.findPossibleClockForm(p1, p1) ||
+            find_1.findPossibleExponentialForm(p1) ||
+            find_1.Find(p1, defs_1.Constants.imaginaryunit))) {
         if (DEBUG_ABS) {
             console.log(` abs: ${p1} is a sum`);
             console.log('abs of a sum');
         }
         // sum
-        p1 = rect(p1); // convert polar terms, if any
-        const result = simplify_trig(power(
+        p1 = rect_1.rect(p1); // convert polar terms, if any
+        const result = simplify_1.simplify_trig(power_1.power(
         // prettier-ignore
-        add(power(real(p1), integer(2)), power(imag(p1), integer(2))), rational(1, 2)));
+        add_1.add(power_1.power(real_1.real(p1), bignum_1.integer(2)), power_1.power(imag_1.imag(p1), bignum_1.integer(2))), bignum_1.rational(1, 2)));
         if (DEBUG_ABS) {
             console.log(` --> ABS of ${input} : ${result}`);
         }
         return result;
     }
-    if (ispower(p1) && equaln(cadr(p1), -1)) {
+    if (defs_1.ispower(p1) && is_1.equaln(defs_1.cadr(p1), -1)) {
         // -1 to any power
-        const one = Constants.One();
+        const one = defs_1.Constants.One();
         if (DEBUG_ABS) {
             console.log(` abs: ${p1} is -1 to any power`);
-            const msg = defs.evaluatingAsFloats
+            const msg = defs_1.defs.evaluatingAsFloats
                 ? ' abs: numeric, so result is 1.0'
                 : ' abs: symbolic, so result is 1';
             console.log(msg);
@@ -169,8 +175,8 @@ export function absval(p1) {
         return one;
     }
     // abs(a^b) is equal to abs(a)^b IF b is positive
-    if (ispower(p1) && ispositivenumber(caddr(p1))) {
-        const result = power(abs(cadr(p1)), caddr(p1));
+    if (defs_1.ispower(p1) && is_1.ispositivenumber(defs_1.caddr(p1))) {
+        const result = power_1.power(abs(defs_1.cadr(p1)), defs_1.caddr(p1));
         if (DEBUG_ABS) {
             console.log(` abs: ${p1} is something to the power of a positive number`);
             console.log(` --> ABS of ${input} : ${result}`);
@@ -178,26 +184,26 @@ export function absval(p1) {
         return result;
     }
     // abs(e^something)
-    if (ispower(p1) && cadr(p1) === symbol(E)) {
+    if (defs_1.ispower(p1) && defs_1.cadr(p1) === symbol_1.symbol(defs_1.E)) {
         // exponential
-        const result = exponential(real(caddr(p1)));
+        const result = misc_1.exponential(real_1.real(defs_1.caddr(p1)));
         if (DEBUG_ABS) {
             console.log(` abs: ${p1} is an exponential`);
             console.log(` --> ABS of ${input} : ${result}`);
         }
         return result;
     }
-    if (ismultiply(p1)) {
+    if (defs_1.ismultiply(p1)) {
         // product
-        const result = p1.tail().map(absval).reduce(multiply);
+        const result = p1.tail().map(absval).reduce(multiply_1.multiply);
         if (DEBUG_ABS) {
             console.log(` abs: ${p1} is a product`);
             console.log(` --> ABS of ${input} : ${result}`);
         }
         return result;
     }
-    if (car(p1) === symbol(ABS)) {
-        const absOfAbs = makeList(symbol(ABS), cadr(p1));
+    if (defs_1.car(p1) === symbol_1.symbol(defs_1.ABS)) {
+        const absOfAbs = list_1.makeList(symbol_1.symbol(defs_1.ABS), defs_1.cadr(p1));
         if (DEBUG_ABS) {
             console.log(` abs: ${p1} is abs of a abs`);
             console.log(` --> ABS of ${input} : ${absOfAbs}`);
@@ -234,23 +240,24 @@ export function absval(p1) {
       restore()
       return
     */
-    if (istensor(p1)) {
+    if (defs_1.istensor(p1)) {
         return absval_tensor(p1);
     }
-    if (isnegativeterm(p1) || (isadd(p1) && isnegativeterm(cadr(p1)))) {
-        p1 = negate(p1);
+    if (is_1.isnegativeterm(p1) || (defs_1.isadd(p1) && is_1.isnegativeterm(defs_1.cadr(p1)))) {
+        p1 = multiply_1.negate(p1);
     }
-    const l = makeList(symbol(ABS), p1);
+    const l = list_1.makeList(symbol_1.symbol(defs_1.ABS), p1);
     if (DEBUG_ABS) {
         console.log(` abs: ${p1} is nothing decomposable`);
         console.log(` --> ABS of ${input} : ${l}`);
     }
     return l;
 }
+exports.absval = absval;
 // also called the "norm" of a vector
 function absval_tensor(p1) {
     if (p1.tensor.ndim !== 1) {
-        stop('abs(tensor) with tensor rank > 1');
+        run_1.stop('abs(tensor) with tensor rank > 1');
     }
-    return Eval(simplify(power(inner(p1, conjugate(p1)), rational(1, 2))));
+    return eval_1.Eval(simplify_1.simplify(power_1.power(inner_1.inner(p1, conj_1.conjugate(p1)), bignum_1.rational(1, 2))));
 }

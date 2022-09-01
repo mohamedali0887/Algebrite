@@ -1,12 +1,15 @@
-import { cadr, Constants, isdouble, isrational, MSIGN, MZERO, SGN } from '../runtime/defs';
-import { symbol } from "../runtime/symbol";
-import { absval } from './abs';
-import { Eval } from './eval';
-import { iscomplexnumber, isnegativeterm } from './is';
-import { makeList } from './list';
-import { mmul } from './mmul';
-import { multiply, negate } from './multiply';
-import { power } from './power';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.sgn = exports.Eval_sgn = void 0;
+const defs_1 = require("../runtime/defs");
+const symbol_1 = require("../runtime/symbol");
+const abs_1 = require("./abs");
+const eval_1 = require("./eval");
+const is_1 = require("./is");
+const list_1 = require("./list");
+const mmul_1 = require("./mmul");
+const multiply_1 = require("./multiply");
+const power_1 = require("./power");
 //-----------------------------------------------------------------------------
 //
 //  Author : philippe.billet@noos.fr
@@ -15,33 +18,35 @@ import { power } from './power';
 //
 //
 //-----------------------------------------------------------------------------
-export function Eval_sgn(p1) {
-    return sgn(Eval(cadr(p1)));
+function Eval_sgn(p1) {
+    return sgn(eval_1.Eval(defs_1.cadr(p1)));
 }
-export function sgn(X) {
-    if (isdouble(X)) {
+exports.Eval_sgn = Eval_sgn;
+function sgn(X) {
+    if (defs_1.isdouble(X)) {
         if (X.d > 0) {
-            return Constants.one;
+            return defs_1.Constants.one;
         }
         if (X.d === 0) {
-            return Constants.one;
+            return defs_1.Constants.one;
         }
-        return Constants.negOne;
+        return defs_1.Constants.negOne;
     }
-    if (isrational(X)) {
-        if (MSIGN(mmul(X.q.a, X.q.b)) === -1) {
-            return Constants.negOne;
+    if (defs_1.isrational(X)) {
+        if (defs_1.MSIGN(mmul_1.mmul(X.q.a, X.q.b)) === -1) {
+            return defs_1.Constants.negOne;
         }
-        if (MZERO(mmul(X.q.a, X.q.b))) {
-            return Constants.zero;
+        if (defs_1.MZERO(mmul_1.mmul(X.q.a, X.q.b))) {
+            return defs_1.Constants.zero;
         }
-        return Constants.one;
+        return defs_1.Constants.one;
     }
-    if (iscomplexnumber(X)) {
-        return multiply(power(Constants.negOne, absval(X)), X);
+    if (is_1.iscomplexnumber(X)) {
+        return multiply_1.multiply(power_1.power(defs_1.Constants.negOne, abs_1.absval(X)), X);
     }
-    if (isnegativeterm(X)) {
-        return multiply(makeList(symbol(SGN), negate(X)), Constants.negOne);
+    if (is_1.isnegativeterm(X)) {
+        return multiply_1.multiply(list_1.makeList(symbol_1.symbol(defs_1.SGN), multiply_1.negate(X)), defs_1.Constants.negOne);
     }
-    return makeList(symbol(SGN), X);
+    return list_1.makeList(symbol_1.symbol(defs_1.SGN), X);
 }
+exports.sgn = sgn;

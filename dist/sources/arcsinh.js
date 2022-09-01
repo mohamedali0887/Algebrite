@@ -1,9 +1,12 @@
-import { ARCSINH, cadr, car, Constants, isdouble, SINH } from '../runtime/defs';
-import { symbol } from "../runtime/symbol";
-import { double } from './bignum';
-import { Eval } from './eval';
-import { isZeroAtomOrTensor } from './is';
-import { makeList } from './list';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Eval_arcsinh = void 0;
+const defs_1 = require("../runtime/defs");
+const symbol_1 = require("../runtime/symbol");
+const bignum_1 = require("./bignum");
+const eval_1 = require("./eval");
+const is_1 = require("./is");
+const list_1 = require("./list");
 /* arcsinh =====================================================================
 
 Tags
@@ -19,20 +22,21 @@ General description
 Returns the inverse hyperbolic sine of x.
 
 */
-export function Eval_arcsinh(x) {
-    return arcsinh(Eval(cadr(x)));
+function Eval_arcsinh(x) {
+    return arcsinh(eval_1.Eval(defs_1.cadr(x)));
 }
+exports.Eval_arcsinh = Eval_arcsinh;
 function arcsinh(x) {
-    if (car(x) === symbol(SINH)) {
-        return cadr(x);
+    if (defs_1.car(x) === symbol_1.symbol(defs_1.SINH)) {
+        return defs_1.cadr(x);
     }
-    if (isdouble(x)) {
+    if (defs_1.isdouble(x)) {
         let { d } = x;
         d = Math.log(d + Math.sqrt(d * d + 1.0));
-        return double(d);
+        return bignum_1.double(d);
     }
-    if (isZeroAtomOrTensor(x)) {
-        return Constants.zero;
+    if (is_1.isZeroAtomOrTensor(x)) {
+        return defs_1.Constants.zero;
     }
-    return makeList(symbol(ARCSINH), x);
+    return list_1.makeList(symbol_1.symbol(defs_1.ARCSINH), x);
 }

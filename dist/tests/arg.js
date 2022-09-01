@@ -1,5 +1,7 @@
-import { run_test } from '../test-harness';
-run_test([
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const test_harness_1 = require("../test-harness");
+test_harness_1.run_test([
     // wrong
     //"arg(-1)",
     //"-pi",
@@ -21,7 +23,7 @@ run_test([
     '1/3*pi',
 ]);
 // check when not assuming real variables ----------
-run_test([
+test_harness_1.run_test([
     'assumeRealVariables = 0',
     '',
     'arg(a)',
@@ -42,7 +44,7 @@ run_test([
     'assumeRealVariables = 1',
     '',
 ]);
-run_test([
+test_harness_1.run_test([
     'assumeRealVariables = 1',
     '',
     // --------------------------------------------------

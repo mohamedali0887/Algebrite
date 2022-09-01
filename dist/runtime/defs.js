@@ -1,25 +1,32 @@
-import bigInt from 'big-integer';
-import { collectLatexStringFromReturnValue, print_expr, } from '../sources/print';
-import { symbol } from './symbol';
-export function breakpoint() { }
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.evalFloats = exports.evalPolar = exports.doexpand = exports.noexpand = exports.Constants = exports.$ = exports.reset_after_error = exports.MEQUAL = exports.MZERO = exports.MSIGN = exports.isidentitymatrix = exports.isinv = exports.istranspose = exports.isinnerordot = exports.isfactorial = exports.ispower = exports.ismultiply = exports.isadd = exports.caddaddr = exports.cdddaddr = exports.caddadr = exports.cddaddr = exports.cadaddr = exports.caddddr = exports.cddddr = exports.cadddr = exports.cdaddr = exports.caddar = exports.cadadr = exports.caaddr = exports.cdddr = exports.cddar = exports.cdadr = exports.cadar = exports.caddr = exports.caadr = exports.cddr = exports.cdar = exports.cadr = exports.caar = exports.cdr = exports.car = exports.issymbol = exports.isNumericAtomOrTensor = exports.istensor = exports.isstr = exports.isNumericAtom = exports.isdouble = exports.isrational = exports.iscons = exports.dotprod_unicode = exports.transpose_unicode = exports.logbuf = exports.mtotal = exports.primetab = exports.parse_time_simplifications = exports.predefinedSymbolsInGlobalScope_doNotTrackInDependencies = exports.MAXDIM = exports.MAX_CONSECUTIVE_APPLICATIONS_OF_SINGLE_RULE = exports.MAX_CONSECUTIVE_APPLICATIONS_OF_ALL_RULES = exports.MAXPRIMETAB = exports.E = exports.C6 = exports.C5 = exports.C4 = exports.C3 = exports.C2 = exports.C1 = exports.SYMBOL_X_UNDERSCORE = exports.SYMBOL_B_UNDERSCORE = exports.SYMBOL_A_UNDERSCORE = exports.SYMBOL_IDENTITY_MATRIX = exports.SYMBOL_Z = exports.SYMBOL_Y = exports.SYMBOL_X = exports.SYMBOL_T = exports.SYMBOL_S = exports.SYMBOL_R = exports.SYMBOL_N = exports.SYMBOL_J = exports.SYMBOL_I = exports.SYMBOL_D = exports.SYMBOL_C = exports.SYMBOL_B = exports.SYMBOL_A = exports.PI = exports.VERSION = exports.SECRETX = exports.METAX = exports.METAB = exports.METAA = exports.DRAWX = exports.YYE = exports.MAX_FIXED_PRINTOUT_DIGITS = exports.FORCE_FIXED_PRINTOUT = exports.TRACE = exports.ASSUME_REAL_VARIABLES = exports.BAKE = exports.AUTOEXPAND = exports.LAST_PLAIN_PRINT = exports.LAST_LIST_PRINT = exports.LAST_LATEX_PRINT = exports.LAST_FULL_PRINT = exports.LAST_2DASCII_PRINT = exports.LAST_PRINT = exports.LAST = exports.NIL = exports.ZERO = exports.UNIT = exports.TRANSPOSE = exports.TESTLT = exports.TESTLE = exports.TESTGT = exports.TESTGE = exports.TESTEQ = exports.TEST = exports.TAYLOR = exports.TANH = exports.TAN = exports.SYMBOLSINFO = exports.SUM = exports.SUBST = exports.STOP = exports.SQRT = exports.SHAPE = exports.SINH = exports.SIN = exports.SIMPLIFY = exports.SILENTPATTERN = exports.SGN = exports.SETQ = exports.ROOTS = exports.YYRECT = exports.ROUND = exports.REAL = exports.RATIONALIZE = exports.RANK = exports.QUOTIENT = exports.QUOTE = exports.PRODUCT = exports.PRINTPLAIN = exports.PRINTLIST = exports.PRINTLATEX = exports.PRINTFULL = exports.PRINT2DASCII = exports.PRINT = exports.PRINT_LEAVE_X_ALONE = exports.PRINT_LEAVE_E_ALONE = exports.PRIME = exports.POWER = exports.POLAR = exports.PATTERNSINFO = exports.PATTERN = exports.OUTER = exports.OR = exports.OPERATOR = exports.NUMERATOR = exports.NUMBER = exports.NROOTS = exports.NOT = exports.MULTIPLY = exports.MOD = exports.LOOKUP = exports.LOG = exports.LEGENDRE = exports.LEADING = exports.LCM = exports.LAGUERRE = exports.ISPRIME = exports.ISINTEGER = exports.INVG = exports.INV = exports.INTEGRAL = exports.INNER = exports.INDEX = exports.IMAG = exports.HILBERT = exports.HERMITE = exports.GCD = exports.GAMMA = exports.FUNCTION = exports.FOR = exports.FLOOR = exports.FLOATF = exports.FILTER = exports.FACTORPOLY = exports.FACTORIAL = exports.FACTOR = exports.EXPSIN = exports.EXPCOS = exports.EXPAND = exports.EXP = exports.EVAL = exports.ERFC = exports.ERF = exports.EIGENVEC = exports.EIGENVAL = exports.EIGEN = exports.DSOLVE = exports.DRAW = exports.DOT = exports.DO = exports.DIVISORS = exports.DIRAC = exports.DIM = exports.DET = exports.DERIVATIVE = exports.DENOMINATOR = exports.DEGREE = exports.DEFINT = exports.DECOMP = exports.COSH = exports.COS = exports.CONTRACT = exports.CONJ = exports.CONDENSE = exports.COFACTOR = exports.COEFF = exports.CLOCK = exports.CLEARPATTERNS = exports.CLEARALL = exports.CLEAR = exports.CIRCEXP = exports.CHOOSE = exports.CHECK = exports.CEILING = exports.BINOMIAL = exports.BINDING = exports.BESSELY = exports.BESSELJ = exports.ATOMIZE = exports.ARG = exports.ARCTANH = exports.ARCTAN = exports.ARCSINH = exports.ARCSIN = exports.ARCCOSH = exports.ARCCOS = exports.APPROXRATIO = exports.AND = exports.ADJ = exports.ADD = exports.ABS = exports.SYM = exports.TENSOR = exports.STR = exports.DOUBLE = exports.NUM = exports.CONS = exports.Sym = exports.Tensor = exports.Str = exports.Double = exports.Num = exports.Cons = exports.BaseAtom = exports.avoidCalculatingPowersIntoArctans = exports.do_simplify_nested_radicals = exports.dontCreateNewRadicalsInDenominatorWhenEvalingMultiplication = exports.defs = exports.PRINTMODE_LIST = exports.PRINTMODE_HUMAN = exports.PRINTMODE_COMPUTER = exports.PRINTMODE_2DASCII = exports.PRINTMODE_LATEX = exports.PRINTOUTRESULT = exports.DEBUG = exports.NSYM = exports.version = exports.breakpoint = void 0;
+const big_integer_1 = __importDefault(require("big-integer"));
+const print_1 = require("../sources/print");
+const symbol_1 = require("./symbol");
+function breakpoint() { }
+exports.breakpoint = breakpoint;
 // also change the version in the package.json file
-export const version = '2.0.1';
+exports.version = '2.0.1';
 const SELFTEST = 1;
 // size of the symbol table
-export const NSYM = 1000;
-export const DEBUG = false;
-export const PRINTOUTRESULT = false;
+exports.NSYM = 1000;
+exports.DEBUG = false;
+exports.PRINTOUTRESULT = false;
 // printing-related constants
-export const PRINTMODE_LATEX = 'PRINTMODE_LATEX';
-export const PRINTMODE_2DASCII = 'PRINTMODE_2DASCII';
-export const PRINTMODE_COMPUTER = 'PRINTMODE_COMPUTER';
-export const PRINTMODE_HUMAN = 'PRINTMODE_HUMAN';
-export const PRINTMODE_LIST = 'PRINTMODE_LIST';
+exports.PRINTMODE_LATEX = 'PRINTMODE_LATEX';
+exports.PRINTMODE_2DASCII = 'PRINTMODE_2DASCII';
+exports.PRINTMODE_COMPUTER = 'PRINTMODE_COMPUTER';
+exports.PRINTMODE_HUMAN = 'PRINTMODE_HUMAN';
+exports.PRINTMODE_LIST = 'PRINTMODE_LIST';
 class Defs {
     constructor() {
         // when the user uses the generic "print" statement
         // this setting kicks-in.
-        this.printMode = PRINTMODE_COMPUTER;
+        this.printMode = exports.PRINTMODE_COMPUTER;
         this.recursionLevelNestedRadicalsRemoval = 0;
         this.errorMessage = '';
         // needed for the mechanism to
@@ -49,10 +56,10 @@ class Defs {
         this.fullDoubleOutput = false;
     }
 }
-export const defs = new Defs();
-export const dontCreateNewRadicalsInDenominatorWhenEvalingMultiplication = true;
-export const do_simplify_nested_radicals = true;
-export const avoidCalculatingPowersIntoArctans = true;
+exports.defs = new Defs();
+exports.dontCreateNewRadicalsInDenominatorWhenEvalingMultiplication = true;
+exports.do_simplify_nested_radicals = true;
+exports.avoidCalculatingPowersIntoArctans = true;
 // Symbolic expressions are built by connecting U structs.
 //
 // For example, (a b + c) is built like this:
@@ -71,18 +78,19 @@ export const avoidCalculatingPowersIntoArctans = true;
 //                       |MUL    |    |SYM a  |    |SYM b  |
 //                       |       |    |       |    |       |
 //                       |_______|    |_______|    |_______|
-export class BaseAtom {
+class BaseAtom {
     toString() {
-        return print_expr(this);
+        return print_1.print_expr(this);
     }
     toLatexString() {
-        return collectLatexStringFromReturnValue(this);
+        return print_1.collectLatexStringFromReturnValue(this);
     }
 }
-export class Cons extends BaseAtom {
+exports.BaseAtom = BaseAtom;
+class Cons extends BaseAtom {
     constructor(car, cdr) {
         super();
-        this.k = CONS;
+        this.k = exports.CONS;
         this.cons = { car, cdr };
     }
     *[Symbol.iterator]() {
@@ -108,34 +116,38 @@ export class Cons extends BaseAtom {
         return new Cons(f(a), b);
     }
 }
-export class Num extends BaseAtom {
-    constructor(a, b = bigInt.one) {
+exports.Cons = Cons;
+class Num extends BaseAtom {
+    constructor(a, b = big_integer_1.default.one) {
         super();
         this.a = a;
         this.b = b;
         this.q = this;
-        this.k = NUM;
+        this.k = exports.NUM;
     }
 }
-export class Double extends BaseAtom {
+exports.Num = Num;
+class Double extends BaseAtom {
     constructor(d) {
         super();
         this.d = d;
-        this.k = DOUBLE;
+        this.k = exports.DOUBLE;
     }
 }
-export class Str extends BaseAtom {
+exports.Double = Double;
+class Str extends BaseAtom {
     constructor(str) {
         super();
         this.str = str;
-        this.k = STR;
+        this.k = exports.STR;
     }
 }
-export class Tensor extends BaseAtom {
+exports.Str = Str;
+class Tensor extends BaseAtom {
     constructor() {
         super(...arguments);
         this.tensor = this;
-        this.k = TENSOR;
+        this.k = exports.TENSOR;
         this.ndim = 0; // number of dimensions
         this.dim = []; // dimension length, for each dimension
         this.elem = []; // an array containing all the data
@@ -144,214 +156,216 @@ export class Tensor extends BaseAtom {
         return this.elem.length;
     }
 }
-export class Sym extends BaseAtom {
+exports.Tensor = Tensor;
+class Sym extends BaseAtom {
     constructor(printname) {
         super();
         this.printname = printname;
-        this.k = SYM;
+        this.k = exports.SYM;
     }
 }
+exports.Sym = Sym;
 // the following enum is for struct U, member k
-export const CONS = 0;
-export const NUM = 1;
-export const DOUBLE = 2;
-export const STR = 3;
-export const TENSOR = 4;
-export const SYM = 5;
+exports.CONS = 0;
+exports.NUM = 1;
+exports.DOUBLE = 2;
+exports.STR = 3;
+exports.TENSOR = 4;
+exports.SYM = 5;
 // the following enum is for indexing the symbol table
 // standard functions first, then nil, then everything else
 let counter = 0;
-export const ABS = 'abs';
-export const ADD = 'add';
-export const ADJ = 'adj';
-export const AND = 'and';
-export const APPROXRATIO = 'approxratio';
-export const ARCCOS = 'arccos';
-export const ARCCOSH = 'arccosh';
-export const ARCSIN = 'arcsin';
-export const ARCSINH = 'arcsinh';
-export const ARCTAN = 'arctan';
-export const ARCTANH = 'arctanh';
-export const ARG = 'arg';
-export const ATOMIZE = 'atomize';
-export const BESSELJ = 'besselj';
-export const BESSELY = 'bessely';
-export const BINDING = 'binding';
-export const BINOMIAL = 'binomial';
-export const CEILING = 'ceiling';
-export const CHECK = 'check';
-export const CHOOSE = 'choose';
-export const CIRCEXP = 'circexp';
-export const CLEAR = 'clear';
-export const CLEARALL = 'clearall';
-export const CLEARPATTERNS = 'clearpatterns';
-export const CLOCK = 'clock';
-export const COEFF = 'coeff';
-export const COFACTOR = 'cofactor';
-export const CONDENSE = 'condense';
-export const CONJ = 'conj';
-export const CONTRACT = 'contract';
-export const COS = 'cos';
-export const COSH = 'cosh';
-export const DECOMP = 'decomp';
-export const DEFINT = 'defint';
-export const DEGREE = 'deg';
-export const DENOMINATOR = 'denominator';
-export const DERIVATIVE = 'derivative';
-export const DET = 'det';
-export const DIM = 'dim';
-export const DIRAC = 'dirac';
-export const DIVISORS = 'divisors';
-export const DO = 'do';
-export const DOT = 'dot';
-export const DRAW = 'draw';
-export const DSOLVE = 'dsolve';
-export const EIGEN = 'eigen';
-export const EIGENVAL = 'eigenval';
-export const EIGENVEC = 'eigenvec';
-export const ERF = 'erf';
-export const ERFC = 'erfc';
-export const EVAL = 'eval';
-export const EXP = 'exp';
-export const EXPAND = 'expand';
-export const EXPCOS = 'expcos';
-export const EXPSIN = 'expsin';
-export const FACTOR = 'factor';
-export const FACTORIAL = 'factorial';
-export const FACTORPOLY = 'factorpoly';
-export const FILTER = 'filter';
-export const FLOATF = 'float';
-export const FLOOR = 'floor';
-export const FOR = 'for';
-export const FUNCTION = 'function';
-export const GAMMA = 'Gamma';
-export const GCD = 'gcd';
-export const HERMITE = 'hermite';
-export const HILBERT = 'hilbert';
-export const IMAG = 'imag';
-export const INDEX = 'component';
-export const INNER = 'inner';
-export const INTEGRAL = 'integral';
-export const INV = 'inv';
-export const INVG = 'invg';
-export const ISINTEGER = 'isinteger';
-export const ISPRIME = 'isprime';
-export const LAGUERRE = 'laguerre';
+exports.ABS = 'abs';
+exports.ADD = 'add';
+exports.ADJ = 'adj';
+exports.AND = 'and';
+exports.APPROXRATIO = 'approxratio';
+exports.ARCCOS = 'arccos';
+exports.ARCCOSH = 'arccosh';
+exports.ARCSIN = 'arcsin';
+exports.ARCSINH = 'arcsinh';
+exports.ARCTAN = 'arctan';
+exports.ARCTANH = 'arctanh';
+exports.ARG = 'arg';
+exports.ATOMIZE = 'atomize';
+exports.BESSELJ = 'besselj';
+exports.BESSELY = 'bessely';
+exports.BINDING = 'binding';
+exports.BINOMIAL = 'binomial';
+exports.CEILING = 'ceiling';
+exports.CHECK = 'check';
+exports.CHOOSE = 'choose';
+exports.CIRCEXP = 'circexp';
+exports.CLEAR = 'clear';
+exports.CLEARALL = 'clearall';
+exports.CLEARPATTERNS = 'clearpatterns';
+exports.CLOCK = 'clock';
+exports.COEFF = 'coeff';
+exports.COFACTOR = 'cofactor';
+exports.CONDENSE = 'condense';
+exports.CONJ = 'conj';
+exports.CONTRACT = 'contract';
+exports.COS = 'cos';
+exports.COSH = 'cosh';
+exports.DECOMP = 'decomp';
+exports.DEFINT = 'defint';
+exports.DEGREE = 'deg';
+exports.DENOMINATOR = 'denominator';
+exports.DERIVATIVE = 'derivative';
+exports.DET = 'det';
+exports.DIM = 'dim';
+exports.DIRAC = 'dirac';
+exports.DIVISORS = 'divisors';
+exports.DO = 'do';
+exports.DOT = 'dot';
+exports.DRAW = 'draw';
+exports.DSOLVE = 'dsolve';
+exports.EIGEN = 'eigen';
+exports.EIGENVAL = 'eigenval';
+exports.EIGENVEC = 'eigenvec';
+exports.ERF = 'erf';
+exports.ERFC = 'erfc';
+exports.EVAL = 'eval';
+exports.EXP = 'exp';
+exports.EXPAND = 'expand';
+exports.EXPCOS = 'expcos';
+exports.EXPSIN = 'expsin';
+exports.FACTOR = 'factor';
+exports.FACTORIAL = 'factorial';
+exports.FACTORPOLY = 'factorpoly';
+exports.FILTER = 'filter';
+exports.FLOATF = 'float';
+exports.FLOOR = 'floor';
+exports.FOR = 'for';
+exports.FUNCTION = 'function';
+exports.GAMMA = 'Gamma';
+exports.GCD = 'gcd';
+exports.HERMITE = 'hermite';
+exports.HILBERT = 'hilbert';
+exports.IMAG = 'imag';
+exports.INDEX = 'component';
+exports.INNER = 'inner';
+exports.INTEGRAL = 'integral';
+exports.INV = 'inv';
+exports.INVG = 'invg';
+exports.ISINTEGER = 'isinteger';
+exports.ISPRIME = 'isprime';
+exports.LAGUERRE = 'laguerre';
 //  LAPLACE = 
-export const LCM = 'lcm';
-export const LEADING = 'leading';
-export const LEGENDRE = 'legendre';
-export const LOG = 'log';
-export const LOOKUP = 'lookup';
-export const MOD = 'mod';
-export const MULTIPLY = 'multiply';
-export const NOT = 'not';
-export const NROOTS = 'nroots';
-export const NUMBER = 'number';
-export const NUMERATOR = 'numerator';
-export const OPERATOR = 'operator';
-export const OR = 'or';
-export const OUTER = 'outer';
-export const PATTERN = 'pattern';
-export const PATTERNSINFO = 'patternsinfo';
-export const POLAR = 'polar';
-export const POWER = 'power';
-export const PRIME = 'prime';
-export const PRINT_LEAVE_E_ALONE = 'printLeaveEAlone';
-export const PRINT_LEAVE_X_ALONE = 'printLeaveXAlone';
-export const PRINT = 'print';
-export const PRINT2DASCII = 'print2dascii';
-export const PRINTFULL = 'printcomputer';
-export const PRINTLATEX = 'printlatex';
-export const PRINTLIST = 'printlist';
-export const PRINTPLAIN = 'printhuman';
-export const PRODUCT = 'product';
-export const QUOTE = 'quote';
-export const QUOTIENT = 'quotient';
-export const RANK = 'rank';
-export const RATIONALIZE = 'rationalize';
-export const REAL = 'real';
-export const ROUND = 'round';
-export const YYRECT = 'rect';
-export const ROOTS = 'roots';
-export const SETQ = 'equals';
-export const SGN = 'sgn';
-export const SILENTPATTERN = 'silentpattern';
-export const SIMPLIFY = 'simplify';
-export const SIN = 'sin';
-export const SINH = 'sinh';
-export const SHAPE = 'shape';
-export const SQRT = 'sqrt';
-export const STOP = 'stop';
-export const SUBST = 'subst';
-export const SUM = 'sum';
-export const SYMBOLSINFO = 'symbolsinfo';
-export const TAN = 'tan';
-export const TANH = 'tanh';
-export const TAYLOR = 'taylor';
-export const TEST = 'test';
-export const TESTEQ = 'testeq';
-export const TESTGE = 'testge';
-export const TESTGT = 'testgt';
-export const TESTLE = 'testle';
-export const TESTLT = 'testlt';
-export const TRANSPOSE = 'transpose';
-export const UNIT = 'unit';
-export const ZERO = 'zero';
+exports.LCM = 'lcm';
+exports.LEADING = 'leading';
+exports.LEGENDRE = 'legendre';
+exports.LOG = 'log';
+exports.LOOKUP = 'lookup';
+exports.MOD = 'mod';
+exports.MULTIPLY = 'multiply';
+exports.NOT = 'not';
+exports.NROOTS = 'nroots';
+exports.NUMBER = 'number';
+exports.NUMERATOR = 'numerator';
+exports.OPERATOR = 'operator';
+exports.OR = 'or';
+exports.OUTER = 'outer';
+exports.PATTERN = 'pattern';
+exports.PATTERNSINFO = 'patternsinfo';
+exports.POLAR = 'polar';
+exports.POWER = 'power';
+exports.PRIME = 'prime';
+exports.PRINT_LEAVE_E_ALONE = 'printLeaveEAlone';
+exports.PRINT_LEAVE_X_ALONE = 'printLeaveXAlone';
+exports.PRINT = 'print';
+exports.PRINT2DASCII = 'print2dascii';
+exports.PRINTFULL = 'printcomputer';
+exports.PRINTLATEX = 'printlatex';
+exports.PRINTLIST = 'printlist';
+exports.PRINTPLAIN = 'printhuman';
+exports.PRODUCT = 'product';
+exports.QUOTE = 'quote';
+exports.QUOTIENT = 'quotient';
+exports.RANK = 'rank';
+exports.RATIONALIZE = 'rationalize';
+exports.REAL = 'real';
+exports.ROUND = 'round';
+exports.YYRECT = 'rect';
+exports.ROOTS = 'roots';
+exports.SETQ = 'equals';
+exports.SGN = 'sgn';
+exports.SILENTPATTERN = 'silentpattern';
+exports.SIMPLIFY = 'simplify';
+exports.SIN = 'sin';
+exports.SINH = 'sinh';
+exports.SHAPE = 'shape';
+exports.SQRT = 'sqrt';
+exports.STOP = 'stop';
+exports.SUBST = 'subst';
+exports.SUM = 'sum';
+exports.SYMBOLSINFO = 'symbolsinfo';
+exports.TAN = 'tan';
+exports.TANH = 'tanh';
+exports.TAYLOR = 'taylor';
+exports.TEST = 'test';
+exports.TESTEQ = 'testeq';
+exports.TESTGE = 'testge';
+exports.TESTGT = 'testgt';
+exports.TESTLE = 'testle';
+exports.TESTLT = 'testlt';
+exports.TRANSPOSE = 'transpose';
+exports.UNIT = 'unit';
+exports.ZERO = 'zero';
 // ALL THE SYMBOLS ABOVE NIL ARE KEYWORDS,
 // WHICH MEANS THAT USER CANNOT REDEFINE THEM
-export const NIL = 'nil'; // nil goes here, after standard functions
-export const LAST = 'last';
-export const LAST_PRINT = 'lastprint';
-export const LAST_2DASCII_PRINT = 'last2dasciiprint';
-export const LAST_FULL_PRINT = 'lastfullprint';
-export const LAST_LATEX_PRINT = 'lastlatexprint';
-export const LAST_LIST_PRINT = 'lastlistprint';
-export const LAST_PLAIN_PRINT = 'lastplainprint';
-export const AUTOEXPAND = 'autoexpand';
-export const BAKE = 'bake';
-export const ASSUME_REAL_VARIABLES = 'assumeRealVariables';
-export const TRACE = 'trace';
-export const FORCE_FIXED_PRINTOUT = 'forceFixedPrintout';
-export const MAX_FIXED_PRINTOUT_DIGITS = 'maxFixedPrintoutDigits';
-export const YYE = '~'; // tilde so sort puts it after other symbols
-export const DRAWX = '$DRAWX'; // special purpose internal symbols
-export const METAA = '$METAA';
-export const METAB = '$METAB';
-export const METAX = '$METAX';
-export const SECRETX = '$SECRETX';
-export const VERSION = 'version';
-export const PI = 'pi';
-export const SYMBOL_A = 'a';
-export const SYMBOL_B = 'b';
-export const SYMBOL_C = 'c';
-export const SYMBOL_D = 'd';
-export const SYMBOL_I = 'i';
-export const SYMBOL_J = 'j';
-export const SYMBOL_N = 'n';
-export const SYMBOL_R = 'r';
-export const SYMBOL_S = 's';
-export const SYMBOL_T = 't';
-export const SYMBOL_X = 'x';
-export const SYMBOL_Y = 'y';
-export const SYMBOL_Z = 'z';
-export const SYMBOL_IDENTITY_MATRIX = 'I';
-export const SYMBOL_A_UNDERSCORE = 'a_';
-export const SYMBOL_B_UNDERSCORE = 'b_';
-export const SYMBOL_X_UNDERSCORE = 'x_';
-export const C1 = '$C1';
-export const C2 = '$C2';
-export const C3 = '$C3';
-export const C4 = '$C4';
-export const C5 = '$C5';
-export const C6 = '$C6';
-export const E = YYE;
-export const MAXPRIMETAB = 10000;
-export const MAX_CONSECUTIVE_APPLICATIONS_OF_ALL_RULES = 5;
-export const MAX_CONSECUTIVE_APPLICATIONS_OF_SINGLE_RULE = 10;
+exports.NIL = 'nil'; // nil goes here, after standard functions
+exports.LAST = 'last';
+exports.LAST_PRINT = 'lastprint';
+exports.LAST_2DASCII_PRINT = 'last2dasciiprint';
+exports.LAST_FULL_PRINT = 'lastfullprint';
+exports.LAST_LATEX_PRINT = 'lastlatexprint';
+exports.LAST_LIST_PRINT = 'lastlistprint';
+exports.LAST_PLAIN_PRINT = 'lastplainprint';
+exports.AUTOEXPAND = 'autoexpand';
+exports.BAKE = 'bake';
+exports.ASSUME_REAL_VARIABLES = 'assumeRealVariables';
+exports.TRACE = 'trace';
+exports.FORCE_FIXED_PRINTOUT = 'forceFixedPrintout';
+exports.MAX_FIXED_PRINTOUT_DIGITS = 'maxFixedPrintoutDigits';
+exports.YYE = '~'; // tilde so sort puts it after other symbols
+exports.DRAWX = '$DRAWX'; // special purpose internal symbols
+exports.METAA = '$METAA';
+exports.METAB = '$METAB';
+exports.METAX = '$METAX';
+exports.SECRETX = '$SECRETX';
+exports.VERSION = 'version';
+exports.PI = 'pi';
+exports.SYMBOL_A = 'a';
+exports.SYMBOL_B = 'b';
+exports.SYMBOL_C = 'c';
+exports.SYMBOL_D = 'd';
+exports.SYMBOL_I = 'i';
+exports.SYMBOL_J = 'j';
+exports.SYMBOL_N = 'n';
+exports.SYMBOL_R = 'r';
+exports.SYMBOL_S = 's';
+exports.SYMBOL_T = 't';
+exports.SYMBOL_X = 'x';
+exports.SYMBOL_Y = 'y';
+exports.SYMBOL_Z = 'z';
+exports.SYMBOL_IDENTITY_MATRIX = 'I';
+exports.SYMBOL_A_UNDERSCORE = 'a_';
+exports.SYMBOL_B_UNDERSCORE = 'b_';
+exports.SYMBOL_X_UNDERSCORE = 'x_';
+exports.C1 = '$C1';
+exports.C2 = '$C2';
+exports.C3 = '$C3';
+exports.C4 = '$C4';
+exports.C5 = '$C5';
+exports.C6 = '$C6';
+exports.E = exports.YYE;
+exports.MAXPRIMETAB = 10000;
+exports.MAX_CONSECUTIVE_APPLICATIONS_OF_ALL_RULES = 5;
+exports.MAX_CONSECUTIVE_APPLICATIONS_OF_SINGLE_RULE = 10;
 //define _USE_MATH_DEFINES // for MS C++
-export const MAXDIM = 24;
-export const predefinedSymbolsInGlobalScope_doNotTrackInDependencies = [
+exports.MAXDIM = 24;
+exports.predefinedSymbolsInGlobalScope_doNotTrackInDependencies = [
     'rationalize',
     'abs',
     'e',
@@ -383,11 +397,11 @@ export const predefinedSymbolsInGlobalScope_doNotTrackInDependencies = [
 // immediately simple operations on
 // constants, removing 1s from products
 // etc.
-export const parse_time_simplifications = true;
-export const primetab = (function () {
+exports.parse_time_simplifications = true;
+exports.primetab = (function () {
     const primes = [2];
     let i = 3;
-    while (primes.length < MAXPRIMETAB) {
+    while (primes.length < exports.MAXPRIMETAB) {
         let j = 0;
         const ceil = Math.sqrt(i);
         while (j < primes.length && primes[j] <= ceil) {
@@ -402,38 +416,44 @@ export const primetab = (function () {
         }
         i += 2;
     }
-    primes[MAXPRIMETAB] = 0;
+    primes[exports.MAXPRIMETAB] = 0;
     return primes;
 })();
 let draw_flag = false;
-export const mtotal = 0;
-export const logbuf = '';
+exports.mtotal = 0;
+exports.logbuf = '';
 const arglist = []; // will contain U
 const draw_stop_return = null; // extern jmp_buf ?????
-export const transpose_unicode = 7488;
-export const dotprod_unicode = 183;
-export function iscons(p) {
-    return p.k === CONS;
+exports.transpose_unicode = 7488;
+exports.dotprod_unicode = 183;
+function iscons(p) {
+    return p.k === exports.CONS;
 }
-export function isrational(p) {
-    return p.k === NUM;
+exports.iscons = iscons;
+function isrational(p) {
+    return p.k === exports.NUM;
 }
-export function isdouble(p) {
-    return p.k === DOUBLE;
+exports.isrational = isrational;
+function isdouble(p) {
+    return p.k === exports.DOUBLE;
 }
-export function isNumericAtom(p) {
+exports.isdouble = isdouble;
+function isNumericAtom(p) {
     return isrational(p) || isdouble(p);
 }
-export function isstr(p) {
-    return p.k === STR;
+exports.isNumericAtom = isNumericAtom;
+function isstr(p) {
+    return p.k === exports.STR;
 }
-export function istensor(p) {
-    return p.k === TENSOR;
+exports.isstr = isstr;
+function istensor(p) {
+    return p.k === exports.TENSOR;
 }
+exports.istensor = istensor;
 // because of recursion, we consider a scalar to be
 // a tensor, so a numeric scalar will return true
-export function isNumericAtomOrTensor(p) {
-    if (isNumericAtom(p) || p === symbol(SYMBOL_IDENTITY_MATRIX)) {
+function isNumericAtomOrTensor(p) {
+    if (isNumericAtom(p) || p === symbol_1.symbol(exports.SYMBOL_IDENTITY_MATRIX)) {
         return true;
     }
     if (!istensor(p)) {
@@ -450,119 +470,153 @@ export function isNumericAtomOrTensor(p) {
     }
     return true;
 }
-export function issymbol(p) {
-    return p.k === SYM;
+exports.isNumericAtomOrTensor = isNumericAtomOrTensor;
+function issymbol(p) {
+    return p.k === exports.SYM;
 }
-export function car(p) {
+exports.issymbol = issymbol;
+function car(p) {
     if (iscons(p)) {
         return p.cons.car;
     }
     else {
-        return symbol(NIL);
+        return symbol_1.symbol(exports.NIL);
     }
 }
-export function cdr(p) {
+exports.car = car;
+function cdr(p) {
     if (iscons(p)) {
         return p.cons.cdr;
     }
     else {
-        return symbol(NIL);
+        return symbol_1.symbol(exports.NIL);
     }
 }
-export function caar(p) {
+exports.cdr = cdr;
+function caar(p) {
     return car(car(p));
 }
-export function cadr(p) {
+exports.caar = caar;
+function cadr(p) {
     return car(cdr(p));
 }
-export function cdar(p) {
+exports.cadr = cadr;
+function cdar(p) {
     return cdr(car(p));
 }
-export function cddr(p) {
+exports.cdar = cdar;
+function cddr(p) {
     return cdr(cdr(p));
 }
-export function caadr(p) {
+exports.cddr = cddr;
+function caadr(p) {
     return car(car(cdr(p)));
 }
-export function caddr(p) {
+exports.caadr = caadr;
+function caddr(p) {
     return car(cdr(cdr(p)));
 }
-export function cadar(p) {
+exports.caddr = caddr;
+function cadar(p) {
     return car(cdr(car(p)));
 }
-export function cdadr(p) {
+exports.cadar = cadar;
+function cdadr(p) {
     return cdr(car(cdr(p)));
 }
-export function cddar(p) {
+exports.cdadr = cdadr;
+function cddar(p) {
     return cdr(cdr(car(p)));
 }
-export function cdddr(p) {
+exports.cddar = cddar;
+function cdddr(p) {
     return cdr(cdr(cdr(p)));
 }
-export function caaddr(p) {
+exports.cdddr = cdddr;
+function caaddr(p) {
     return car(car(cdr(cdr(p))));
 }
-export function cadadr(p) {
+exports.caaddr = caaddr;
+function cadadr(p) {
     return car(cdr(car(cdr(p))));
 }
-export function caddar(p) {
+exports.cadadr = cadadr;
+function caddar(p) {
     return car(cdr(cdr(car(p))));
 }
-export function cdaddr(p) {
+exports.caddar = caddar;
+function cdaddr(p) {
     return cdr(car(cdr(cdr(p))));
 }
-export function cadddr(p) {
+exports.cdaddr = cdaddr;
+function cadddr(p) {
     return car(cdr(cdr(cdr(p))));
 }
-export function cddddr(p) {
+exports.cadddr = cadddr;
+function cddddr(p) {
     return cdr(cdr(cdr(cdr(p))));
 }
-export function caddddr(p) {
+exports.cddddr = cddddr;
+function caddddr(p) {
     return car(cdr(cdr(cdr(cdr(p)))));
 }
-export function cadaddr(p) {
+exports.caddddr = caddddr;
+function cadaddr(p) {
     return car(cdr(car(cdr(cdr(p)))));
 }
-export function cddaddr(p) {
+exports.cadaddr = cadaddr;
+function cddaddr(p) {
     return cdr(cdr(car(cdr(cdr(p)))));
 }
-export function caddadr(p) {
+exports.cddaddr = cddaddr;
+function caddadr(p) {
     return car(cdr(cdr(car(cdr(p)))));
 }
-export function cdddaddr(p) {
+exports.caddadr = caddadr;
+function cdddaddr(p) {
     return cdr(cdr(cdr(car(cdr(cdr(p))))));
 }
-export function caddaddr(p) {
+exports.cdddaddr = cdddaddr;
+function caddaddr(p) {
     return car(cdr(cdr(car(cdr(cdr(p))))));
 }
-export function isadd(p) {
-    return car(p) === symbol(ADD);
+exports.caddaddr = caddaddr;
+function isadd(p) {
+    return car(p) === symbol_1.symbol(exports.ADD);
 }
-export function ismultiply(p) {
-    return car(p) === symbol(MULTIPLY);
+exports.isadd = isadd;
+function ismultiply(p) {
+    return car(p) === symbol_1.symbol(exports.MULTIPLY);
 }
-export function ispower(p) {
-    return car(p) === symbol(POWER);
+exports.ismultiply = ismultiply;
+function ispower(p) {
+    return car(p) === symbol_1.symbol(exports.POWER);
 }
-export function isfactorial(p) {
-    return car(p) === symbol(FACTORIAL);
+exports.ispower = ispower;
+function isfactorial(p) {
+    return car(p) === symbol_1.symbol(exports.FACTORIAL);
 }
-export function isinnerordot(p) {
-    return car(p) === symbol(INNER) || car(p) === symbol(DOT);
+exports.isfactorial = isfactorial;
+function isinnerordot(p) {
+    return car(p) === symbol_1.symbol(exports.INNER) || car(p) === symbol_1.symbol(exports.DOT);
 }
-export function istranspose(p) {
-    return car(p) === symbol(TRANSPOSE);
+exports.isinnerordot = isinnerordot;
+function istranspose(p) {
+    return car(p) === symbol_1.symbol(exports.TRANSPOSE);
 }
-export function isinv(p) {
-    return car(p) === symbol(INV);
+exports.istranspose = istranspose;
+function isinv(p) {
+    return car(p) === symbol_1.symbol(exports.INV);
 }
+exports.isinv = isinv;
 // TODO this is a bit of a shallow check, we should
 // check when we are passed an actual tensor and possibly
 // cache the test result.
-export function isidentitymatrix(p) {
-    return p === symbol(SYMBOL_IDENTITY_MATRIX);
+function isidentitymatrix(p) {
+    return p === symbol_1.symbol(exports.SYMBOL_IDENTITY_MATRIX);
 }
-export function MSIGN(p) {
+exports.isidentitymatrix = isidentitymatrix;
+function MSIGN(p) {
     if (p.isPositive()) {
         return 1;
     }
@@ -573,89 +627,98 @@ export function MSIGN(p) {
         return -1;
     }
 }
+exports.MSIGN = MSIGN;
 function MLENGTH(p) {
     return p.toString().length;
 }
-export function MZERO(p) {
+function MZERO(p) {
     return p.isZero();
 }
-export function MEQUAL(p, n) {
+exports.MZERO = MZERO;
+function MEQUAL(p, n) {
     if (p == null) {
         breakpoint;
     }
     return p.equals(n);
 }
-export function reset_after_error() {
-    defs.esc_flag = false;
+exports.MEQUAL = MEQUAL;
+function reset_after_error() {
+    exports.defs.esc_flag = false;
     draw_flag = false;
-    defs.evaluatingAsFloats = false;
-    defs.evaluatingPolar = false;
+    exports.defs.evaluatingAsFloats = false;
+    exports.defs.evaluatingPolar = false;
 }
-export const $ = {};
-export class Constants {
+exports.reset_after_error = reset_after_error;
+exports.$ = {};
+class Constants {
     static One() {
-        return defs.evaluatingAsFloats ? Constants.oneAsDouble : Constants.one;
+        return exports.defs.evaluatingAsFloats ? Constants.oneAsDouble : Constants.one;
     }
     static NegOne() {
-        return defs.evaluatingAsFloats
+        return exports.defs.evaluatingAsFloats
             ? Constants.negOneAsDouble
             : Constants.negOne;
     }
     static Zero() {
-        return defs.evaluatingAsFloats ? Constants.zeroAsDouble : Constants.zero;
+        return exports.defs.evaluatingAsFloats ? Constants.zeroAsDouble : Constants.zero;
     }
     static Pi() {
-        return defs.evaluatingAsFloats ? Constants.piAsDouble : symbol(PI);
+        return exports.defs.evaluatingAsFloats ? Constants.piAsDouble : symbol_1.symbol(exports.PI);
     }
 }
-Constants.one = new Num(bigInt(1));
+exports.Constants = Constants;
+Constants.one = new Num(big_integer_1.default(1));
 Constants.oneAsDouble = new Double(1.0);
-Constants.negOne = new Num(bigInt(-1));
+Constants.negOne = new Num(big_integer_1.default(-1));
 Constants.negOneAsDouble = new Double(-1.0);
-Constants.zero = new Num(bigInt(0));
+Constants.zero = new Num(big_integer_1.default(0));
 Constants.zeroAsDouble = new Double(0.0);
 Constants.piAsDouble = new Double(Math.PI);
 // Call a function temporarily setting "expanding" to false
-export function noexpand(func, ...args) {
-    const prev_expanding = defs.expanding;
-    defs.expanding = false;
+function noexpand(func, ...args) {
+    const prev_expanding = exports.defs.expanding;
+    exports.defs.expanding = false;
     try {
         return func(...args);
     }
     finally {
-        defs.expanding = prev_expanding;
+        exports.defs.expanding = prev_expanding;
     }
 }
+exports.noexpand = noexpand;
 // Call a function temporarily setting "expanding" to true
-export function doexpand(func, ...args) {
-    const prev_expanding = defs.expanding;
-    defs.expanding = true;
+function doexpand(func, ...args) {
+    const prev_expanding = exports.defs.expanding;
+    exports.defs.expanding = true;
     try {
         return func(...args);
     }
     finally {
-        defs.expanding = prev_expanding;
+        exports.defs.expanding = prev_expanding;
     }
 }
+exports.doexpand = doexpand;
 // Call a function temporarily setting "evaluatingPolar" to true
-export function evalPolar(func, ...args) {
-    const prev_evaluatingPolar = defs.evaluatingPolar;
-    defs.evaluatingPolar = true;
+function evalPolar(func, ...args) {
+    const prev_evaluatingPolar = exports.defs.evaluatingPolar;
+    exports.defs.evaluatingPolar = true;
     try {
         return func(...args);
     }
     finally {
-        defs.evaluatingPolar = prev_evaluatingPolar;
+        exports.defs.evaluatingPolar = prev_evaluatingPolar;
     }
 }
+exports.evalPolar = evalPolar;
 // Call a function temporarily setting "evaluatingAsFloats" to true
-export function evalFloats(func, ...args) {
-    const prev_evaluatingAsFloats = defs.evaluatingAsFloats;
-    defs.evaluatingAsFloats = true;
+function evalFloats(func, ...args) {
+    const prev_evaluatingAsFloats = exports.defs.evaluatingAsFloats;
+    exports.defs.evaluatingAsFloats = true;
     try {
         return func(...args);
     }
     finally {
-        defs.evaluatingAsFloats = prev_evaluatingAsFloats;
+        exports.defs.evaluatingAsFloats = prev_evaluatingAsFloats;
     }
 }
+exports.evalFloats = evalFloats;

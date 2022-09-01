@@ -1,5 +1,8 @@
-import { cadr, iscons, SYM } from '../runtime/defs';
-import { get_binding } from '../runtime/symbol';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Eval_lookup = void 0;
+const defs_1 = require("../runtime/defs");
+const symbol_1 = require("../runtime/symbol");
 // now this might be a little confusing, so a
 // clarification is in order.
 // First off, at the scripting level most things
@@ -113,10 +116,11 @@ import { get_binding } from '../runtime/symbol';
 // when assigned to x.
 //    lookup(x)
 //       => gives z
-export function Eval_lookup(p1) {
-    p1 = cadr(p1);
-    if (!iscons(p1) && cadr(p1).k === SYM) {
-        p1 = get_binding(p1);
+function Eval_lookup(p1) {
+    p1 = defs_1.cadr(p1);
+    if (!defs_1.iscons(p1) && defs_1.cadr(p1).k === defs_1.SYM) {
+        p1 = symbol_1.get_binding(p1);
     }
     return p1;
 }
+exports.Eval_lookup = Eval_lookup;

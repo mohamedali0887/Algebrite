@@ -1,5 +1,7 @@
-import { run_test } from '../test-harness';
-run_test([
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const test_harness_1 = require("../test-harness");
+test_harness_1.run_test([
     // note how check can turn an assignment
     // into a test, so in this case a is not
     // assigned anything

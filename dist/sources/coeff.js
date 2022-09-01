@@ -1,12 +1,15 @@
-import { cadddr, caddr, cadr, Constants, doexpand, NIL, SYMBOL_X } from '../runtime/defs';
-import { symbol } from "../runtime/symbol";
-import { equal } from '../sources/misc';
-import { subtract } from './add';
-import { Eval } from './eval';
-import { filter } from './filter';
-import { divide } from './multiply';
-import { power } from './power';
-import { subst } from './subst';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.coeff = exports.Eval_coeff = void 0;
+const defs_1 = require("../runtime/defs");
+const symbol_1 = require("../runtime/symbol");
+const misc_1 = require("../sources/misc");
+const add_1 = require("./add");
+const eval_1 = require("./eval");
+const filter_1 = require("./filter");
+const multiply_1 = require("./multiply");
+const power_1 = require("./power");
+const subst_1 = require("./subst");
 /* coeff =====================================================================
 
 Tags
@@ -22,18 +25,19 @@ General description
 Returns the coefficient of x^n in polynomial p. The x argument can be omitted for polynomials in x.
 
 */
-export function Eval_coeff(p1) {
-    let N = Eval(cadddr(p1));
-    let X = Eval(caddr(p1));
-    const P = Eval(cadr(p1));
-    if (N === symbol(NIL)) {
+function Eval_coeff(p1) {
+    let N = eval_1.Eval(defs_1.cadddr(p1));
+    let X = eval_1.Eval(defs_1.caddr(p1));
+    const P = eval_1.Eval(defs_1.cadr(p1));
+    if (N === symbol_1.symbol(defs_1.NIL)) {
         // only 2 args?
         N = X;
-        X = symbol(SYMBOL_X);
+        X = symbol_1.symbol(defs_1.SYMBOL_X);
     }
     // divide p by x^n, keep the constant part
-    return filter(divide(P, power(X, N)), X);
+    return filter_1.filter(multiply_1.divide(P, power_1.power(X, N)), X);
 }
+exports.Eval_coeff = Eval_coeff;
 //-----------------------------------------------------------------------------
 //
 //  Get polynomial coefficients
@@ -47,15 +51,16 @@ export function Eval_coeff(p1) {
 //      [Coefficient of x^0, ..., Coefficient of x^(n-1)]
 //
 //-----------------------------------------------------------------------------
-export function coeff(p, x) {
+function coeff(p, x) {
     const coefficients = [];
     while (true) {
-        const c = Eval(subst(p, x, Constants.zero));
+        const c = eval_1.Eval(subst_1.subst(p, x, defs_1.Constants.zero));
         coefficients.push(c);
-        p = subtract(p, c);
-        if (equal(p, Constants.zero)) {
+        p = add_1.subtract(p, c);
+        if (misc_1.equal(p, defs_1.Constants.zero)) {
             return coefficients;
         }
-        p = doexpand(divide, p, x);
+        p = defs_1.doexpand(multiply_1.divide, p, x);
     }
 }
+exports.coeff = coeff;

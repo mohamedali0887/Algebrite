@@ -1,21 +1,25 @@
-import { cadddr, caddr, cadr, Constants, NIL, SYMBOL_X } from '../runtime/defs';
-import { symbol } from "../runtime/symbol";
-import { add, subtract } from './add';
-import { integer } from './bignum';
-import { coeff } from './coeff';
-import { Eval } from './eval';
-import { divide, multiply } from './multiply';
-import { power } from './power';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.divpoly = exports.Eval_quotient = void 0;
+const defs_1 = require("../runtime/defs");
+const symbol_1 = require("../runtime/symbol");
+const add_1 = require("./add");
+const bignum_1 = require("./bignum");
+const coeff_1 = require("./coeff");
+const eval_1 = require("./eval");
+const multiply_1 = require("./multiply");
+const power_1 = require("./power");
 // Divide polynomials
-export function Eval_quotient(p1) {
-    const DIVIDEND = Eval(cadr(p1)); // 1st arg, p(x)
-    const DIVISOR = Eval(caddr(p1)); // 2nd arg, q(x)
-    let X = Eval(cadddr(p1)); // 3rd arg, x, default x
-    if (X === symbol(NIL)) {
-        X = symbol(SYMBOL_X);
+function Eval_quotient(p1) {
+    const DIVIDEND = eval_1.Eval(defs_1.cadr(p1)); // 1st arg, p(x)
+    const DIVISOR = eval_1.Eval(defs_1.caddr(p1)); // 2nd arg, q(x)
+    let X = eval_1.Eval(defs_1.cadddr(p1)); // 3rd arg, x, default x
+    if (X === symbol_1.symbol(defs_1.NIL)) {
+        X = symbol_1.symbol(defs_1.SYMBOL_X);
     }
     return divpoly(DIVIDEND, DIVISOR, X);
 }
+exports.Eval_quotient = Eval_quotient;
 //-----------------------------------------------------------------------------
 //
 //  Divide polynomials
@@ -27,21 +31,22 @@ export function Eval_quotient(p1) {
 //  Output:    Quotient
 //
 //-----------------------------------------------------------------------------
-export function divpoly(DIVIDEND, DIVISOR, X) {
-    const dividendCs = coeff(DIVIDEND, X);
+function divpoly(DIVIDEND, DIVISOR, X) {
+    const dividendCs = coeff_1.coeff(DIVIDEND, X);
     let m = dividendCs.length - 1; // m is dividend's power
-    const divisorCs = coeff(DIVISOR, X);
+    const divisorCs = coeff_1.coeff(DIVISOR, X);
     const n = divisorCs.length - 1; // n is divisor's power
     let x = m - n;
-    let QUOTIENT = Constants.zero;
+    let QUOTIENT = defs_1.Constants.zero;
     while (x >= 0) {
-        const Q = divide(dividendCs[m], divisorCs[n]);
+        const Q = multiply_1.divide(dividendCs[m], divisorCs[n]);
         for (let i = 0; i <= n; i++) {
-            dividendCs[x + i] = subtract(dividendCs[x + i], multiply(divisorCs[i], Q));
+            dividendCs[x + i] = add_1.subtract(dividendCs[x + i], multiply_1.multiply(divisorCs[i], Q));
         }
-        QUOTIENT = add(QUOTIENT, multiply(Q, power(X, integer(x))));
+        QUOTIENT = add_1.add(QUOTIENT, multiply_1.multiply(Q, power_1.power(X, bignum_1.integer(x))));
         m--;
         x--;
     }
     return QUOTIENT;
 }
+exports.divpoly = divpoly;

@@ -1,9 +1,12 @@
-import { car, cdr, DEBUG, defs, iscons, NIL, PATTERN, Str } from '../runtime/defs';
-import { stop } from '../runtime/run';
-import { symbol } from '../runtime/symbol';
-import { equal } from '../sources/misc';
-import { makeList } from './list';
-import { print_list } from './print';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Eval_patternsinfo = exports.Eval_clearpatterns = exports.do_clearPatterns = exports.Eval_pattern = exports.Eval_silentpattern = void 0;
+const defs_1 = require("../runtime/defs");
+const run_1 = require("../runtime/run");
+const symbol_1 = require("../runtime/symbol");
+const misc_1 = require("../sources/misc");
+const list_1 = require("./list");
+const print_1 = require("./print");
 /*
   Add a pattern i.e. a substitution rule.
   Substitution rule needs a template as first argument
@@ -14,86 +17,91 @@ import { print_list } from './print';
 // same as Eval_pattern but only leaves
 // NIL on stack at return, hence gives no
 // printout
-export function Eval_silentpattern(p1) {
+function Eval_silentpattern(p1) {
     Eval_pattern(p1);
-    return symbol(NIL);
+    return symbol_1.symbol(defs_1.NIL);
 }
-export function Eval_pattern(p1) {
+exports.Eval_silentpattern = Eval_silentpattern;
+function Eval_pattern(p1) {
     // check that the parameters are allright
     let thirdArgument;
-    if (!iscons(cdr(p1))) {
-        stop('pattern needs at least a template and a transformed version');
+    if (!defs_1.iscons(defs_1.cdr(p1))) {
+        run_1.stop('pattern needs at least a template and a transformed version');
     }
-    const firstArgument = car(cdr(p1));
-    const secondArgument = car(cdr(cdr(p1)));
-    if (secondArgument === symbol(NIL)) {
-        stop('pattern needs at least a template and a transformed version');
+    const firstArgument = defs_1.car(defs_1.cdr(p1));
+    const secondArgument = defs_1.car(defs_1.cdr(defs_1.cdr(p1)));
+    if (secondArgument === symbol_1.symbol(defs_1.NIL)) {
+        run_1.stop('pattern needs at least a template and a transformed version');
     }
     // third argument is optional and contains the tests
-    if (!iscons(cdr(cdr(p1)))) {
-        thirdArgument = symbol(NIL);
+    if (!defs_1.iscons(defs_1.cdr(defs_1.cdr(p1)))) {
+        thirdArgument = symbol_1.symbol(defs_1.NIL);
     }
     else {
-        thirdArgument = car(cdr(cdr(cdr(p1))));
+        thirdArgument = defs_1.car(defs_1.cdr(defs_1.cdr(defs_1.cdr(p1))));
     }
-    if (equal(firstArgument, secondArgument)) {
-        stop('recursive pattern');
+    if (misc_1.equal(firstArgument, secondArgument)) {
+        run_1.stop('recursive pattern');
     }
     // console.log "Eval_pattern of " + cdr(p1)
     // this is likely to create garbage collection
     // problems in the C version as it's an
     // untracked reference
-    let stringKey = 'template: ' + print_list(firstArgument);
-    stringKey += ' tests: ' + print_list(thirdArgument);
-    if (DEBUG) {
+    let stringKey = 'template: ' + print_1.print_list(firstArgument);
+    stringKey += ' tests: ' + print_1.print_list(thirdArgument);
+    if (defs_1.DEBUG) {
         console.log(`pattern stringkey: ${stringKey}`);
     }
-    const patternPosition = defs.userSimplificationsInStringForm.indexOf(stringKey);
+    const patternPosition = defs_1.defs.userSimplificationsInStringForm.indexOf(stringKey);
     // if pattern is not there yet, add it, otherwise replace it
     if (patternPosition === -1) {
         //console.log "adding pattern because it doesn't exist: " + cdr(p1)
-        defs.userSimplificationsInStringForm.push(stringKey);
-        defs.userSimplificationsInListForm.push(cdr(p1));
+        defs_1.defs.userSimplificationsInStringForm.push(stringKey);
+        defs_1.defs.userSimplificationsInListForm.push(defs_1.cdr(p1));
     }
     else {
-        if (DEBUG) {
-            console.log(`pattern already exists, replacing. ${cdr(p1)}`);
+        if (defs_1.DEBUG) {
+            console.log(`pattern already exists, replacing. ${defs_1.cdr(p1)}`);
         }
-        defs.userSimplificationsInStringForm[patternPosition] = stringKey;
-        defs.userSimplificationsInListForm[patternPosition] = cdr(p1);
+        defs_1.defs.userSimplificationsInStringForm[patternPosition] = stringKey;
+        defs_1.defs.userSimplificationsInListForm[patternPosition] = defs_1.cdr(p1);
     }
     // return the pattern node itself so we can
     // give some printout feedback
-    return makeList(symbol(PATTERN), cdr(p1));
+    return list_1.makeList(symbol_1.symbol(defs_1.PATTERN), defs_1.cdr(p1));
 }
+exports.Eval_pattern = Eval_pattern;
 /*
   Clear all patterns
 */
-export function do_clearPatterns() {
-    defs.userSimplificationsInListForm = [];
-    defs.userSimplificationsInStringForm = [];
+function do_clearPatterns() {
+    defs_1.defs.userSimplificationsInListForm = [];
+    defs_1.defs.userSimplificationsInStringForm = [];
 }
-export function Eval_clearpatterns() {
+exports.do_clearPatterns = do_clearPatterns;
+function Eval_clearpatterns() {
     // this is likely to create garbage collection
     // problems in the C version as it's an
     // untracked reference
     do_clearPatterns();
     // return nothing
-    return symbol(NIL);
+    return symbol_1.symbol(defs_1.NIL);
 }
-export function Eval_patternsinfo() {
+exports.Eval_clearpatterns = Eval_clearpatterns;
+function Eval_patternsinfo() {
     const patternsinfoToBePrinted = patternsinfo();
     if (patternsinfoToBePrinted !== '') {
-        return new Str(patternsinfoToBePrinted);
+        return new defs_1.Str(patternsinfoToBePrinted);
     }
     else {
-        return symbol(NIL);
+        return symbol_1.symbol(defs_1.NIL);
     }
 }
+exports.Eval_patternsinfo = Eval_patternsinfo;
 function patternsinfo() {
     let patternsinfoToBePrinted = '';
-    for (let i of Array.from(defs.userSimplificationsInListForm)) {
-        patternsinfoToBePrinted += defs.userSimplificationsInListForm + '\n';
+    for (let i of Array.from(defs_1.defs.userSimplificationsInListForm)) {
+        patternsinfoToBePrinted += defs_1.defs.userSimplificationsInListForm + '\n';
     }
     return patternsinfoToBePrinted;
 }

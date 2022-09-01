@@ -1,10 +1,13 @@
-import { nativeInt } from '../sources/bignum';
-import { isZeroAtomOrTensor } from '../sources/is';
-import { makeList } from '../sources/list';
-import { defs, FORCE_FIXED_PRINTOUT, iscons, MAX_FIXED_PRINTOUT_DIGITS, PRINTMODE_LATEX } from './defs';
-import { stop } from './run';
-import { get_binding, symbol } from './symbol';
-export function strcmp(str1, str2) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.yn = exports.jn = exports.append = exports.isalnumorunderscore = exports.isalpha = exports.isdigit = exports.isspace = exports.clear_term = exports.doubleToReasonableString = exports.strcmp = void 0;
+const bignum_1 = require("../sources/bignum");
+const is_1 = require("../sources/is");
+const list_1 = require("../sources/list");
+const defs_1 = require("./defs");
+const run_1 = require("./run");
+const symbol_1 = require("./symbol");
+function strcmp(str1, str2) {
     if (str1 === str2) {
         return 0;
     }
@@ -15,19 +18,20 @@ export function strcmp(str1, str2) {
         return -1;
     }
 }
-export function doubleToReasonableString(d) {
+exports.strcmp = strcmp;
+function doubleToReasonableString(d) {
     // when generating code, print out
     // the standard JS Number printout
     let stringRepresentation;
-    if (defs.codeGen || defs.fullDoubleOutput) {
+    if (defs_1.defs.codeGen || defs_1.defs.fullDoubleOutput) {
         return '' + d;
     }
-    if (isZeroAtomOrTensor(get_binding(symbol(FORCE_FIXED_PRINTOUT)))) {
+    if (is_1.isZeroAtomOrTensor(symbol_1.get_binding(symbol_1.symbol(defs_1.FORCE_FIXED_PRINTOUT)))) {
         stringRepresentation = '' + d;
         // manipulate the string so that it can be parsed by
         // Algebrite (something like 1.23e-123 wouldn't cut it because
         // that would be parsed as 1.23*e - 123)
-        if (defs.printMode === PRINTMODE_LATEX) {
+        if (defs_1.defs.printMode === defs_1.PRINTMODE_LATEX) {
             // 1.0\mathrm{e}{-10} looks much better than the plain 1.0e-10
             if (/\d*\.\d*e.*/gm.test(stringRepresentation)) {
                 stringRepresentation = stringRepresentation.replace(/e(.*)/gm, '\\mathrm{e}{$1}');
@@ -52,7 +56,7 @@ export function doubleToReasonableString(d) {
         }
     }
     else {
-        const maxFixedPrintoutDigits = nativeInt(get_binding(symbol(MAX_FIXED_PRINTOUT_DIGITS)));
+        const maxFixedPrintoutDigits = bignum_1.nativeInt(symbol_1.get_binding(symbol_1.symbol(defs_1.MAX_FIXED_PRINTOUT_DIGITS)));
         //console.log "maxFixedPrintoutDigits: " + maxFixedPrintoutDigits
         //console.log "type: " + typeof(maxFixedPrintoutDigits)
         //console.log "toFixed: " + d.toFixed(maxFixedPrintoutDigits)
@@ -74,10 +78,12 @@ export function doubleToReasonableString(d) {
     }
     return stringRepresentation;
 }
+exports.doubleToReasonableString = doubleToReasonableString;
 // does nothing
-export function clear_term() { }
+function clear_term() { }
+exports.clear_term = clear_term;
 // s is a string here anyways
-export function isspace(s) {
+function isspace(s) {
     if (s == null) {
         return false;
     }
@@ -88,19 +94,22 @@ export function isspace(s) {
         s === '\f' ||
         s === '\r');
 }
-export function isdigit(str) {
+exports.isspace = isspace;
+function isdigit(str) {
     if (str == null) {
         return false;
     }
     return /^\d+$/.test(str);
 }
-export function isalpha(str) {
+exports.isdigit = isdigit;
+function isalpha(str) {
     if (str == null) {
         return false;
     }
     //Check for non-alphabetic characters and space
     return str.search(/[^A-Za-z]/) === -1;
 }
+exports.isalpha = isalpha;
 function isalphaOrUnderscore(str) {
     if (str == null) {
         return false;
@@ -114,31 +123,35 @@ function isunderscore(str) {
     }
     return str.search(/_/) === -1;
 }
-export function isalnumorunderscore(str) {
+function isalnumorunderscore(str) {
     if (str == null) {
         return false;
     }
     return isalphaOrUnderscore(str) || isdigit(str);
 }
+exports.isalnumorunderscore = isalnumorunderscore;
 // Append one list to another.
-export function append(p1, p2) {
+function append(p1, p2) {
     // from https://github.com/gbl08ma/eigenmath/blob/8be989f00f2f6f37989bb7fd2e75a83f882fdc49/src/append.cpp
     const arr = [];
-    if (iscons(p1)) {
+    if (defs_1.iscons(p1)) {
         arr.push(...p1);
     }
-    if (iscons(p2)) {
+    if (defs_1.iscons(p2)) {
         arr.push(...p2);
     }
-    return makeList(...arr);
+    return list_1.makeList(...arr);
 }
-export function jn(n, x) {
-    stop('Not implemented');
+exports.append = append;
+function jn(n, x) {
+    run_1.stop('Not implemented');
     // See https://git.musl-libc.org/cgit/musl/tree/src/math/jn.c
     // https://github.com/SheetJS/bessel
 }
-export function yn(n, x) {
-    stop('Not implemented');
+exports.jn = jn;
+function yn(n, x) {
+    run_1.stop('Not implemented');
     // See https://git.musl-libc.org/cgit/musl/tree/src/math/jn.c
     // https://github.com/SheetJS/bessel
 }
+exports.yn = yn;

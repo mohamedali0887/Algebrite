@@ -1,12 +1,15 @@
-import { BESSELY, caddr, cadr, Constants, isdouble } from '../runtime/defs';
-import { yn } from '../runtime/otherCFunctions';
-import { symbol } from "../runtime/symbol";
-import { double, nativeInt } from './bignum';
-import { Eval } from './eval';
-import { isnegativeterm } from './is';
-import { makeList } from './list';
-import { multiply, negate } from './multiply';
-import { power } from './power';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.bessely = exports.Eval_bessely = void 0;
+const defs_1 = require("../runtime/defs");
+const otherCFunctions_1 = require("../runtime/otherCFunctions");
+const symbol_1 = require("../runtime/symbol");
+const bignum_1 = require("./bignum");
+const eval_1 = require("./eval");
+const is_1 = require("./is");
+const list_1 = require("./list");
+const multiply_1 = require("./multiply");
+const power_1 = require("./power");
 /* bessely =====================================================================
 
 Tags
@@ -23,20 +26,22 @@ General description
 Bessel function of second kind.
 
 */
-export function Eval_bessely(p1) {
-    return bessely(Eval(cadr(p1)), Eval(caddr(p1)));
+function Eval_bessely(p1) {
+    return bessely(eval_1.Eval(defs_1.cadr(p1)), eval_1.Eval(defs_1.caddr(p1)));
 }
-export function bessely(p1, p2) {
+exports.Eval_bessely = Eval_bessely;
+function bessely(p1, p2) {
     return yybessely(p1, p2);
 }
+exports.bessely = bessely;
 function yybessely(X, N) {
-    const n = nativeInt(N);
-    if (isdouble(X) && !isNaN(n)) {
-        const d = yn(n, X.d);
-        return double(d);
+    const n = bignum_1.nativeInt(N);
+    if (defs_1.isdouble(X) && !isNaN(n)) {
+        const d = otherCFunctions_1.yn(n, X.d);
+        return bignum_1.double(d);
     }
-    if (isnegativeterm(N)) {
-        return multiply(power(Constants.negOne, N), makeList(symbol(BESSELY), X, negate(N)));
+    if (is_1.isnegativeterm(N)) {
+        return multiply_1.multiply(power_1.power(defs_1.Constants.negOne, N), list_1.makeList(symbol_1.symbol(defs_1.BESSELY), X, multiply_1.negate(N)));
     }
-    return makeList(symbol(BESSELY), X, N);
+    return list_1.makeList(symbol_1.symbol(defs_1.BESSELY), X, N);
 }

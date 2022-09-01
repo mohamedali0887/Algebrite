@@ -1,5 +1,7 @@
-import { run_test } from '../test-harness';
-run_test([
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const test_harness_1 = require("../test-harness");
+test_harness_1.run_test([
     'A=[[A11,A12],[A21,A22]]',
     '',
     'A[1,1]',

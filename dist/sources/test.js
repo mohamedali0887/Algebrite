@@ -1,24 +1,27 @@
-import { caddr, cadr, car, cddr, cdr, Constants, DOUBLE, iscons, MSIGN, NIL, NUM } from '../runtime/defs';
-import { symbol } from "../runtime/symbol";
-import { subtract } from './add';
-import { Eval } from './eval';
-import { yyfloat } from './float';
-import { isZeroAtomOrTensor, isZeroLikeOrNonZeroLikeOrUndetermined } from './is';
-import { simplify } from './simplify';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Eval_or = exports.Eval_and = exports.Eval_not = exports.Eval_testlt = exports.Eval_testle = exports.Eval_testgt = exports.Eval_testge = exports.Eval_testeq = exports.Eval_test = void 0;
+const defs_1 = require("../runtime/defs");
+const symbol_1 = require("../runtime/symbol");
+const add_1 = require("./add");
+const eval_1 = require("./eval");
+const float_1 = require("./float");
+const is_1 = require("./is");
+const simplify_1 = require("./simplify");
 // If the number of args is odd then the last arg is the default result.
 // Works like a switch statement. Could also be used for piecewise
 // functions? TODO should probably be called "switch"?
-export function Eval_test(p1) {
+function Eval_test(p1) {
     const orig = p1;
-    p1 = cdr(p1);
-    while (iscons(p1)) {
+    p1 = defs_1.cdr(p1);
+    while (defs_1.iscons(p1)) {
         // odd number of parameters means that the
         // last argument becomes the default case
         // i.e. the one without a test.
-        if (cdr(p1) === symbol(NIL)) {
-            return Eval(car(p1)); // default case
+        if (defs_1.cdr(p1) === symbol_1.symbol(defs_1.NIL)) {
+            return eval_1.Eval(defs_1.car(p1)); // default case
         }
-        const checkResult = isZeroLikeOrNonZeroLikeOrUndetermined(car(p1));
+        const checkResult = is_1.isZeroLikeOrNonZeroLikeOrUndetermined(defs_1.car(p1));
         if (checkResult == null) {
             // we couldn't determine the result
             // of a test. This means we can't conclude
@@ -29,27 +32,28 @@ export function Eval_test(p1) {
         }
         else if (checkResult) {
             // test succesful, we found out output
-            return Eval(cadr(p1));
+            return eval_1.Eval(defs_1.cadr(p1));
         }
         else {
             // test unsuccessful, continue to the
             // next pair of test,value
-            p1 = cddr(p1);
+            p1 = defs_1.cddr(p1);
         }
     }
     // no test matched and there was no
     // catch-all case, so we return zero.
-    return Constants.zero;
+    return defs_1.Constants.zero;
 }
+exports.Eval_test = Eval_test;
 // we test A==B by first subtracting and checking if we symbolically
 // get zero. If not, we evaluate to float and check if we get a zero.
 // If we get another NUMBER then we know they are different.
 // If we get something else, then we don't know and we return the
 // unaveluated test, which is the same as saying "maybe".
-export function Eval_testeq(p1) {
+function Eval_testeq(p1) {
     // first try without simplifyng both sides
     const orig = p1;
-    let subtractionResult = subtract(Eval(cadr(p1)), Eval(caddr(p1)));
+    let subtractionResult = add_1.subtract(eval_1.Eval(defs_1.cadr(p1)), eval_1.Eval(defs_1.caddr(p1)));
     // OK so we are doing something tricky here
     // we are using isZeroLikeOrNonZeroLikeOrUndetermined to check if the result
     // is zero or not zero or unknown.
@@ -57,101 +61,107 @@ export function Eval_testeq(p1) {
     // to determine the zero-ness/non-zero-ness or
     // undeterminate-ness of things so we use
     // that here and down below.
-    let checkResult = isZeroLikeOrNonZeroLikeOrUndetermined(subtractionResult);
+    let checkResult = is_1.isZeroLikeOrNonZeroLikeOrUndetermined(subtractionResult);
     if (checkResult) {
-        return Constants.zero;
+        return defs_1.Constants.zero;
     }
     else if (checkResult != null && !checkResult) {
-        return Constants.one;
+        return defs_1.Constants.one;
     }
     // we didn't get a simple numeric result but
     // let's try again after doing
     // a simplification on both sides
-    const arg1 = simplify(Eval(cadr(p1)));
-    const arg2 = simplify(Eval(caddr(p1)));
-    subtractionResult = subtract(arg1, arg2);
-    checkResult = isZeroLikeOrNonZeroLikeOrUndetermined(subtractionResult);
+    const arg1 = simplify_1.simplify(eval_1.Eval(defs_1.cadr(p1)));
+    const arg2 = simplify_1.simplify(eval_1.Eval(defs_1.caddr(p1)));
+    subtractionResult = add_1.subtract(arg1, arg2);
+    checkResult = is_1.isZeroLikeOrNonZeroLikeOrUndetermined(subtractionResult);
     if (checkResult) {
-        return Constants.zero;
+        return defs_1.Constants.zero;
     }
     else if (checkResult != null && !checkResult) {
-        return Constants.one;
+        return defs_1.Constants.one;
     }
     // if we didn't get to a number then we
     // don't know whether the quantities are
     // different so do nothing
     return orig;
 }
+exports.Eval_testeq = Eval_testeq;
 // Relational operators expect a numeric result for operand difference.
-export function Eval_testge(p1) {
+function Eval_testge(p1) {
     const orig = p1;
     const comparison = cmp_args(p1);
     if (comparison == null) {
         return orig;
     }
     if (comparison >= 0) {
-        return Constants.one;
+        return defs_1.Constants.one;
     }
     else {
-        return Constants.zero;
+        return defs_1.Constants.zero;
     }
 }
-export function Eval_testgt(p1) {
+exports.Eval_testge = Eval_testge;
+function Eval_testgt(p1) {
     const orig = p1;
     const comparison = cmp_args(p1);
     if (comparison == null) {
         return orig;
     }
     if (comparison > 0) {
-        return Constants.one;
+        return defs_1.Constants.one;
     }
     else {
-        return Constants.zero;
+        return defs_1.Constants.zero;
     }
 }
-export function Eval_testle(p1) {
+exports.Eval_testgt = Eval_testgt;
+function Eval_testle(p1) {
     const orig = p1;
     const comparison = cmp_args(p1);
     if (comparison == null) {
         return orig;
     }
     if (comparison <= 0) {
-        return Constants.one;
+        return defs_1.Constants.one;
     }
     else {
-        return Constants.zero;
+        return defs_1.Constants.zero;
     }
 }
-export function Eval_testlt(p1) {
+exports.Eval_testle = Eval_testle;
+function Eval_testlt(p1) {
     const orig = p1;
     const comparison = cmp_args(p1);
     if (comparison == null) {
         return orig;
     }
     if (comparison < 0) {
-        return Constants.one;
+        return defs_1.Constants.one;
     }
     else {
-        return Constants.zero;
+        return defs_1.Constants.zero;
     }
 }
+exports.Eval_testlt = Eval_testlt;
 // not definition
-export function Eval_not(p1) {
+function Eval_not(p1) {
     const wholeAndExpression = p1;
-    const checkResult = isZeroLikeOrNonZeroLikeOrUndetermined(cadr(p1));
+    const checkResult = is_1.isZeroLikeOrNonZeroLikeOrUndetermined(defs_1.cadr(p1));
     if (checkResult == null) {
         // inconclusive test on predicate
         return wholeAndExpression;
     }
     else if (checkResult) {
         // true -> false
-        return Constants.zero;
+        return defs_1.Constants.zero;
     }
     else {
         // false -> true
-        return Constants.one;
+        return defs_1.Constants.one;
     }
 }
+exports.Eval_not = Eval_not;
 /* and =====================================================================
 
 Tags
@@ -168,13 +178,13 @@ Logical-and of predicate expressions.
 
 */
 // and definition
-export function Eval_and(p1) {
+function Eval_and(p1) {
     const wholeAndExpression = p1;
-    let andPredicates = cdr(wholeAndExpression);
+    let andPredicates = defs_1.cdr(wholeAndExpression);
     let somePredicateUnknown = false;
-    while (iscons(andPredicates)) {
+    while (defs_1.iscons(andPredicates)) {
         // eval each predicate
-        const checkResult = isZeroLikeOrNonZeroLikeOrUndetermined(car(andPredicates));
+        const checkResult = is_1.isZeroLikeOrNonZeroLikeOrUndetermined(defs_1.car(andPredicates));
         if (checkResult == null) {
             // here we have stuff that is not reconducible to any
             // numeric value (or tensor with numeric values) e.g.
@@ -186,15 +196,15 @@ export function Eval_and(p1) {
             // it won't matter that we found some unknowns and
             // the whole test will be immediately zero).
             somePredicateUnknown = true;
-            andPredicates = cdr(andPredicates);
+            andPredicates = defs_1.cdr(andPredicates);
         }
         else if (checkResult) {
             // found a true, move on to the next predicate
-            andPredicates = cdr(andPredicates);
+            andPredicates = defs_1.cdr(andPredicates);
         }
         else if (!checkResult) {
             // found a false, enough to falsify everything and return
-            return Constants.zero;
+            return defs_1.Constants.zero;
         }
     }
     // We checked all the predicates and none of them
@@ -207,17 +217,18 @@ export function Eval_and(p1) {
         return wholeAndExpression;
     }
     else {
-        return Constants.one;
+        return defs_1.Constants.one;
     }
 }
+exports.Eval_and = Eval_and;
 // or definition
-export function Eval_or(p1) {
+function Eval_or(p1) {
     const wholeOrExpression = p1;
-    let orPredicates = cdr(wholeOrExpression);
+    let orPredicates = defs_1.cdr(wholeOrExpression);
     let somePredicateUnknown = false;
-    while (iscons(orPredicates)) {
+    while (defs_1.iscons(orPredicates)) {
         // eval each predicate
-        const checkResult = isZeroLikeOrNonZeroLikeOrUndetermined(car(orPredicates));
+        const checkResult = is_1.isZeroLikeOrNonZeroLikeOrUndetermined(defs_1.car(orPredicates));
         if (checkResult == null) {
             // here we have stuff that is not reconducible to any
             // numeric value (or tensor with numeric values) e.g.
@@ -229,15 +240,15 @@ export function Eval_or(p1) {
             // it won't matter that we found some unknowns and
             // the whole test will be immediately zero).
             somePredicateUnknown = true;
-            orPredicates = cdr(orPredicates);
+            orPredicates = defs_1.cdr(orPredicates);
         }
         else if (checkResult) {
             // found a true, enough to return true
-            return Constants.one;
+            return defs_1.Constants.one;
         }
         else if (!checkResult) {
             // found a false, move on to the next predicate
-            orPredicates = cdr(orPredicates);
+            orPredicates = defs_1.cdr(orPredicates);
         }
     }
     // We checked all the predicates and none of them
@@ -250,9 +261,10 @@ export function Eval_or(p1) {
         return wholeOrExpression;
     }
     else {
-        return Constants.zero;
+        return defs_1.Constants.zero;
     }
 }
+exports.Eval_or = Eval_or;
 // use subtract for cases like A < A + 1
 // TODO you could be smarter here and
 // simplify both sides only in the case
@@ -260,28 +272,28 @@ export function Eval_or(p1) {
 // a bit like we do in Eval_testeq
 function cmp_args(p1) {
     let t = 0;
-    const arg1 = simplify(Eval(cadr(p1)));
-    const arg2 = simplify(Eval(caddr(p1)));
-    p1 = subtract(arg1, arg2);
+    const arg1 = simplify_1.simplify(eval_1.Eval(defs_1.cadr(p1)));
+    const arg2 = simplify_1.simplify(eval_1.Eval(defs_1.caddr(p1)));
+    p1 = add_1.subtract(arg1, arg2);
     // try floating point if necessary
-    if (p1.k !== NUM && p1.k !== DOUBLE) {
-        p1 = Eval(yyfloat(p1));
+    if (p1.k !== defs_1.NUM && p1.k !== defs_1.DOUBLE) {
+        p1 = eval_1.Eval(float_1.yyfloat(p1));
     }
     //console.log "comparison: " + p1.toString()
-    if (isZeroAtomOrTensor(p1)) {
+    if (is_1.isZeroAtomOrTensor(p1)) {
         //console.log "comparison isZero "
         return 0;
     }
     switch (p1.k) {
-        case NUM:
-            if (MSIGN(p1.q.a) === -1) {
+        case defs_1.NUM:
+            if (defs_1.MSIGN(p1.q.a) === -1) {
                 t = -1;
             }
             else {
                 t = 1;
             }
             break;
-        case DOUBLE:
+        case defs_1.DOUBLE:
             //console.log "comparison p1.d: " + p1.d
             if (p1.d < 0.0) {
                 t = -1;

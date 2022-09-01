@@ -1,8 +1,11 @@
-import { caadr, caddr, cadr, car, cdadr, EVAL, FUNCTION, issymbol, NIL } from '../runtime/defs';
-import { stop } from '../runtime/run';
-import { set_binding, symbol } from '../runtime/symbol';
-import { Eval } from './eval';
-import { makeList } from './list';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Eval_function_reference = exports.define_user_function = void 0;
+const defs_1 = require("../runtime/defs");
+const run_1 = require("../runtime/run");
+const symbol_1 = require("../runtime/symbol");
+const eval_1 = require("./eval");
+const list_1 = require("./list");
 // Store a function definition
 //
 // Example:
@@ -36,16 +39,16 @@ import { makeList } from './list';
 // F function name
 // A argument list
 // B function body
-export function define_user_function(p1) {
-    const F = caadr(p1);
-    const A = cdadr(p1);
-    let B = caddr(p1);
-    if (!issymbol(F)) {
-        stop('function name?');
+function define_user_function(p1) {
+    const F = defs_1.caadr(p1);
+    const A = defs_1.cdadr(p1);
+    let B = defs_1.caddr(p1);
+    if (!defs_1.issymbol(F)) {
+        run_1.stop('function name?');
     }
     // evaluate function body (maybe)
-    if (car(B) === symbol(EVAL)) {
-        B = Eval(cadr(B));
+    if (defs_1.car(B) === symbol_1.symbol(defs_1.EVAL)) {
+        B = eval_1.Eval(defs_1.cadr(B));
     }
     // note how, unless explicitly forced by an eval,
     // (handled by the if just above)
@@ -59,11 +62,13 @@ export function define_user_function(p1) {
     // which would need to otherwise
     // be solved by some scope device
     // somehow
-    B = makeList(symbol(FUNCTION), B, A);
-    set_binding(F, B);
+    B = list_1.makeList(symbol_1.symbol(defs_1.FUNCTION), B, A);
+    symbol_1.set_binding(F, B);
     // return value is nil
-    return symbol(NIL);
+    return symbol_1.symbol(defs_1.NIL);
 }
-export function Eval_function_reference(p1) {
+exports.define_user_function = define_user_function;
+function Eval_function_reference(p1) {
     return p1;
 }
+exports.Eval_function_reference = Eval_function_reference;

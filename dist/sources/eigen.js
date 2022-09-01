@@ -1,12 +1,15 @@
-import { cadr, EIGEN, EIGENVAL, EIGENVEC, isdouble, istensor, NIL } from '../runtime/defs';
-import { stop } from '../runtime/run';
-import { set_binding, symbol, usr_symbol } from '../runtime/symbol';
-import { double } from './bignum';
-import { Eval } from './eval';
-import { yyfloat } from './float';
-import { makeList } from './list';
-import { print_str } from './print';
-import { copy_tensor } from './tensor';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Eval_eigenvec = exports.Eval_eigenval = exports.Eval_eigen = void 0;
+const defs_1 = require("../runtime/defs");
+const run_1 = require("../runtime/run");
+const symbol_1 = require("../runtime/symbol");
+const bignum_1 = require("./bignum");
+const eval_1 = require("./eval");
+const float_1 = require("./float");
+const list_1 = require("./list");
+const print_1 = require("./print");
+const tensor_1 = require("./tensor");
 /* eigen =====================================================================
 
 Tags
@@ -91,18 +94,19 @@ Result:
 let EIG_N = 0;
 const EIG_yydd = [];
 const EIG_yyqq = [];
-export function Eval_eigen(p1) {
+function Eval_eigen(p1) {
     const { arg } = EIG_check_arg(p1);
     if (!arg) {
-        stop('eigen: argument is not a square matrix');
+        run_1.stop('eigen: argument is not a square matrix');
     }
-    let [p2, p3] = eigen(EIGEN, arg);
-    p1 = usr_symbol('D');
-    set_binding(p1, p2);
-    p1 = usr_symbol('Q');
-    set_binding(p1, p3);
-    return symbol(NIL);
+    let [p2, p3] = eigen(defs_1.EIGEN, arg);
+    p1 = symbol_1.usr_symbol('D');
+    symbol_1.set_binding(p1, p2);
+    p1 = symbol_1.usr_symbol('Q');
+    symbol_1.set_binding(p1, p3);
+    return symbol_1.symbol(defs_1.NIL);
 }
+exports.Eval_eigen = Eval_eigen;
 /* eigenval =====================================================================
 
 Tags
@@ -118,14 +122,15 @@ General description
 Compute eigenvalues of m. See "eigen" for more info.
 
 */
-export function Eval_eigenval(p1) {
+function Eval_eigenval(p1) {
     const { arg, invalid } = EIG_check_arg(p1);
     if (invalid) {
-        return makeList(symbol(EIGENVAL), invalid);
+        return list_1.makeList(symbol_1.symbol(defs_1.EIGENVAL), invalid);
     }
-    let [p2, p3] = eigen(EIGENVAL, arg);
+    let [p2, p3] = eigen(defs_1.EIGENVAL, arg);
     return p2;
 }
+exports.Eval_eigenval = Eval_eigenval;
 /* eigenvec =====================================================================
 
 Tags
@@ -141,32 +146,33 @@ General description
 Compute eigenvectors of m. See "eigen" for more info.
 
 */
-export function Eval_eigenvec(p1) {
+function Eval_eigenvec(p1) {
     const { arg, invalid } = EIG_check_arg(p1);
     if (invalid) {
-        return makeList(symbol(EIGENVEC), invalid);
+        return list_1.makeList(symbol_1.symbol(defs_1.EIGENVEC), invalid);
     }
-    let [_, p3] = eigen(EIGENVEC, arg);
+    let [_, p3] = eigen(defs_1.EIGENVEC, arg);
     return p3;
 }
+exports.Eval_eigenvec = Eval_eigenvec;
 function EIG_check_arg(p1) {
-    p1 = Eval(yyfloat(Eval(cadr(p1))));
-    if (!istensor(p1)) {
+    p1 = eval_1.Eval(float_1.yyfloat(eval_1.Eval(defs_1.cadr(p1))));
+    if (!defs_1.istensor(p1)) {
         return { invalid: p1 };
     }
     if (p1.tensor.ndim !== 2 || p1.tensor.dim[0] !== p1.tensor.dim[1]) {
-        stop('eigen: argument is not a square matrix');
+        run_1.stop('eigen: argument is not a square matrix');
     }
     EIG_N = p1.tensor.dim[0];
     if (!eigIsDoubleTensor(p1)) {
-        stop('eigen: matrix is not numerical');
+        run_1.stop('eigen: matrix is not numerical');
     }
     for (let i = 0; i < EIG_N - 1; i++) {
         for (let j = i + 1; j < EIG_N; j++) {
             const eli = p1.tensor.elem[EIG_N * i + j];
             const elj = p1.tensor.elem[EIG_N * j + i];
             if (Math.abs(eli.d - elj.d) > 1e-10) {
-                stop('eigen: matrix is not symmetrical');
+                run_1.stop('eigen: matrix is not symmetrical');
             }
         }
     }
@@ -175,7 +181,7 @@ function EIG_check_arg(p1) {
 function eigIsDoubleTensor(p1) {
     for (let i = 0; i < EIG_N; i++) {
         for (let j = 0; j < EIG_N; j++) {
-            if (!isdouble(p1.tensor.elem[EIG_N * i + j])) {
+            if (!defs_1.isdouble(p1.tensor.elem[EIG_N * i + j])) {
                 return false;
             }
         }
@@ -229,23 +235,23 @@ function eigen(op, p1) {
         }
     }
     if (i === 100) {
-        print_str('\nnote: eigen did not converge\n');
+        print_1.print_str('\nnote: eigen did not converge\n');
     }
     let D;
-    if (op === EIGEN || op === EIGENVAL) {
-        D = copy_tensor(p1);
+    if (op === defs_1.EIGEN || op === defs_1.EIGENVAL) {
+        D = tensor_1.copy_tensor(p1);
         for (let i = 0; i < EIG_N; i++) {
             for (let j = 0; j < EIG_N; j++) {
-                D.tensor.elem[EIG_N * i + j] = double(EIG_yydd[EIG_N * i + j]);
+                D.tensor.elem[EIG_N * i + j] = bignum_1.double(EIG_yydd[EIG_N * i + j]);
             }
         }
     }
     let Q;
-    if (op === EIGEN || op === EIGENVEC) {
-        Q = copy_tensor(p1);
+    if (op === defs_1.EIGEN || op === defs_1.EIGENVEC) {
+        Q = tensor_1.copy_tensor(p1);
         for (let i = 0; i < EIG_N; i++) {
             for (let j = 0; j < EIG_N; j++) {
-                Q.tensor.elem[EIG_N * i + j] = double(EIG_yyqq[EIG_N * i + j]);
+                Q.tensor.elem[EIG_N * i + j] = bignum_1.double(EIG_yyqq[EIG_N * i + j]);
             }
         }
     }

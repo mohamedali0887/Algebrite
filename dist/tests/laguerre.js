@@ -1,5 +1,7 @@
-import { run_test } from '../test-harness';
-run_test([
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const test_harness_1 = require("../test-harness");
+test_harness_1.run_test([
     'laguerre(x,n)',
     'laguerre(x,n,0)',
     'laguerre(x,n,k)',

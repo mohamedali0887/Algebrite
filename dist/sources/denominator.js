@@ -1,9 +1,12 @@
-import { caddr, cadr, car, cdr, Constants, isadd, ismultiply, ispower, isrational } from '../runtime/defs';
-import { mp_denominator } from './bignum';
-import { Eval } from './eval';
-import { isnegativeterm, isplusone } from './is';
-import { multiply_all, reciprocate } from './multiply';
-import { rationalize } from './rationalize';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.denominator = exports.Eval_denominator = void 0;
+const defs_1 = require("../runtime/defs");
+const bignum_1 = require("./bignum");
+const eval_1 = require("./eval");
+const is_1 = require("./is");
+const multiply_1 = require("./multiply");
+const rationalize_1 = require("./rationalize");
 /* denominator =====================================================================
 
 Tags
@@ -19,22 +22,24 @@ General description
 Returns the denominator of expression x.
 
 */
-export function Eval_denominator(p1) {
-    return denominator(Eval(cadr(p1)));
+function Eval_denominator(p1) {
+    return denominator(eval_1.Eval(defs_1.cadr(p1)));
 }
-export function denominator(p1) {
+exports.Eval_denominator = Eval_denominator;
+function denominator(p1) {
     //console.trace "denominator of: " + p1
-    if (isadd(p1)) {
-        p1 = rationalize(p1);
+    if (defs_1.isadd(p1)) {
+        p1 = rationalize_1.rationalize(p1);
     }
-    if (ismultiply(p1) && !isplusone(car(cdr(p1)))) {
-        return multiply_all(p1.tail().map(denominator));
+    if (defs_1.ismultiply(p1) && !is_1.isplusone(defs_1.car(defs_1.cdr(p1)))) {
+        return multiply_1.multiply_all(p1.tail().map(denominator));
     }
-    if (isrational(p1)) {
-        return mp_denominator(p1);
+    if (defs_1.isrational(p1)) {
+        return bignum_1.mp_denominator(p1);
     }
-    if (ispower(p1) && isnegativeterm(caddr(p1))) {
-        return reciprocate(p1);
+    if (defs_1.ispower(p1) && is_1.isnegativeterm(defs_1.caddr(p1))) {
+        return multiply_1.reciprocate(p1);
     }
-    return Constants.one;
+    return defs_1.Constants.one;
 }
+exports.denominator = denominator;

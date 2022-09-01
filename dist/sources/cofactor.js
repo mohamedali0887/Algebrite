@@ -1,9 +1,12 @@
-import { cadddr, caddr, cadr } from '../runtime/defs';
-import { stop } from '../runtime/run';
-import { determinant } from './det';
-import { Eval, evaluate_integer } from './eval';
-import { negate } from './multiply';
-import { is_square_matrix } from './tensor';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.cofactor = exports.Eval_cofactor = void 0;
+const defs_1 = require("../runtime/defs");
+const run_1 = require("../runtime/run");
+const det_1 = require("./det");
+const eval_1 = require("./eval");
+const multiply_1 = require("./multiply");
+const tensor_1 = require("./tensor");
 /* cofactor =====================================================================
 
 Tags
@@ -21,23 +24,24 @@ Let c be the cofactor matrix of matrix m, i.e. tranpose(c) = adj(m).
 This function returns c[i,j].
 
 */
-export function Eval_cofactor(p1) {
-    const p2 = Eval(cadr(p1));
-    if (!is_square_matrix(p2)) {
-        stop('cofactor: 1st arg: square matrix expected');
+function Eval_cofactor(p1) {
+    const p2 = eval_1.Eval(defs_1.cadr(p1));
+    if (!tensor_1.is_square_matrix(p2)) {
+        run_1.stop('cofactor: 1st arg: square matrix expected');
     }
     const n = p2.tensor.dim[0];
-    const i = evaluate_integer(caddr(p1));
+    const i = eval_1.evaluate_integer(defs_1.caddr(p1));
     if (i < 1 || i > n) {
-        stop('cofactor: 2nd arg: row index expected');
+        run_1.stop('cofactor: 2nd arg: row index expected');
     }
-    const j = evaluate_integer(cadddr(p1));
+    const j = eval_1.evaluate_integer(defs_1.cadddr(p1));
     if (j < 1 || j > n) {
-        stop('cofactor: 3rd arg: column index expected');
+        run_1.stop('cofactor: 3rd arg: column index expected');
     }
     return cofactor(p2, n, i - 1, j - 1);
 }
-export function cofactor(p, n, row, col) {
+exports.Eval_cofactor = Eval_cofactor;
+function cofactor(p, n, row, col) {
     const elements = [];
     for (let i = 0; i < n; i++) {
         for (let j = 0; j < n; j++) {
@@ -46,9 +50,10 @@ export function cofactor(p, n, row, col) {
             }
         }
     }
-    let result = determinant(elements, n - 1);
+    let result = det_1.determinant(elements, n - 1);
     if ((row + col) % 2) {
-        result = negate(result);
+        result = multiply_1.negate(result);
     }
     return result;
 }
+exports.cofactor = cofactor;

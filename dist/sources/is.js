@@ -1,25 +1,28 @@
-import { breakpoint, cadddr, caddr, cadr, car, cdr, Constants, DEBUG, DOUBLE, FLOATF, isadd, iscons, isdouble, ismultiply, isNumericAtom, isNumericAtomOrTensor, ispower, isrational, issymbol, istensor, MEQUAL, MSIGN, MZERO, NUM, PI, SYMBOL_X, SYMBOL_Y, SYMBOL_Z } from '../runtime/defs';
-import { Find } from '../runtime/find';
-import { symbol } from "../runtime/symbol";
-import { equal, length } from '../sources/misc';
-import { absValFloat } from './abs';
-import { integer, nativeInt } from './bignum';
-import { Eval_predicate } from './eval';
-import { zzfloat } from './float';
-import { guess } from './guess';
-import { multiply } from './multiply';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.isnpi = exports.isquarterturn = exports.isimaginaryunit = exports.isfloating = exports.isMinusSqrtThreeOverTwo = exports.isSqrtThreeOverTwo = exports.isminusoneoversqrttwo = exports.isoneoversqrttwo = exports.isminusoneovertwo = exports.isoneovertwo = exports.equalq = exports.equaln = exports.isfraction = exports.isoneover = exports.isNumberOneOverSomething = exports.isintegerfactor = exports.issymbolic = exports.isnegative = exports.iseveninteger = exports.iscomplexnumber = exports.iscomplexnumberdouble = exports.isimaginarynumber = exports.isnegativeterm = exports.ispolyexpandedform = exports.isunivarpolyfactoredorexpandedform = exports.isposint = exports.isnonnegativeinteger = exports.isintegerorintegerfloat = exports.isinteger = exports.isone = exports.isminusone = exports.isplusone = exports.isplustwo = exports.ispositivenumber = exports.isnegativenumber = exports.isZeroLikeOrNonZeroLikeOrUndetermined = exports.isZeroAtomOrTensor = exports.isZeroAtom = void 0;
+const defs_1 = require("../runtime/defs");
+const find_1 = require("../runtime/find");
+const symbol_1 = require("../runtime/symbol");
+const misc_1 = require("../sources/misc");
+const abs_1 = require("./abs");
+const bignum_1 = require("./bignum");
+const eval_1 = require("./eval");
+const float_1 = require("./float");
+const guess_1 = require("./guess");
+const multiply_1 = require("./multiply");
 const DEBUG_IS = false;
 // this routine is a simple check on whether we have
 // a basic zero in our hands. It doesn't perform any
 // calculations or simplifications.
-export function isZeroAtom(p) {
+function isZeroAtom(p) {
     switch (p.k) {
-        case NUM:
-            if (MZERO(p.q.a)) {
+        case defs_1.NUM:
+            if (defs_1.MZERO(p.q.a)) {
                 return true;
             }
             break;
-        case DOUBLE:
+        case defs_1.DOUBLE:
             if (p.d === 0.0) {
                 return true;
             }
@@ -27,11 +30,12 @@ export function isZeroAtom(p) {
     }
     return false;
 }
+exports.isZeroAtom = isZeroAtom;
 // this routine is a simple check on whether we have
 // a basic zero in our hands. It doesn't perform any
 // calculations or simplifications.
 function isZeroTensor(p) {
-    if (!istensor(p)) {
+    if (!defs_1.istensor(p)) {
         return false;
     }
     return p.tensor.elem.every((el) => isZeroAtomOrTensor(el));
@@ -39,9 +43,10 @@ function isZeroTensor(p) {
 // this routine is a simple check on whether we have
 // a basic zero in our hands. It doesn't perform any
 // calculations or simplifications.
-export function isZeroAtomOrTensor(p) {
+function isZeroAtomOrTensor(p) {
     return isZeroAtom(p) || isZeroTensor(p);
 }
+exports.isZeroAtomOrTensor = isZeroAtomOrTensor;
 // This is a key routine to try to determine whether
 // the argument looks like zero/false, or non-zero/true,
 // or undetermined.
@@ -51,9 +56,9 @@ export function isZeroAtomOrTensor(p) {
 // Note that if one wants to check if we have a simple
 // zero atom or tensor in our hands, then the isZeroAtomOrTensor
 // routine is sufficient.
-export function isZeroLikeOrNonZeroLikeOrUndetermined(valueOrPredicate) {
+function isZeroLikeOrNonZeroLikeOrUndetermined(valueOrPredicate) {
     // just like Eval but turns assignments into equality checks
-    let evalledArgument = Eval_predicate(valueOrPredicate);
+    let evalledArgument = eval_1.Eval_predicate(valueOrPredicate);
     // OK first check if we already have
     // a simple zero (or simple zero tensor)
     if (isZeroAtomOrTensor(evalledArgument)) {
@@ -64,7 +69,7 @@ export function isZeroLikeOrNonZeroLikeOrUndetermined(valueOrPredicate) {
     // In such cases, since we
     // just excluded they are zero, then we take it as
     // a "true"
-    if (isNumericAtomOrTensor(evalledArgument)) {
+    if (defs_1.isNumericAtomOrTensor(evalledArgument)) {
         return true;
     }
     // if we are here we are in the case of value that
@@ -74,7 +79,7 @@ export function isZeroLikeOrNonZeroLikeOrUndetermined(valueOrPredicate) {
     // so in such cases let's try to do a float()
     // so we might get down to a simple numeric value
     // in some of those cases
-    evalledArgument = zzfloat(evalledArgument);
+    evalledArgument = float_1.zzfloat(evalledArgument);
     // anything that could be calculated down to a simple
     // numeric value is now indeed either a
     // double OR a double with an imaginary component
@@ -89,7 +94,7 @@ export function isZeroLikeOrNonZeroLikeOrUndetermined(valueOrPredicate) {
     if (isZeroAtomOrTensor(evalledArgument)) {
         return false;
     }
-    if (isNumericAtomOrTensor(evalledArgument)) {
+    if (defs_1.isNumericAtomOrTensor(evalledArgument)) {
         return true;
     }
     // here we still have cases of simple numeric values
@@ -99,13 +104,13 @@ export function isZeroLikeOrNonZeroLikeOrUndetermined(valueOrPredicate) {
     // since we JUST have to spot "zeros" we can just
     // calculate the absolute value and re-do all the checks
     // we just did
-    if (Find(evalledArgument, Constants.imaginaryunit)) {
-        evalledArgument = Eval_predicate(absValFloat(evalledArgument));
+    if (find_1.Find(evalledArgument, defs_1.Constants.imaginaryunit)) {
+        evalledArgument = eval_1.Eval_predicate(abs_1.absValFloat(evalledArgument));
         // re-do the simple-number checks...
         if (isZeroAtomOrTensor(evalledArgument)) {
             return false;
         }
-        if (isNumericAtomOrTensor(evalledArgument)) {
+        if (defs_1.isNumericAtomOrTensor(evalledArgument)) {
             return true;
         }
     }
@@ -116,14 +121,15 @@ export function isZeroLikeOrNonZeroLikeOrUndetermined(valueOrPredicate) {
     // to leave the whole thing unevalled
     return null;
 }
-export function isnegativenumber(p) {
+exports.isZeroLikeOrNonZeroLikeOrUndetermined = isZeroLikeOrNonZeroLikeOrUndetermined;
+function isnegativenumber(p) {
     switch (p.k) {
-        case NUM:
-            if (MSIGN(p.q.a) === -1) {
+        case defs_1.NUM:
+            if (defs_1.MSIGN(p.q.a) === -1) {
                 return true;
             }
             break;
-        case DOUBLE:
+        case defs_1.DOUBLE:
             if (p.d < 0.0) {
                 return true;
             }
@@ -131,14 +137,15 @@ export function isnegativenumber(p) {
     }
     return false;
 }
-export function ispositivenumber(p) {
+exports.isnegativenumber = isnegativenumber;
+function ispositivenumber(p) {
     switch (p.k) {
-        case NUM:
-            if (MSIGN(p.q.a) === 1) {
+        case defs_1.NUM:
+            if (defs_1.MSIGN(p.q.a) === 1) {
                 return true;
             }
             break;
-        case DOUBLE:
+        case defs_1.DOUBLE:
             if (p.d > 0.0) {
                 return true;
             }
@@ -146,14 +153,15 @@ export function ispositivenumber(p) {
     }
     return false;
 }
-export function isplustwo(p) {
+exports.ispositivenumber = ispositivenumber;
+function isplustwo(p) {
     switch (p.k) {
-        case NUM:
-            if (MEQUAL(p.q.a, 2) && MEQUAL(p.q.b, 1)) {
+        case defs_1.NUM:
+            if (defs_1.MEQUAL(p.q.a, 2) && defs_1.MEQUAL(p.q.b, 1)) {
                 return true;
             }
             break;
-        case DOUBLE:
+        case defs_1.DOUBLE:
             if (p.d === 2.0) {
                 return true;
             }
@@ -161,14 +169,15 @@ export function isplustwo(p) {
     }
     return false;
 }
-export function isplusone(p) {
+exports.isplustwo = isplustwo;
+function isplusone(p) {
     switch (p.k) {
-        case NUM:
-            if (MEQUAL(p.q.a, 1) && MEQUAL(p.q.b, 1)) {
+        case defs_1.NUM:
+            if (defs_1.MEQUAL(p.q.a, 1) && defs_1.MEQUAL(p.q.b, 1)) {
                 return true;
             }
             break;
-        case DOUBLE:
+        case defs_1.DOUBLE:
             if (p.d === 1.0) {
                 return true;
             }
@@ -176,14 +185,15 @@ export function isplusone(p) {
     }
     return false;
 }
-export function isminusone(p) {
+exports.isplusone = isplusone;
+function isminusone(p) {
     switch (p.k) {
-        case NUM:
-            if (MEQUAL(p.q.a, -1) && MEQUAL(p.q.b, 1)) {
+        case defs_1.NUM:
+            if (defs_1.MEQUAL(p.q.a, -1) && defs_1.MEQUAL(p.q.b, 1)) {
                 return true;
             }
             break;
-        case DOUBLE:
+        case defs_1.DOUBLE:
             if (p.d === -1.0) {
                 return true;
             }
@@ -191,14 +201,17 @@ export function isminusone(p) {
     }
     return false;
 }
-export function isone(p) {
+exports.isminusone = isminusone;
+function isone(p) {
     return isplusone(p) || isminusone(p);
 }
-export function isinteger(p) {
-    return p.k === NUM && MEQUAL(p.q.b, 1);
+exports.isone = isone;
+function isinteger(p) {
+    return p.k === defs_1.NUM && defs_1.MEQUAL(p.q.b, 1);
 }
-export function isintegerorintegerfloat(p) {
-    if (p.k === DOUBLE) {
+exports.isinteger = isinteger;
+function isintegerorintegerfloat(p) {
+    if (p.k === defs_1.DOUBLE) {
         if (p.d === Math.round(p.d)) {
             return true;
         }
@@ -206,25 +219,29 @@ export function isintegerorintegerfloat(p) {
     }
     return isinteger(p);
 }
-export function isnonnegativeinteger(p) {
-    return isrational(p) && MEQUAL(p.q.b, 1) && MSIGN(p.q.a) === 1;
+exports.isintegerorintegerfloat = isintegerorintegerfloat;
+function isnonnegativeinteger(p) {
+    return defs_1.isrational(p) && defs_1.MEQUAL(p.q.b, 1) && defs_1.MSIGN(p.q.a) === 1;
 }
-export function isposint(p) {
-    return isinteger(p) && MSIGN(p.q.a) === 1;
+exports.isnonnegativeinteger = isnonnegativeinteger;
+function isposint(p) {
+    return isinteger(p) && defs_1.MSIGN(p.q.a) === 1;
 }
+exports.isposint = isposint;
 // --------------------------------------
-export function isunivarpolyfactoredorexpandedform(p, x) {
+function isunivarpolyfactoredorexpandedform(p, x) {
     if (x == null) {
-        x = guess(p);
+        x = guess_1.guess(p);
     }
     if (ispolyfactoredorexpandedform(p, x) &&
-        countTrue(Find(p, symbol(SYMBOL_X)), Find(p, symbol(SYMBOL_Y)), Find(p, symbol(SYMBOL_Z))) === 1) {
+        countTrue(find_1.Find(p, symbol_1.symbol(defs_1.SYMBOL_X)), find_1.Find(p, symbol_1.symbol(defs_1.SYMBOL_Y)), find_1.Find(p, symbol_1.symbol(defs_1.SYMBOL_Z))) === 1) {
         return x;
     }
     else {
         return false;
     }
 }
+exports.isunivarpolyfactoredorexpandedform = isunivarpolyfactoredorexpandedform;
 function countTrue(...a) {
     // Number(true) = 1
     return a.reduce((count, x) => count + Number(x), 0);
@@ -237,10 +254,10 @@ function ispolyfactoredorexpandedform(p, x) {
     return ispolyfactoredorexpandedform_factor(p, x);
 }
 function ispolyfactoredorexpandedform_factor(p, x) {
-    if (ismultiply(p)) {
+    if (defs_1.ismultiply(p)) {
         return p.tail().every((el) => {
             const bool = ispolyfactoredorexpandedform_power(el, x);
-            if (DEBUG) {
+            if (defs_1.DEBUG) {
                 console.log(`ispolyfactoredorexpandedform_factor testing ${el}`);
                 if (bool) {
                     console.log(`... tested negative:${el}`);
@@ -254,33 +271,34 @@ function ispolyfactoredorexpandedform_factor(p, x) {
     }
 }
 function ispolyfactoredorexpandedform_power(p, x) {
-    if (ispower(p)) {
-        if (DEBUG) {
+    if (defs_1.ispower(p)) {
+        if (defs_1.DEBUG) {
             console.log('ispolyfactoredorexpandedform_power (isposint(caddr(p)) ' +
-                (isposint(caddr(p)),
-                    DEBUG
+                (isposint(defs_1.caddr(p)),
+                    defs_1.DEBUG
                         ? console.log('ispolyfactoredorexpandedform_power ispolyexpandedform_expr(cadr(p), x)) ' +
-                            ispolyexpandedform_expr(cadr(p), x))
+                            ispolyexpandedform_expr(defs_1.cadr(p), x))
                         : undefined));
         }
-        return isposint(caddr(p)) && ispolyexpandedform_expr(cadr(p), x);
+        return isposint(defs_1.caddr(p)) && ispolyexpandedform_expr(defs_1.cadr(p), x);
     }
     else {
-        if (DEBUG) {
+        if (defs_1.DEBUG) {
             console.log(`ispolyfactoredorexpandedform_power not a power, testing if this is exp form: ${p}`);
         }
         return ispolyexpandedform_expr(p, x);
     }
 }
 // --------------------------------------
-export function ispolyexpandedform(p, x) {
-    if (Find(p, x)) {
+function ispolyexpandedform(p, x) {
+    if (find_1.Find(p, x)) {
         return ispolyexpandedform_expr(p, x);
     }
     return false;
 }
+exports.ispolyexpandedform = ispolyexpandedform;
 function ispolyexpandedform_expr(p, x) {
-    if (isadd(p)) {
+    if (defs_1.isadd(p)) {
         return p.tail().every((el) => ispolyexpandedform_term(el, x));
     }
     else {
@@ -288,7 +306,7 @@ function ispolyexpandedform_expr(p, x) {
     }
 }
 function ispolyexpandedform_term(p, x) {
-    if (ismultiply(p)) {
+    if (defs_1.ismultiply(p)) {
         return p.tail().every((el) => ispolyexpandedform_factor(el, x));
     }
     else {
@@ -296,22 +314,23 @@ function ispolyexpandedform_term(p, x) {
     }
 }
 function ispolyexpandedform_factor(p, x) {
-    if (equal(p, x)) {
+    if (misc_1.equal(p, x)) {
         return true;
     }
-    if (ispower(p) && equal(cadr(p), x)) {
-        return isposint(caddr(p));
+    if (defs_1.ispower(p) && misc_1.equal(defs_1.cadr(p), x)) {
+        return isposint(defs_1.caddr(p));
     }
-    return !Find(p, x);
+    return !find_1.Find(p, x);
 }
 // --------------------------------------
-export function isnegativeterm(p) {
-    return isnegativenumber(p) || (ismultiply(p) && isnegativenumber(cadr(p)));
+function isnegativeterm(p) {
+    return isnegativenumber(p) || (defs_1.ismultiply(p) && isnegativenumber(defs_1.cadr(p)));
 }
+exports.isnegativeterm = isnegativeterm;
 function hasNegativeRationalExponent(p) {
-    if (ispower(p) &&
-        isrational(car(cdr(cdr(p)))) &&
-        isnegativenumber(car(cdr(p)))) {
+    if (defs_1.ispower(p) &&
+        defs_1.isrational(defs_1.car(defs_1.cdr(defs_1.cdr(p)))) &&
+        isnegativenumber(defs_1.car(defs_1.cdr(p)))) {
         if (DEBUG_IS) {
             console.log(`hasNegativeRationalExponent: ${p} has imaginary component`);
         }
@@ -325,19 +344,19 @@ function hasNegativeRationalExponent(p) {
     }
 }
 function isimaginarynumberdouble(p) {
-    return ((ismultiply(p) &&
-        length(p) === 3 &&
-        isdouble(cadr(p)) &&
-        hasNegativeRationalExponent(caddr(p))) ||
-        equal(p, Constants.imaginaryunit));
+    return ((defs_1.ismultiply(p) &&
+        misc_1.length(p) === 3 &&
+        defs_1.isdouble(defs_1.cadr(p)) &&
+        hasNegativeRationalExponent(defs_1.caddr(p))) ||
+        misc_1.equal(p, defs_1.Constants.imaginaryunit));
 }
-export function isimaginarynumber(p) {
-    if ((ismultiply(p) &&
-        length(p) === 3 &&
-        isNumericAtom(cadr(p)) &&
-        equal(caddr(p), Constants.imaginaryunit)) ||
-        equal(p, Constants.imaginaryunit) ||
-        hasNegativeRationalExponent(caddr(p))) {
+function isimaginarynumber(p) {
+    if ((defs_1.ismultiply(p) &&
+        misc_1.length(p) === 3 &&
+        defs_1.isNumericAtom(defs_1.cadr(p)) &&
+        misc_1.equal(defs_1.caddr(p), defs_1.Constants.imaginaryunit)) ||
+        misc_1.equal(p, defs_1.Constants.imaginaryunit) ||
+        hasNegativeRationalExponent(defs_1.caddr(p))) {
         if (DEBUG_IS) {
             console.log(`isimaginarynumber: ${p} is imaginary number`);
         }
@@ -350,138 +369,158 @@ export function isimaginarynumber(p) {
         return false;
     }
 }
-export function iscomplexnumberdouble(p) {
-    return ((isadd(p) &&
-        length(p) === 3 &&
-        isdouble(cadr(p)) &&
-        isimaginarynumberdouble(caddr(p))) ||
+exports.isimaginarynumber = isimaginarynumber;
+function iscomplexnumberdouble(p) {
+    return ((defs_1.isadd(p) &&
+        misc_1.length(p) === 3 &&
+        defs_1.isdouble(defs_1.cadr(p)) &&
+        isimaginarynumberdouble(defs_1.caddr(p))) ||
         isimaginarynumberdouble(p));
 }
-export function iscomplexnumber(p) {
+exports.iscomplexnumberdouble = iscomplexnumberdouble;
+function iscomplexnumber(p) {
     if (DEBUG_IS) {
-        breakpoint;
+        defs_1.breakpoint;
     }
-    if ((isadd(p) &&
-        length(p) === 3 &&
-        isNumericAtom(cadr(p)) &&
-        isimaginarynumber(caddr(p))) ||
+    if ((defs_1.isadd(p) &&
+        misc_1.length(p) === 3 &&
+        defs_1.isNumericAtom(defs_1.cadr(p)) &&
+        isimaginarynumber(defs_1.caddr(p))) ||
         isimaginarynumber(p)) {
-        if (DEBUG) {
+        if (defs_1.DEBUG) {
             console.log(`iscomplexnumber: ${p} is imaginary number`);
         }
         return true;
     }
     else {
-        if (DEBUG) {
+        if (defs_1.DEBUG) {
             console.log(`iscomplexnumber: ${p} is imaginary number`);
         }
         return false;
     }
 }
-export function iseveninteger(p) {
+exports.iscomplexnumber = iscomplexnumber;
+function iseveninteger(p) {
     return isinteger(p) && p.q.a.isEven();
 }
-export function isnegative(p) {
-    return (isadd(p) && isnegativeterm(cadr(p))) || isnegativeterm(p);
+exports.iseveninteger = iseveninteger;
+function isnegative(p) {
+    return (defs_1.isadd(p) && isnegativeterm(defs_1.cadr(p))) || isnegativeterm(p);
 }
+exports.isnegative = isnegative;
 // returns 1 if there's a symbol somewhere.
 // not used anywhere. Note that PI and POWER are symbols,
 // so for example 2^3 would be symbolic
 // while -1^(1/2) i.e. 'i' is not, so this can
 // be tricky to use.
-export function issymbolic(p) {
-    if (issymbol(p)) {
+function issymbolic(p) {
+    if (defs_1.issymbol(p)) {
         return true;
     }
-    if (iscons(p)) {
+    if (defs_1.iscons(p)) {
         return [...p].some(issymbolic);
     }
     return false;
 }
+exports.issymbolic = issymbolic;
 // i.e. 2, 2^3, etc.
-export function isintegerfactor(p) {
-    return (isinteger(p) || (ispower(p) && isinteger(cadr(p)) && isinteger(caddr(p))));
+function isintegerfactor(p) {
+    return (isinteger(p) || (defs_1.ispower(p) && isinteger(defs_1.cadr(p)) && isinteger(defs_1.caddr(p))));
 }
-export function isNumberOneOverSomething(p) {
-    return isfraction(p) && MEQUAL(p.q.a.abs(), 1);
+exports.isintegerfactor = isintegerfactor;
+function isNumberOneOverSomething(p) {
+    return isfraction(p) && defs_1.MEQUAL(p.q.a.abs(), 1);
 }
-export function isoneover(p) {
-    return ispower(p) && isminusone(caddr(p));
+exports.isNumberOneOverSomething = isNumberOneOverSomething;
+function isoneover(p) {
+    return defs_1.ispower(p) && isminusone(defs_1.caddr(p));
 }
-export function isfraction(p) {
-    return p.k === NUM && !MEQUAL(p.q.b, 1);
+exports.isoneover = isoneover;
+function isfraction(p) {
+    return p.k === defs_1.NUM && !defs_1.MEQUAL(p.q.b, 1);
 }
+exports.isfraction = isfraction;
 // n an int
-export function equaln(p, n) {
+function equaln(p, n) {
     switch (p.k) {
-        case NUM:
-            return MEQUAL(p.q.a, n) && MEQUAL(p.q.b, 1);
-        case DOUBLE:
+        case defs_1.NUM:
+            return defs_1.MEQUAL(p.q.a, n) && defs_1.MEQUAL(p.q.b, 1);
+        case defs_1.DOUBLE:
             return p.d === n;
         default:
             return false;
     }
 }
+exports.equaln = equaln;
 // a and b ints
-export function equalq(p, a, b) {
+function equalq(p, a, b) {
     switch (p.k) {
-        case NUM:
-            return MEQUAL(p.q.a, a) && MEQUAL(p.q.b, b);
-        case DOUBLE:
+        case defs_1.NUM:
+            return defs_1.MEQUAL(p.q.a, a) && defs_1.MEQUAL(p.q.b, b);
+        case defs_1.DOUBLE:
             return p.d === a / b;
         default:
             return false;
     }
 }
+exports.equalq = equalq;
 // p == 1/2 ?
-export function isoneovertwo(p) {
+function isoneovertwo(p) {
     return equalq(p, 1, 2);
 }
+exports.isoneovertwo = isoneovertwo;
 // p == -1/2 ?
-export function isminusoneovertwo(p) {
+function isminusoneovertwo(p) {
     return equalq(p, -1, 2);
 }
+exports.isminusoneovertwo = isminusoneovertwo;
 // p == 1/sqrt(2) ?
-export function isoneoversqrttwo(p) {
-    return ispower(p) && equaln(cadr(p), 2) && equalq(caddr(p), -1, 2);
+function isoneoversqrttwo(p) {
+    return defs_1.ispower(p) && equaln(defs_1.cadr(p), 2) && equalq(defs_1.caddr(p), -1, 2);
 }
+exports.isoneoversqrttwo = isoneoversqrttwo;
 // p == -1/sqrt(2) ?
-export function isminusoneoversqrttwo(p) {
-    return (ismultiply(p) &&
-        equaln(cadr(p), -1) &&
-        isoneoversqrttwo(caddr(p)) &&
-        length(p) === 3);
+function isminusoneoversqrttwo(p) {
+    return (defs_1.ismultiply(p) &&
+        equaln(defs_1.cadr(p), -1) &&
+        isoneoversqrttwo(defs_1.caddr(p)) &&
+        misc_1.length(p) === 3);
 }
+exports.isminusoneoversqrttwo = isminusoneoversqrttwo;
 // Check if the value is sqrt(3)/2
-export function isSqrtThreeOverTwo(p) {
-    return (ismultiply(p) &&
-        isoneovertwo(cadr(p)) &&
-        isSqrtThree(caddr(p)) &&
-        length(p) === 3);
+function isSqrtThreeOverTwo(p) {
+    return (defs_1.ismultiply(p) &&
+        isoneovertwo(defs_1.cadr(p)) &&
+        isSqrtThree(defs_1.caddr(p)) &&
+        misc_1.length(p) === 3);
 }
+exports.isSqrtThreeOverTwo = isSqrtThreeOverTwo;
 // Check if the value is -sqrt(3)/2
-export function isMinusSqrtThreeOverTwo(p) {
-    return (ismultiply(p) &&
-        isminusoneovertwo(cadr(p)) &&
-        isSqrtThree(caddr(p)) &&
-        length(p) === 3);
+function isMinusSqrtThreeOverTwo(p) {
+    return (defs_1.ismultiply(p) &&
+        isminusoneovertwo(defs_1.cadr(p)) &&
+        isSqrtThree(defs_1.caddr(p)) &&
+        misc_1.length(p) === 3);
 }
+exports.isMinusSqrtThreeOverTwo = isMinusSqrtThreeOverTwo;
 // Check if value is sqrt(3)
 function isSqrtThree(p) {
-    return ispower(p) && equaln(cadr(p), 3) && isoneovertwo(caddr(p));
+    return defs_1.ispower(p) && equaln(defs_1.cadr(p), 3) && isoneovertwo(defs_1.caddr(p));
 }
-export function isfloating(p) {
-    if (p.k === DOUBLE || p === symbol(FLOATF)) {
+function isfloating(p) {
+    if (p.k === defs_1.DOUBLE || p === symbol_1.symbol(defs_1.FLOATF)) {
         return true;
     }
-    if (iscons(p)) {
+    if (defs_1.iscons(p)) {
         return [...p].some(isfloating);
     }
     return false;
 }
-export function isimaginaryunit(p) {
-    return equal(p, Constants.imaginaryunit);
+exports.isfloating = isfloating;
+function isimaginaryunit(p) {
+    return misc_1.equal(p, defs_1.Constants.imaginaryunit);
 }
+exports.isimaginaryunit = isimaginaryunit;
 // n/2 * i * pi ?
 // return value:
 //  0  no
@@ -489,33 +528,33 @@ export function isimaginaryunit(p) {
 //  2  -1
 //  3  i
 //  4  -i
-export function isquarterturn(p) {
+function isquarterturn(p) {
     let minussign = 0;
-    if (!ismultiply(p)) {
+    if (!defs_1.ismultiply(p)) {
         return 0;
     }
-    if (equal(cadr(p), Constants.imaginaryunit)) {
-        if (caddr(p) !== symbol(PI)) {
+    if (misc_1.equal(defs_1.cadr(p), defs_1.Constants.imaginaryunit)) {
+        if (defs_1.caddr(p) !== symbol_1.symbol(defs_1.PI)) {
             return 0;
         }
-        if (length(p) !== 3) {
+        if (misc_1.length(p) !== 3) {
             return 0;
         }
         return 2;
     }
-    if (!isNumericAtom(cadr(p))) {
+    if (!defs_1.isNumericAtom(defs_1.cadr(p))) {
         return 0;
     }
-    if (!equal(caddr(p), Constants.imaginaryunit)) {
+    if (!misc_1.equal(defs_1.caddr(p), defs_1.Constants.imaginaryunit)) {
         return 0;
     }
-    if (cadddr(p) !== symbol(PI)) {
+    if (defs_1.cadddr(p) !== symbol_1.symbol(defs_1.PI)) {
         return 0;
     }
-    if (length(p) !== 4) {
+    if (misc_1.length(p) !== 4) {
         return 0;
     }
-    let n = nativeInt(multiply(cadr(p), integer(2)));
+    let n = bignum_1.nativeInt(multiply_1.multiply(defs_1.cadr(p), bignum_1.integer(2)));
     if (isNaN(n)) {
         return 0;
     }
@@ -538,22 +577,23 @@ export function isquarterturn(p) {
     }
     return n;
 }
+exports.isquarterturn = isquarterturn;
 // special multiple of pi?
 // returns for the following multiples of pi...
 //  -4/2  -3/2  -2/2  -1/2  1/2  2/2  3/2  4/2
 //  4  1  2  3  1  2  3  4
-export function isnpi(p) {
+function isnpi(p) {
     let n = 0;
-    if (p === symbol(PI)) {
+    if (p === symbol_1.symbol(defs_1.PI)) {
         return 2;
     }
-    if (!ismultiply(p) ||
-        !isNumericAtom(cadr(p)) ||
-        caddr(p) !== symbol(PI) ||
-        length(p) !== 3) {
+    if (!defs_1.ismultiply(p) ||
+        !defs_1.isNumericAtom(defs_1.cadr(p)) ||
+        defs_1.caddr(p) !== symbol_1.symbol(defs_1.PI) ||
+        misc_1.length(p) !== 3) {
         return 0;
     }
-    n = nativeInt(multiply(cadr(p), integer(2)));
+    n = bignum_1.nativeInt(multiply_1.multiply(defs_1.cadr(p), bignum_1.integer(2)));
     if (isNaN(n)) {
         return 0;
     }
@@ -565,3 +605,4 @@ export function isnpi(p) {
     }
     return n;
 }
+exports.isnpi = isnpi;

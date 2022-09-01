@@ -1,5 +1,7 @@
-import { run_test } from '../test-harness';
-run_test([
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const test_harness_1 = require("../test-harness");
+test_harness_1.run_test([
     'defint(x^2,y,0,sqrt(1-x^2),x,-1,1)',
     '1/8*pi',
     // from the eigenmath manual

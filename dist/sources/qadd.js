@@ -1,38 +1,41 @@
-import { Constants, MZERO, Num } from '../runtime/defs';
-import { makeSignSameAs } from './bignum';
-import { madd } from './madd';
-import { mgcd } from './mgcd';
-import { mdiv, mmul } from './mmul';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.qadd = void 0;
+const defs_1 = require("../runtime/defs");
+const bignum_1 = require("./bignum");
+const madd_1 = require("./madd");
+const mgcd_1 = require("./mgcd");
+const mmul_1 = require("./mmul");
 //  Add rational numbers
 //
 //  Input:    p1    addend
 //            p2    addend
 //
 //  Output:    sum
-export function qadd(qadd_frac1, qadd_frac2) {
+function qadd(qadd_frac1, qadd_frac2) {
     // a, qadd_ab, b, qadd_ba, c are all bigNum
     // we are adding the fractions qadd_frac1 + qadd_frac2 i.e.
     // qadd_frac1.q.a/qadd_frac1.q.b + qadd_frac2.q.a/qadd_frac2.q.b
-    const qadd_ab = mmul(qadd_frac1.q.a, qadd_frac2.q.b);
-    const qadd_ba = mmul(qadd_frac1.q.b, qadd_frac2.q.a);
-    const qadd_numerator = madd(qadd_ab, qadd_ba);
+    const qadd_ab = mmul_1.mmul(qadd_frac1.q.a, qadd_frac2.q.b);
+    const qadd_ba = mmul_1.mmul(qadd_frac1.q.b, qadd_frac2.q.a);
+    const qadd_numerator = madd_1.madd(qadd_ab, qadd_ba);
     //mfree(qadd_ab)
     //mfree(qadd_ba)
     // zero?
-    if (MZERO(qadd_numerator)) {
+    if (defs_1.MZERO(qadd_numerator)) {
         //console.log "qadd IS ZERO"
         //mfree(qadd_numerator)
-        return Constants.zero;
+        return defs_1.Constants.zero;
     }
-    const qadd_denominator = mmul(qadd_frac1.q.b, qadd_frac2.q.b);
-    let gcdBetweenNumeratorAndDenominator = mgcd(qadd_numerator, qadd_denominator);
+    const qadd_denominator = mmul_1.mmul(qadd_frac1.q.b, qadd_frac2.q.b);
+    let gcdBetweenNumeratorAndDenominator = mgcd_1.mgcd(qadd_numerator, qadd_denominator);
     //console.log "gcd("+qadd_numerator+","+qadd_denominator+"): " + gcdBetweenNumeratorAndDenominator
-    gcdBetweenNumeratorAndDenominator = makeSignSameAs(gcdBetweenNumeratorAndDenominator, qadd_denominator);
+    gcdBetweenNumeratorAndDenominator = bignum_1.makeSignSameAs(gcdBetweenNumeratorAndDenominator, qadd_denominator);
     //console.log "qadd qadd_denominator: " + qadd_denominator
     //console.log "qadd gcdBetweenNumeratorAndDenominator: " + gcdBetweenNumeratorAndDenominator
-    const a = mdiv(qadd_numerator, gcdBetweenNumeratorAndDenominator);
-    const b = mdiv(qadd_denominator, gcdBetweenNumeratorAndDenominator);
-    const resultSum = new Num(a, b);
+    const a = mmul_1.mdiv(qadd_numerator, gcdBetweenNumeratorAndDenominator);
+    const b = mmul_1.mdiv(qadd_denominator, gcdBetweenNumeratorAndDenominator);
+    const resultSum = new defs_1.Num(a, b);
     //console.log "qadd resultSum.q.a: " + resultSum.q.a
     //console.log "qadd resultSum.q.b: " + resultSum.q.b
     //mfree(qadd_numerator)
@@ -41,3 +44,4 @@ export function qadd(qadd_frac1, qadd_frac2) {
     return resultSum;
     //console.log "qadd result: " + resultSum
 }
+exports.qadd = qadd;

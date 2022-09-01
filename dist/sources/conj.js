@@ -1,10 +1,13 @@
-import { cadr, Constants } from '../runtime/defs';
-import { Find } from '../runtime/find';
-import { clockform } from './clock';
-import { Eval } from './eval';
-import { negate } from './multiply';
-import { polar } from './polar';
-import { subst } from './subst';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.conjugate = exports.Eval_conj = void 0;
+const defs_1 = require("../runtime/defs");
+const find_1 = require("../runtime/find");
+const clock_1 = require("./clock");
+const eval_1 = require("./eval");
+const multiply_1 = require("./multiply");
+const polar_1 = require("./polar");
+const subst_1 = require("./subst");
 /* conj =====================================================================
 
 Tags
@@ -20,18 +23,20 @@ General description
 Returns the complex conjugate of z.
 
 */
-export function Eval_conj(p1) {
-    p1 = Eval(cadr(p1));
-    if (!Find(p1, Constants.imaginaryunit)) {
+function Eval_conj(p1) {
+    p1 = eval_1.Eval(defs_1.cadr(p1));
+    if (!find_1.Find(p1, defs_1.Constants.imaginaryunit)) {
         // example: (-1)^(1/3)
-        return clockform(conjugate(polar(p1)));
+        return clock_1.clockform(conjugate(polar_1.polar(p1)));
     }
     else {
         return conjugate(p1);
     }
 }
+exports.Eval_conj = Eval_conj;
 // careful is you pass this one an expression with
 // i (instead of (-1)^(1/2)) then this doesn't work!
-export function conjugate(p1) {
-    return Eval(subst(p1, Constants.imaginaryunit, negate(Constants.imaginaryunit)));
+function conjugate(p1) {
+    return eval_1.Eval(subst_1.subst(p1, defs_1.Constants.imaginaryunit, multiply_1.negate(defs_1.Constants.imaginaryunit)));
 }
+exports.conjugate = conjugate;

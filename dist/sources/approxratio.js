@@ -1,51 +1,55 @@
-import { alloc_tensor } from '../runtime/alloc';
-import { APPROXRATIO, cadr, car, cdr, Cons, DOUBLE, iscons, istensor } from '../runtime/defs';
-import { symbol } from "../runtime/symbol";
-import { integer, rational } from './bignum';
-import { zzfloat } from './float';
-import { makeList } from './list';
-import { check_tensor_dimensions } from './tensor';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.testApprox = exports.approxAll = exports.approxRationalsOfLogs = exports.approxRadicals = exports.Eval_approxratio = void 0;
+const alloc_1 = require("../runtime/alloc");
+const defs_1 = require("../runtime/defs");
+const symbol_1 = require("../runtime/symbol");
+const bignum_1 = require("./bignum");
+const float_1 = require("./float");
+const list_1 = require("./list");
+const tensor_1 = require("./tensor");
 /*
  Guesses a rational for each float in the passed expression
 */
-export function Eval_approxratio(p1) {
-    return approxratioRecursive(cadr(p1));
+function Eval_approxratio(p1) {
+    return approxratioRecursive(defs_1.cadr(p1));
 }
+exports.Eval_approxratio = Eval_approxratio;
 function approxratioRecursive(expr) {
-    if (istensor(expr)) {
-        const p4 = alloc_tensor(expr.tensor.nelem);
+    if (defs_1.istensor(expr)) {
+        const p4 = alloc_1.alloc_tensor(expr.tensor.nelem);
         p4.tensor.ndim = expr.tensor.ndim;
         p4.tensor.dim = Array.from(expr.tensor.dim);
         p4.tensor.elem = p4.tensor.elem.map((el) => {
             const result = approxratioRecursive(el);
-            check_tensor_dimensions(p4);
+            tensor_1.check_tensor_dimensions(p4);
             return result;
         });
         return p4;
     }
-    if (expr.k === DOUBLE) {
+    if (expr.k === defs_1.DOUBLE) {
         return approxOneRatioOnly(expr);
     }
-    if (iscons(expr)) {
-        return new Cons(approxratioRecursive(car(expr)), approxratioRecursive(cdr(expr)));
+    if (defs_1.iscons(expr)) {
+        return new defs_1.Cons(approxratioRecursive(defs_1.car(expr)), approxratioRecursive(defs_1.cdr(expr)));
     }
     return expr;
 }
 function approxOneRatioOnly(p1) {
-    const supposedlyTheFloat = zzfloat(p1);
-    if (supposedlyTheFloat.k === DOUBLE) {
+    const supposedlyTheFloat = float_1.zzfloat(p1);
+    if (supposedlyTheFloat.k === defs_1.DOUBLE) {
         const theFloat = supposedlyTheFloat.d;
         const splitBeforeAndAfterDot = theFloat.toString().split('.');
         if (splitBeforeAndAfterDot.length === 2) {
             const numberOfDigitsAfterTheDot = splitBeforeAndAfterDot[1].length;
             const precision = 1 / Math.pow(10, numberOfDigitsAfterTheDot);
             const theRatio = floatToRatioRoutine(theFloat, precision);
-            return rational(theRatio[0], theRatio[1]);
+            return bignum_1.rational(theRatio[0], theRatio[1]);
         }
-        return integer(theFloat);
+        return bignum_1.integer(theFloat);
     }
     // we didn't manage, just leave unexpressed
-    return makeList(symbol(APPROXRATIO), supposedlyTheFloat);
+    return list_1.makeList(symbol_1.symbol(defs_1.APPROXRATIO), supposedlyTheFloat);
 }
 // original routine by John Kennedy, see
 // https://web.archive.org/web/20111027100847/http://homepage.smc.edu/kennedy_john/DEC2FRAC.PDF
@@ -239,7 +243,7 @@ function approxRadicalsOfRationals(theFloat) {
     }
     return bestResultSoFar;
 }
-export function approxRadicals(theFloat) {
+function approxRadicals(theFloat) {
     let precision;
     const splitBeforeAndAfterDot = theFloat.toString().split('.');
     if (splitBeforeAndAfterDot.length === 2) {
@@ -270,6 +274,7 @@ export function approxRadicals(theFloat) {
     }
     return null;
 }
+exports.approxRadicals = approxRadicals;
 function approxLogs(theFloat) {
     let precision;
     const splitBeforeAndAfterDot = theFloat.toString().split('.');
@@ -299,7 +304,7 @@ function approxLogs(theFloat) {
     }
     return null;
 }
-export function approxRationalsOfLogs(theFloat) {
+function approxRationalsOfLogs(theFloat) {
     let precision;
     const splitBeforeAndAfterDot = theFloat.toString().split('.');
     if (splitBeforeAndAfterDot.length === 2) {
@@ -369,6 +374,7 @@ export function approxRationalsOfLogs(theFloat) {
     }
     return bestResultSoFar;
 }
+exports.approxRationalsOfLogs = approxRationalsOfLogs;
 function approxLogsOfRationals(theFloat) {
     let precision;
     const splitBeforeAndAfterDot = theFloat.toString().split('.');
@@ -703,7 +709,7 @@ function approxSineOfRationalMultiplesOfPI(theFloat) {
     }
     return bestResultSoFar;
 }
-export function approxAll(theFloat) {
+function approxAll(theFloat) {
     let precision;
     const splitBeforeAndAfterDot = theFloat.toString().split('.');
     if (splitBeforeAndAfterDot.length === 2) {
@@ -806,6 +812,7 @@ export function approxAll(theFloat) {
     }
     return bestApproxSoFar;
 }
+exports.approxAll = approxAll;
 function simpleComplexityMeasure(aResult, b, c) {
     let theSum = 0;
     if (aResult instanceof Array) {
@@ -859,7 +866,7 @@ function simpleComplexityMeasure(aResult, b, c) {
     }
     return theSum;
 }
-export function testApprox() {
+function testApprox() {
     for (let i of [2, 3, 5, 6, 7, 8, 10]) {
         for (let j of [2, 3, 5, 6, 7, 8, 10]) {
             if (i === j) {
@@ -1280,3 +1287,4 @@ export function testApprox() {
     }
     return console.log('testApprox done');
 }
+exports.testApprox = testApprox;

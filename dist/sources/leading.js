@@ -1,11 +1,14 @@
-import { caddr, cadr, NIL } from '../runtime/defs';
-import { symbol } from "../runtime/symbol";
-import { degree } from './degree';
-import { Eval } from './eval';
-import { filter } from './filter';
-import { guess } from './guess';
-import { divide } from './multiply';
-import { power } from './power';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Eval_leading = void 0;
+const defs_1 = require("../runtime/defs");
+const symbol_1 = require("../runtime/symbol");
+const degree_1 = require("./degree");
+const eval_1 = require("./eval");
+const filter_1 = require("./filter");
+const guess_1 = require("./guess");
+const multiply_1 = require("./multiply");
+const power_1 = require("./power");
 /*
  Return the leading coefficient of a polynomial.
 
@@ -19,15 +22,16 @@ Result
 
 The result is undefined if P is not a polynomial.
 */
-export function Eval_leading(p1) {
-    const P = Eval(cadr(p1));
-    p1 = Eval(caddr(p1));
-    const X = p1 === symbol(NIL) ? guess(P) : p1;
+function Eval_leading(p1) {
+    const P = eval_1.Eval(defs_1.cadr(p1));
+    p1 = eval_1.Eval(defs_1.caddr(p1));
+    const X = p1 === symbol_1.symbol(defs_1.NIL) ? guess_1.guess(P) : p1;
     return leading(P, X);
 }
+exports.Eval_leading = Eval_leading;
 function leading(P, X) {
     // N = degree of P
-    const N = degree(P, X);
+    const N = degree_1.degree(P, X);
     // divide through by X ^ N, remove terms that depend on X
-    return filter(divide(P, power(X, N)), X);
+    return filter_1.filter(multiply_1.divide(P, power_1.power(X, N)), X);
 }

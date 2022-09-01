@@ -1,10 +1,15 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.mdivrem = exports.mmod = exports.mdiv = exports.mmul = void 0;
 // Bignum multiplication and division
-export function mmul(a, b) {
+function mmul(a, b) {
     return a.multiply(b);
 }
-export function mdiv(a, b) {
+exports.mmul = mmul;
+function mdiv(a, b) {
     return a.divide(b);
 }
+exports.mdiv = mdiv;
 // a = a + b
 /*
 static void
@@ -50,15 +55,17 @@ mulf(unsigned int *a, unsigned int *b, int len, unsigned int c)
   a[i] = (unsigned int) t
 }
 */
-export function mmod(a, b) {
+function mmod(a, b) {
     return a.mod(b);
 }
+exports.mmod = mmod;
 // return both quotient and remainder of a/b
 // we'd have this method as divmod(number)
 // but obviously doesn't change the passed parameters
-export function mdivrem(a, b) {
+function mdivrem(a, b) {
     const toReturn = a.divmod(b);
     return [toReturn.quotient, toReturn.remainder];
 }
+exports.mdivrem = mdivrem;
 //if SELFTEST
 // small integer tests

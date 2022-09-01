@@ -1,9 +1,12 @@
-import { cadr, Constants, ERFC, isdouble } from '../runtime/defs';
-import { symbol } from "../runtime/symbol";
-import { double } from './bignum';
-import { Eval } from './eval';
-import { isZeroAtomOrTensor } from './is';
-import { makeList } from './list';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.erfc = exports.Eval_erfc = void 0;
+const defs_1 = require("../runtime/defs");
+const symbol_1 = require("../runtime/symbol");
+const bignum_1 = require("./bignum");
+const eval_1 = require("./eval");
+const is_1 = require("./is");
+const list_1 = require("./list");
 //-----------------------------------------------------------------------------
 //
 //  Author : philippe.billet@noos.fr
@@ -13,21 +16,22 @@ import { makeList } from './list';
 //  GW  Added erfc() from Numerical Recipes in C
 //
 //-----------------------------------------------------------------------------
-export function Eval_erfc(p1) {
-    return yerfc(Eval(cadr(p1)));
+function Eval_erfc(p1) {
+    return yerfc(eval_1.Eval(defs_1.cadr(p1)));
 }
+exports.Eval_erfc = Eval_erfc;
 function yerfc(p1) {
-    if (isdouble(p1)) {
+    if (defs_1.isdouble(p1)) {
         const d = erfc(p1.d);
-        return double(d);
+        return bignum_1.double(d);
     }
-    if (isZeroAtomOrTensor(p1)) {
-        return Constants.one;
+    if (is_1.isZeroAtomOrTensor(p1)) {
+        return defs_1.Constants.one;
     }
-    return makeList(symbol(ERFC), p1);
+    return list_1.makeList(symbol_1.symbol(defs_1.ERFC), p1);
 }
 // from Numerical Recipes in C
-export function erfc(x) {
+function erfc(x) {
     if (x === 0) {
         return 1.0;
     }
@@ -56,3 +60,4 @@ export function erfc(x) {
     }
     return 2.0 - ans;
 }
+exports.erfc = erfc;
