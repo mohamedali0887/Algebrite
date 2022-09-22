@@ -11,7 +11,8 @@
     "test": "tests"
   },
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "min": "esbuild dist/index.js --minify --bundle --outfile=dist/algebrite.bundle-for-browser-min.js"
   },
   "repository": {
     "type": "git",
@@ -38,6 +39,7 @@
     "big-integer": "^1.6.32"
   },
   "devDependencies": {
+    "esbuild": "^0.15.8",
     "typescript": "^3.9.6"
   }
 }
