@@ -19,7 +19,7 @@ const integral_1 = require("./sources/integral");
 const is_1 = require("./sources/is");
 const misc_1 = require("./sources/misc");
 const scan_1 = require("./sources/scan");
-const $ = {
+const functions = {
     version: defs_1.version,
     isadd: defs_1.isadd,
     ismultiply: defs_1.ismultiply,
@@ -145,5 +145,6 @@ const builtin_fns = [
     'testeq', 'testge', 'testgt', 'testle',
     'testlt', 'transpose', 'unit', 'zero',
 ];
+const $ = functions;
 Array.from(builtin_fns).map(fn => ($[fn] = zombocom_1.exec.bind(this, fn)));
 exports.default = $;
