@@ -7,6 +7,7 @@
  * https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 
+import { BigInteger } from 'big-integer';
 import {caaddr, caadr, caar, cadaddr, cadadr, cadar, caddaddr, caddadr, caddar, caddddr, cadddr, caddr, cadr, car, cdaddr, cdadr, cdar, cddaddr, cddar, cdddaddr, cddddr, cdddr, cddr, cdr, CONS, Cons, defs, DOUBLE, Double, isadd, iscons, isdouble, isfactorial, ismultiply, isNumericAtom, ispower, isrational, isstr, issymbol, istensor, NUM, Num, STR, Str, SYM, Sym, TENSOR, Tensor, U, version,} from './runtime/defs';
 import {Find} from './runtime/find';
 import {init} from './runtime/init';
@@ -166,7 +167,9 @@ type builtInKeys = 'abs'|'add'|'adj'|'and'|
     'tanh'|'taylor'|'test'|'testeq'|'testge'|'testgt'|'testle'|'testlt'|
     'transpose'|'unit'|'zero';
 
-const $: typeof functions&{[key in builtInKeys]: (...args: U[]) => U; } =
+type Ux = U|number|string|BigInteger;
+
+const $: typeof functions&{[key in builtInKeys]: (...args: Ux[]) => U; } =
     functions as any;
 
 Array.from(builtin_fns).map(fn => ($[fn] = exec.bind(this, fn)));
