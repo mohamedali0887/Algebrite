@@ -1,13 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.real = exports.Eval_real = void 0;
-const defs_1 = require("../runtime/defs");
-const add_1 = require("./add");
-const bignum_1 = require("./bignum");
-const conj_1 = require("./conj");
-const eval_1 = require("./eval");
-const multiply_1 = require("./multiply");
-const rect_1 = require("./rect");
+const defs_js_1 = require("../runtime/defs.js");
+const add_js_1 = require("./add.js");
+const bignum_js_1 = require("./bignum.js");
+const conj_js_1 = require("./conj.js");
+const eval_js_1 = require("./eval.js");
+const multiply_js_1 = require("./multiply.js");
+const rect_js_1 = require("./rect.js");
 /*
  Returns the real part of complex z
 
@@ -19,11 +19,11 @@ const rect_1 = require("./rect");
   exp(i a)  cos(a)
 */
 function Eval_real(p1) {
-    return real(eval_1.Eval(defs_1.cadr(p1)));
+    return real((0, eval_js_1.Eval)((0, defs_js_1.cadr)(p1)));
 }
 exports.Eval_real = Eval_real;
 function real(p) {
-    const p1 = rect_1.rect(p);
-    return multiply_1.divide(add_1.add(p1, conj_1.conjugate(p1)), bignum_1.integer(2));
+    const p1 = (0, rect_js_1.rect)(p);
+    return (0, multiply_js_1.divide)((0, add_js_1.add)(p1, (0, conj_js_1.conjugate)(p1)), (0, bignum_js_1.integer)(2));
 }
 exports.real = real;

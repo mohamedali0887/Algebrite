@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Eval_function_reference = exports.define_user_function = void 0;
-const defs_1 = require("../runtime/defs");
-const run_1 = require("../runtime/run");
-const symbol_1 = require("../runtime/symbol");
-const eval_1 = require("./eval");
-const list_1 = require("./list");
+const defs_js_1 = require("../runtime/defs.js");
+const run_js_1 = require("../runtime/run.js");
+const symbol_js_1 = require("../runtime/symbol.js");
+const eval_js_1 = require("./eval.js");
+const list_js_1 = require("./list.js");
 // Store a function definition
 //
 // Example:
@@ -40,15 +40,15 @@ const list_1 = require("./list");
 // A argument list
 // B function body
 function define_user_function(p1) {
-    const F = defs_1.caadr(p1);
-    const A = defs_1.cdadr(p1);
-    let B = defs_1.caddr(p1);
-    if (!defs_1.issymbol(F)) {
-        run_1.stop('function name?');
+    const F = (0, defs_js_1.caadr)(p1);
+    const A = (0, defs_js_1.cdadr)(p1);
+    let B = (0, defs_js_1.caddr)(p1);
+    if (!(0, defs_js_1.issymbol)(F)) {
+        (0, run_js_1.stop)('function name?');
     }
     // evaluate function body (maybe)
-    if (defs_1.car(B) === symbol_1.symbol(defs_1.EVAL)) {
-        B = eval_1.Eval(defs_1.cadr(B));
+    if ((0, defs_js_1.car)(B) === (0, symbol_js_1.symbol)(defs_js_1.EVAL)) {
+        B = (0, eval_js_1.Eval)((0, defs_js_1.cadr)(B));
     }
     // note how, unless explicitly forced by an eval,
     // (handled by the if just above)
@@ -62,10 +62,10 @@ function define_user_function(p1) {
     // which would need to otherwise
     // be solved by some scope device
     // somehow
-    B = list_1.makeList(symbol_1.symbol(defs_1.FUNCTION), B, A);
-    symbol_1.set_binding(F, B);
+    B = (0, list_js_1.makeList)((0, symbol_js_1.symbol)(defs_js_1.FUNCTION), B, A);
+    (0, symbol_js_1.set_binding)(F, B);
     // return value is nil
-    return symbol_1.symbol(defs_1.NIL);
+    return (0, symbol_js_1.symbol)(defs_js_1.NIL);
 }
 exports.define_user_function = define_user_function;
 function Eval_function_reference(p1) {

@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.degree = exports.Eval_degree = void 0;
-const defs_1 = require("../runtime/defs");
-const symbol_1 = require("../runtime/symbol");
-const misc_1 = require("../sources/misc");
-const eval_1 = require("./eval");
-const guess_1 = require("./guess");
-const is_1 = require("./is");
+const defs_js_1 = require("../runtime/defs.js");
+const symbol_js_1 = require("../runtime/symbol.js");
+const misc_js_1 = require("../sources/misc.js");
+const eval_js_1 = require("./eval.js");
+const guess_js_1 = require("./guess.js");
+const is_js_1 = require("./is.js");
 /* deg =====================================================================
 
 Tags
@@ -23,9 +23,9 @@ Returns the degree of polynomial p(x).
 
 */
 function Eval_degree(p1) {
-    const poly = eval_1.Eval(defs_1.cadr(p1));
-    p1 = eval_1.Eval(defs_1.caddr(p1));
-    const variable = p1 === symbol_1.symbol(defs_1.NIL) ? guess_1.guess(poly) : p1;
+    const poly = (0, eval_js_1.Eval)((0, defs_js_1.cadr)(p1));
+    p1 = (0, eval_js_1.Eval)((0, defs_js_1.caddr)(p1));
+    const variable = p1 === (0, symbol_js_1.symbol)(defs_js_1.NIL) ? (0, guess_js_1.guess)(poly) : p1;
     return degree(poly, variable);
 }
 exports.Eval_degree = Eval_degree;
@@ -43,23 +43,23 @@ exports.Eval_degree = Eval_degree;
 //
 //-----------------------------------------------------------------------------
 function degree(POLY, X) {
-    return yydegree(POLY, X, defs_1.Constants.zero);
+    return yydegree(POLY, X, defs_js_1.Constants.zero);
 }
 exports.degree = degree;
 function yydegree(POLY, X, DEGREE) {
-    if (misc_1.equal(POLY, X)) {
-        if (is_1.isZeroAtomOrTensor(DEGREE)) {
-            DEGREE = defs_1.Constants.one;
+    if ((0, misc_js_1.equal)(POLY, X)) {
+        if ((0, is_js_1.isZeroAtomOrTensor)(DEGREE)) {
+            DEGREE = defs_js_1.Constants.one;
         }
     }
-    else if (defs_1.ispower(POLY)) {
-        if (misc_1.equal(defs_1.cadr(POLY), X) &&
-            defs_1.isNumericAtom(defs_1.caddr(POLY)) &&
-            misc_1.lessp(DEGREE, defs_1.caddr(POLY))) {
-            DEGREE = defs_1.caddr(POLY);
+    else if ((0, defs_js_1.ispower)(POLY)) {
+        if ((0, misc_js_1.equal)((0, defs_js_1.cadr)(POLY), X) &&
+            (0, defs_js_1.isNumericAtom)((0, defs_js_1.caddr)(POLY)) &&
+            (0, misc_js_1.lessp)(DEGREE, (0, defs_js_1.caddr)(POLY))) {
+            DEGREE = (0, defs_js_1.caddr)(POLY);
         }
     }
-    else if (defs_1.iscons(POLY)) {
+    else if ((0, defs_js_1.iscons)(POLY)) {
         DEGREE = POLY.tail().reduce((a, b) => yydegree(b, X, a), DEGREE);
     }
     return DEGREE;

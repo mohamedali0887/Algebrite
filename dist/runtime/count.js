@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.countsize = exports.countOccurrencesOfSymbol = exports.count = void 0;
-const misc_1 = require("../sources/misc");
-const defs_1 = require("./defs");
+const misc_js_1 = require("../sources/misc.js");
+const defs_js_1 = require("./defs.js");
 const sum = (arr) => arr.reduce((a, b) => a + b, 0);
 function count(p) {
     let n;
-    if (defs_1.iscons(p)) {
+    if ((0, defs_js_1.iscons)(p)) {
         const items = [...p];
         n = sum(items.map(count)) + items.length;
     }
@@ -22,10 +22,10 @@ exports.count = count;
 // first argument but didn't try it.
 function countOccurrencesOfSymbol(needle, p) {
     let n = 0;
-    if (defs_1.iscons(p)) {
+    if ((0, defs_js_1.iscons)(p)) {
         n = sum([...p].map((el) => countOccurrencesOfSymbol(needle, el)));
     }
-    else if (misc_1.equal(needle, p)) {
+    else if ((0, misc_js_1.equal)(needle, p)) {
         n = 1;
     }
     return n;
@@ -35,12 +35,12 @@ exports.countOccurrencesOfSymbol = countOccurrencesOfSymbol;
 // in an expression
 function countsize(p) {
     let n = 0;
-    if (defs_1.istensor(p)) {
+    if ((0, defs_js_1.istensor)(p)) {
         for (let i = 0; i < p.tensor.nelem; i++) {
             n += count(p.tensor.elem[i]);
         }
     }
-    else if (defs_1.iscons(p)) {
+    else if ((0, defs_js_1.iscons)(p)) {
         const items = [...p];
         n = sum(items.map(count)) + items.length;
     }

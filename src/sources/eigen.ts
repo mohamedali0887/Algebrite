@@ -9,15 +9,15 @@ import {
   NIL,
   Tensor,
   U
-} from '../runtime/defs';
-import { stop } from '../runtime/run';
-import { set_binding, symbol, usr_symbol } from '../runtime/symbol';
-import { double } from './bignum';
-import { Eval } from './eval';
-import { yyfloat } from './float';
-import { makeList } from './list';
-import { print_str } from './print';
-import { copy_tensor } from './tensor';
+} from '../runtime/defs.js';
+import { stop } from '../runtime/run.js';
+import { set_binding, symbol, usr_symbol } from '../runtime/symbol.js';
+import { double } from './bignum.js';
+import { Eval } from './eval.js';
+import { yyfloat } from './float.js';
+import { makeList } from './list.js';
+import { print_str } from './print.js';
+import { copy_tensor } from './tensor.js';
 
 type EIGENOP = typeof EIGEN | typeof EIGENVAL | typeof EIGENVEC;
 
@@ -80,9 +80,9 @@ Enter:
 Result:
 
      -1.16435e-14
- 
+
      -6.46705e-15
- 
+
      -4.55191e-15
 
 Example 2: Check the relation A = QTDQ.
@@ -91,12 +91,12 @@ Enter:
 
   A - dot(transpose(Q),D,Q)
 
-Result: 
+Result:
 
   6.27365e-12    -1.58236e-11   1.81902e-11
- 
+
   -1.58236e-11   -1.95365e-11   2.56514e-12
- 
+
   1.81902e-11    2.56514e-12    1.32627e-11
 
 */

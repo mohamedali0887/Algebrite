@@ -1,13 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.clockform = exports.Eval_clock = void 0;
-const defs_1 = require("../runtime/defs");
-const symbol_1 = require("../runtime/symbol");
-const abs_1 = require("./abs");
-const arg_1 = require("./arg");
-const eval_1 = require("./eval");
-const list_1 = require("./list");
-const multiply_1 = require("./multiply");
+const defs_js_1 = require("../runtime/defs.js");
+const symbol_js_1 = require("../runtime/symbol.js");
+const abs_js_1 = require("./abs.js");
+const arg_js_1 = require("./arg.js");
+const eval_js_1 = require("./eval.js");
+const list_js_1 = require("./list.js");
+const multiply_js_1 = require("./multiply.js");
 /*
  Convert complex z to clock form
 
@@ -30,7 +30,7 @@ const multiply_1 = require("./multiply");
 //   3) it's a straighforward notation for roots of 1 and -1
 const DEBUG_CLOCKFORM = false;
 function Eval_clock(p1) {
-    return clockform(eval_1.Eval(defs_1.cadr(p1)));
+    return clockform((0, eval_js_1.Eval)((0, defs_js_1.cadr)(p1)));
 }
 exports.Eval_clock = Eval_clock;
 function clockform(p1) {
@@ -38,12 +38,12 @@ function clockform(p1) {
     // that we can't use "power", as "power" evaluates
     // clock forms into rectangular form (see "-1 ^ rational"
     // section in power)
-    const l = list_1.makeList(symbol_1.symbol(defs_1.POWER), defs_1.Constants.negOne, multiply_1.divide(arg_1.arg(p1), defs_1.Constants.Pi()));
-    const multiplied = multiply_1.multiply(abs_1.abs(p1), l);
+    const l = (0, list_js_1.makeList)((0, symbol_js_1.symbol)(defs_js_1.POWER), defs_js_1.Constants.negOne, (0, multiply_js_1.divide)((0, arg_js_1.arg)(p1), defs_js_1.Constants.Pi()));
+    const multiplied = (0, multiply_js_1.multiply)((0, abs_js_1.abs)(p1), l);
     if (DEBUG_CLOCKFORM) {
-        console.log(`clockform: abs of ${p1} : ${abs_1.abs(p1)}`);
-        console.log(`clockform: arg of ${p1} : ${arg_1.arg(p1)}`);
-        console.log(`clockform: divide : ${multiply_1.divide(arg_1.arg(p1), defs_1.Constants.Pi())}`);
+        console.log(`clockform: abs of ${p1} : ${(0, abs_js_1.abs)(p1)}`);
+        console.log(`clockform: arg of ${p1} : ${(0, arg_js_1.arg)(p1)}`);
+        console.log(`clockform: divide : ${(0, multiply_js_1.divide)((0, arg_js_1.arg)(p1), defs_js_1.Constants.Pi())}`);
         console.log(`clockform: power : ${l}`);
         console.log(`clockform: multiply : ${multiplied}`);
     }

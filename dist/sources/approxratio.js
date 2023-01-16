@@ -1,55 +1,55 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.testApprox = exports.approxAll = exports.approxRationalsOfLogs = exports.approxRadicals = exports.Eval_approxratio = void 0;
-const alloc_1 = require("../runtime/alloc");
-const defs_1 = require("../runtime/defs");
-const symbol_1 = require("../runtime/symbol");
-const bignum_1 = require("./bignum");
-const float_1 = require("./float");
-const list_1 = require("./list");
-const tensor_1 = require("./tensor");
+const alloc_js_1 = require("../runtime/alloc.js");
+const defs_js_1 = require("../runtime/defs.js");
+const symbol_js_1 = require("../runtime/symbol.js");
+const bignum_js_1 = require("./bignum.js");
+const float_js_1 = require("./float.js");
+const list_js_1 = require("./list.js");
+const tensor_js_1 = require("./tensor.js");
 /*
  Guesses a rational for each float in the passed expression
 */
 function Eval_approxratio(p1) {
-    return approxratioRecursive(defs_1.cadr(p1));
+    return approxratioRecursive((0, defs_js_1.cadr)(p1));
 }
 exports.Eval_approxratio = Eval_approxratio;
 function approxratioRecursive(expr) {
-    if (defs_1.istensor(expr)) {
-        const p4 = alloc_1.alloc_tensor(expr.tensor.nelem);
+    if ((0, defs_js_1.istensor)(expr)) {
+        const p4 = (0, alloc_js_1.alloc_tensor)(expr.tensor.nelem);
         p4.tensor.ndim = expr.tensor.ndim;
         p4.tensor.dim = Array.from(expr.tensor.dim);
         p4.tensor.elem = p4.tensor.elem.map((el) => {
             const result = approxratioRecursive(el);
-            tensor_1.check_tensor_dimensions(p4);
+            (0, tensor_js_1.check_tensor_dimensions)(p4);
             return result;
         });
         return p4;
     }
-    if (expr.k === defs_1.DOUBLE) {
+    if (expr.k === defs_js_1.DOUBLE) {
         return approxOneRatioOnly(expr);
     }
-    if (defs_1.iscons(expr)) {
-        return new defs_1.Cons(approxratioRecursive(defs_1.car(expr)), approxratioRecursive(defs_1.cdr(expr)));
+    if ((0, defs_js_1.iscons)(expr)) {
+        return new defs_js_1.Cons(approxratioRecursive((0, defs_js_1.car)(expr)), approxratioRecursive((0, defs_js_1.cdr)(expr)));
     }
     return expr;
 }
 function approxOneRatioOnly(p1) {
-    const supposedlyTheFloat = float_1.zzfloat(p1);
-    if (supposedlyTheFloat.k === defs_1.DOUBLE) {
+    const supposedlyTheFloat = (0, float_js_1.zzfloat)(p1);
+    if (supposedlyTheFloat.k === defs_js_1.DOUBLE) {
         const theFloat = supposedlyTheFloat.d;
         const splitBeforeAndAfterDot = theFloat.toString().split('.');
         if (splitBeforeAndAfterDot.length === 2) {
             const numberOfDigitsAfterTheDot = splitBeforeAndAfterDot[1].length;
             const precision = 1 / Math.pow(10, numberOfDigitsAfterTheDot);
             const theRatio = floatToRatioRoutine(theFloat, precision);
-            return bignum_1.rational(theRatio[0], theRatio[1]);
+            return (0, bignum_js_1.rational)(theRatio[0], theRatio[1]);
         }
-        return bignum_1.integer(theFloat);
+        return (0, bignum_js_1.integer)(theFloat);
     }
     // we didn't manage, just leave unexpressed
-    return list_1.makeList(symbol_1.symbol(defs_1.APPROXRATIO), supposedlyTheFloat);
+    return (0, list_js_1.makeList)((0, symbol_js_1.symbol)(defs_js_1.APPROXRATIO), supposedlyTheFloat);
 }
 // original routine by John Kennedy, see
 // https://web.archive.org/web/20111027100847/http://homepage.smc.edu/kennedy_john/DEC2FRAC.PDF

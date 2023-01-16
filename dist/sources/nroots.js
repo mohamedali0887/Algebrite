@@ -1,21 +1,21 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Eval_nroots = void 0;
-const alloc_1 = require("../runtime/alloc");
-const defs_1 = require("../runtime/defs");
-const run_1 = require("../runtime/run");
-const symbol_1 = require("../runtime/symbol");
-const misc_1 = require("../sources/misc");
-const add_1 = require("./add");
-const bignum_1 = require("./bignum");
-const coeff_1 = require("./coeff");
-const eval_1 = require("./eval");
-const float_1 = require("./float");
-const guess_1 = require("./guess");
-const imag_1 = require("./imag");
-const is_1 = require("./is");
-const multiply_1 = require("./multiply");
-const real_1 = require("./real");
+const alloc_js_1 = require("../runtime/alloc.js");
+const defs_js_1 = require("../runtime/defs.js");
+const run_js_1 = require("../runtime/run.js");
+const symbol_js_1 = require("../runtime/symbol.js");
+const misc_js_1 = require("../sources/misc.js");
+const add_js_1 = require("./add.js");
+const bignum_js_1 = require("./bignum.js");
+const coeff_js_1 = require("./coeff.js");
+const eval_js_1 = require("./eval.js");
+const float_js_1 = require("./float.js");
+const guess_js_1 = require("./guess.js");
+const imag_js_1 = require("./imag.js");
+const is_js_1 = require("./is.js");
+const multiply_js_1 = require("./multiply.js");
+const real_js_1 = require("./real.js");
 // find the roots of a polynomial numerically
 const NROOTS_YMAX = 101;
 const NROOTS_DELTA = 1.0e-6;
@@ -49,24 +49,24 @@ for (let initNRoots = 0; initNRoots < NROOTS_YMAX; initNRoots++) {
     nroots_c[initNRoots] = new numericRootOfPolynomial();
 }
 function Eval_nroots(p1) {
-    let p2 = eval_1.Eval(defs_1.caddr(p1));
-    p1 = eval_1.Eval(defs_1.cadr(p1));
-    p2 = p2 === symbol_1.symbol(defs_1.NIL) ? guess_1.guess(p1) : p2;
-    if (!is_1.ispolyexpandedform(p1, p2)) {
-        run_1.stop('nroots: polynomial?');
+    let p2 = (0, eval_js_1.Eval)((0, defs_js_1.caddr)(p1));
+    p1 = (0, eval_js_1.Eval)((0, defs_js_1.cadr)(p1));
+    p2 = p2 === (0, symbol_js_1.symbol)(defs_js_1.NIL) ? (0, guess_js_1.guess)(p1) : p2;
+    if (!(0, is_js_1.ispolyexpandedform)(p1, p2)) {
+        (0, run_js_1.stop)('nroots: polynomial?');
     }
     // get the coefficients
-    const cs = coeff_1.coeff(p1, p2);
+    const cs = (0, coeff_js_1.coeff)(p1, p2);
     let n = cs.length;
     if (n > NROOTS_YMAX) {
-        run_1.stop('nroots: degree?');
+        (0, run_js_1.stop)('nroots: degree?');
     }
     // convert the coefficients to real and imaginary doubles
     for (let i = 0; i < n; i++) {
-        p1 = eval_1.Eval(float_1.yyfloat(real_1.real(cs[i])));
-        p2 = eval_1.Eval(float_1.yyfloat(imag_1.imag(cs[i])));
-        if (!defs_1.isdouble(p1) || !defs_1.isdouble(p2)) {
-            run_1.stop('nroots: coefficients?');
+        p1 = (0, eval_js_1.Eval)((0, float_js_1.yyfloat)((0, real_js_1.real)(cs[i])));
+        p2 = (0, eval_js_1.Eval)((0, float_js_1.yyfloat)((0, imag_js_1.imag)(cs[i])));
+        if (!(0, defs_js_1.isdouble)(p1) || !(0, defs_js_1.isdouble)(p2)) {
+            (0, run_js_1.stop)('nroots: coefficients?');
         }
         nroots_c[i].r = p1.d;
         nroots_c[i].i = p2.d;
@@ -82,7 +82,7 @@ function Eval_nroots(p1) {
         if (Math.abs(nroots_a.i) < NROOTS_DELTA) {
             nroots_a.i = 0.0;
         }
-        roots.push(add_1.add(bignum_1.double(nroots_a.r), multiply_1.multiply(bignum_1.double(nroots_a.i), defs_1.Constants.imaginaryunit)));
+        roots.push((0, add_js_1.add)((0, bignum_js_1.double)(nroots_a.r), (0, multiply_js_1.multiply)((0, bignum_js_1.double)(nroots_a.i), defs_js_1.Constants.imaginaryunit)));
         NROOTS_divpoly(k);
     }
     // now make n equal to the number of roots
@@ -91,8 +91,8 @@ function Eval_nroots(p1) {
         return roots[0];
     }
     else if (n > 1) {
-        roots.sort(misc_1.cmp_expr);
-        p1 = alloc_1.alloc_tensor(n);
+        roots.sort(misc_js_1.cmp_expr);
+        p1 = (0, alloc_js_1.alloc_tensor)(n);
         p1.tensor.ndim = 1;
         p1.tensor.dim[0] = n;
         p1.tensor.elem = roots;
@@ -134,7 +134,7 @@ function findroot(n) {
         for (let k = 0; k < 1000; k++) {
             compute_fa(n);
             const nrabs = NROOTS_ABS(nroots_fa);
-            if (defs_1.DEBUG) {
+            if (defs_js_1.DEBUG) {
                 console.log(`nrabs: ${nrabs}`);
             }
             if (nrabs < NROOTS_EPSILON) {
@@ -174,7 +174,7 @@ function findroot(n) {
                 nroots_b.i - (nroots_y.r * nroots_fb.i + nroots_y.i * nroots_fb.r);
         }
     }
-    run_1.stop('nroots: convergence error');
+    (0, run_js_1.stop)('nroots: convergence error');
 }
 function compute_fa(n) {
     // x = a
@@ -204,7 +204,7 @@ function NROOTS_divpoly(n) {
             nroots_c[k].i * nroots_a.r + nroots_c[k].r * nroots_a.i;
     }
     if (NROOTS_ABS(nroots_c[0]) > NROOTS_DELTA) {
-        run_1.stop('nroots: residual error');
+        (0, run_js_1.stop)('nroots: residual error');
     }
     for (let k = 0; k < n - 1; k++) {
         nroots_c[k].r = nroots_c[k + 1].r;

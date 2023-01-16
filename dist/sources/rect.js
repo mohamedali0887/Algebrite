@@ -1,18 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.rect = exports.Eval_rect = void 0;
-const defs_1 = require("../runtime/defs");
-const find_1 = require("../runtime/find");
-const symbol_1 = require("../runtime/symbol");
-const abs_1 = require("./abs");
-const add_1 = require("./add");
-const arg_1 = require("./arg");
-const cos_1 = require("./cos");
-const eval_1 = require("./eval");
-const is_1 = require("./is");
-const list_1 = require("./list");
-const multiply_1 = require("./multiply");
-const sin_1 = require("./sin");
+const defs_js_1 = require("../runtime/defs.js");
+const find_js_1 = require("../runtime/find.js");
+const symbol_js_1 = require("../runtime/symbol.js");
+const abs_js_1 = require("./abs.js");
+const add_js_1 = require("./add.js");
+const arg_js_1 = require("./arg.js");
+const cos_js_1 = require("./cos.js");
+const eval_js_1 = require("./eval.js");
+const is_js_1 = require("./is.js");
+const list_js_1 = require("./list.js");
+const multiply_js_1 = require("./multiply.js");
+const sin_js_1 = require("./sin.js");
 /*
 Convert complex z to rectangular form
 
@@ -22,27 +22,27 @@ Convert complex z to rectangular form
 */
 const DEBUG_RECT = false;
 function Eval_rect(p1) {
-    return rect(eval_1.Eval(defs_1.cadr(p1)));
+    return rect((0, eval_js_1.Eval)((0, defs_js_1.cadr)(p1)));
 }
 exports.Eval_rect = Eval_rect;
 function rect(p1) {
     const input = p1;
     if (DEBUG_RECT) {
         console.log(`RECT of ${input}`);
-        console.log(`any clock forms in : ${input} ? ${find_1.findPossibleClockForm(input, p1)}`);
+        console.log(`any clock forms in : ${input} ? ${(0, find_js_1.findPossibleClockForm)(input, p1)}`);
     }
     // if we assume real variables, then the
     // rect of any symbol is the symbol itself
     // (note that 'i' is not a symbol, it's made of (-1)^(1/2))
     // otherwise we have to leave unevalled
-    if (defs_1.issymbol(p1)) {
+    if ((0, defs_js_1.issymbol)(p1)) {
         if (DEBUG_RECT) {
             console.log(` rect: simple symbol: ${input}`);
         }
-        if (!is_1.isZeroAtomOrTensor(symbol_1.get_binding(symbol_1.symbol(defs_1.ASSUME_REAL_VARIABLES)))) {
+        if (!(0, is_js_1.isZeroAtomOrTensor)((0, symbol_js_1.get_binding)((0, symbol_js_1.symbol)(defs_js_1.ASSUME_REAL_VARIABLES)))) {
             return p1;
         }
-        return list_1.makeList(symbol_1.symbol(defs_1.YYRECT), p1);
+        return (0, list_js_1.makeList)((0, symbol_js_1.symbol)(defs_js_1.YYRECT), p1);
         // TODO this is quite dirty, ideally we don't need this
         // but removing this creates a few failings in the tests
         // that I can't investigate right now.
@@ -54,42 +54,42 @@ function rect(p1) {
         // which shouldn't match but do
         //
     }
-    if (!is_1.isZeroAtomOrTensor(symbol_1.get_binding(symbol_1.symbol(defs_1.ASSUME_REAL_VARIABLES))) &&
-        !find_1.findPossibleExponentialForm(p1) && // no exp form?
-        !find_1.findPossibleClockForm(p1, p1) && // no clock form?
-        !(find_1.Find(p1, symbol_1.symbol(defs_1.SIN)) &&
-            find_1.Find(p1, symbol_1.symbol(defs_1.COS)) &&
-            find_1.Find(p1, defs_1.Constants.imaginaryunit))) {
+    if (!(0, is_js_1.isZeroAtomOrTensor)((0, symbol_js_1.get_binding)((0, symbol_js_1.symbol)(defs_js_1.ASSUME_REAL_VARIABLES))) &&
+        !(0, find_js_1.findPossibleExponentialForm)(p1) && // no exp form?
+        !(0, find_js_1.findPossibleClockForm)(p1, p1) && // no clock form?
+        !((0, find_js_1.Find)(p1, (0, symbol_js_1.symbol)(defs_js_1.SIN)) &&
+            (0, find_js_1.Find)(p1, (0, symbol_js_1.symbol)(defs_js_1.COS)) &&
+            (0, find_js_1.Find)(p1, defs_js_1.Constants.imaginaryunit))) {
         // no polar form?
         if (DEBUG_RECT) {
             console.log(` rect: simple symbol: ${input}`);
         }
         return p1; // ib
     }
-    if (defs_1.ismultiply(p1) &&
-        is_1.isimaginaryunit(defs_1.cadr(p1)) &&
-        !is_1.isZeroAtomOrTensor(symbol_1.get_binding(symbol_1.symbol(defs_1.ASSUME_REAL_VARIABLES)))) {
+    if ((0, defs_js_1.ismultiply)(p1) &&
+        (0, is_js_1.isimaginaryunit)((0, defs_js_1.cadr)(p1)) &&
+        !(0, is_js_1.isZeroAtomOrTensor)((0, symbol_js_1.get_binding)((0, symbol_js_1.symbol)(defs_js_1.ASSUME_REAL_VARIABLES)))) {
         return p1; // sum
     }
-    if (defs_1.isadd(p1)) {
+    if ((0, defs_js_1.isadd)(p1)) {
         if (DEBUG_RECT) {
             console.log(` rect - ${input} is a sum `);
         }
-        return p1.tail().reduce((a, b) => add_1.add(a, rect(b)), defs_1.Constants.zero);
+        return p1.tail().reduce((a, b) => (0, add_js_1.add)(a, rect(b)), defs_js_1.Constants.zero);
     }
     // try to get to the rectangular form by doing
     // abs(p1) * (cos (theta) + i * sin(theta))
     // where theta is arg(p1)
     // abs(z) * (cos(arg(z)) + i sin(arg(z)))
-    const result = multiply_1.multiply(abs_1.abs(p1), add_1.add(cos_1.cosine(arg_1.arg(p1)), multiply_1.multiply(defs_1.Constants.imaginaryunit, sin_1.sine(arg_1.arg(p1)))));
+    const result = (0, multiply_js_1.multiply)((0, abs_js_1.abs)(p1), (0, add_js_1.add)((0, cos_js_1.cosine)((0, arg_js_1.arg)(p1)), (0, multiply_js_1.multiply)(defs_js_1.Constants.imaginaryunit, (0, sin_js_1.sine)((0, arg_js_1.arg)(p1)))));
     if (DEBUG_RECT) {
         console.log(` rect - ${input} is NOT a sum `);
-        console.log(` rect - ${input} abs: ${abs_1.abs(p1)}`);
+        console.log(` rect - ${input} abs: ${(0, abs_js_1.abs)(p1)}`);
         console.log(` rect - ${input} arg of ${p1} : ${p1}`);
-        console.log(` rect - ${input} cosine: ${cos_1.cosine(arg_1.arg(p1))}`);
-        console.log(` rect - ${input} sine: ${sin_1.sine(arg_1.arg(p1))}`);
-        console.log(` rect - ${input} i * sine: ${multiply_1.multiply(defs_1.Constants.imaginaryunit, sin_1.sine(arg_1.arg(p1)))}`);
-        console.log(` rect - ${input} cos + i * sine: ${add_1.add(cos_1.cosine(arg_1.arg(p1)), multiply_1.multiply(defs_1.Constants.imaginaryunit, sin_1.sine(arg_1.arg(p1))))}`);
+        console.log(` rect - ${input} cosine: ${(0, cos_js_1.cosine)((0, arg_js_1.arg)(p1))}`);
+        console.log(` rect - ${input} sine: ${(0, sin_js_1.sine)((0, arg_js_1.arg)(p1))}`);
+        console.log(` rect - ${input} i * sine: ${(0, multiply_js_1.multiply)(defs_js_1.Constants.imaginaryunit, (0, sin_js_1.sine)((0, arg_js_1.arg)(p1)))}`);
+        console.log(` rect - ${input} cos + i * sine: ${(0, add_js_1.add)((0, cos_js_1.cosine)((0, arg_js_1.arg)(p1)), (0, multiply_js_1.multiply)(defs_js_1.Constants.imaginaryunit, (0, sin_js_1.sine)((0, arg_js_1.arg)(p1))))}`);
         console.log(`rect of ${input} : ${result}`);
     }
     return result;

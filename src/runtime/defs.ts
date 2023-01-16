@@ -1,11 +1,12 @@
 import bigInt from 'big-integer';
-import {collectLatexStringFromReturnValue, print_expr,} from '../sources/print';
-import {symbol} from './symbol';
+
+import {collectLatexStringFromReturnValue, print_expr,} from '../sources/print.js';
+
+import {symbol} from './symbol.js';
 
 export function breakpoint() {}
 
-// also change the version in the package.json file
-export const version = '2.0.1';
+export {version} from './version.js';
 
 const SELFTEST = 1;
 
@@ -22,12 +23,8 @@ export const PRINTMODE_COMPUTER = 'PRINTMODE_COMPUTER';
 export const PRINTMODE_HUMAN = 'PRINTMODE_HUMAN';
 export const PRINTMODE_LIST = 'PRINTMODE_LIST';
 
-export type PrintMode =
-  | typeof PRINTMODE_LATEX
-  | typeof PRINTMODE_2DASCII
-  | typeof PRINTMODE_COMPUTER
-  | typeof PRINTMODE_HUMAN
-  | typeof PRINTMODE_LIST;
+export type PrintMode =|typeof PRINTMODE_LATEX|typeof PRINTMODE_2DASCII|
+    typeof PRINTMODE_COMPUTER|typeof PRINTMODE_HUMAN|typeof PRINTMODE_LIST;
 
 class Defs {
   // when the user uses the generic "print" statement
@@ -40,7 +37,7 @@ class Defs {
   // needed for the mechanism to
   // find all dependencies between variables
   // in a script
-  public symbolsDependencies: { [key: string]: string[] } = {};
+  public symbolsDependencies: {[key: string]: string[]} = {};
 
   public symbolsHavingReassignments: string[] = [];
   public symbolsInExpressionsWithoutAssignments: string[] = [];
@@ -58,7 +55,7 @@ class Defs {
   public evaluatingAsFloats = false;
   public evaluatingPolar = false;
   public esc_flag = false;
-  public trigmode: 0 | 1 | 2 = 0;
+  public trigmode: 0|1|2 = 0;
 
   public out_count = 0;
   public test_flag = false;
@@ -103,15 +100,15 @@ export abstract class BaseAtom {
 }
 
 export class Cons extends BaseAtom {
-  public readonly cons: { car: U; cdr: U };
+  public readonly cons: {car: U; cdr: U};
   public k: typeof CONS = CONS;
 
   constructor(car: U, cdr: U) {
     super();
-    this.cons = { car, cdr };
+    this.cons = {car, cdr};
   }
 
-  public *[Symbol.iterator]() {
+  public * [Symbol.iterator]() {
     let u: U = this;
     while (iscons(u)) {
       yield car(u);
@@ -141,15 +138,13 @@ export class Num extends BaseAtom {
   public readonly q: Num = this;
   public k: typeof NUM = NUM;
   constructor(
-    public a: bigInt.BigInteger,
-    public b: bigInt.BigInteger = bigInt.one
-  ) {
+      public a: bigInt.BigInteger, public b: bigInt.BigInteger = bigInt.one) {
     super();
   }
 
   // These flags are not actually set, they're only used for typechecking.
   // Don't use them directly.
-  __ts_sign?: -1 | 0 | 1;
+  __ts_sign?: -1|0|1;
   __ts_integer?: boolean;
   __ts_special?: number;
 }
@@ -162,7 +157,7 @@ export class Double extends BaseAtom {
 
   // These flags are not actually set, they're only used for typechecking.
   // Don't use them directly.
-  __ts_sign?: -1 | 0 | 1;
+  __ts_sign?: -1|0|1;
   __ts_integer?: boolean;
   __ts_special?: number;
 }
@@ -178,9 +173,9 @@ export class Tensor<T extends U = U> extends BaseAtom {
   public readonly tensor = this;
   public k: typeof TENSOR = TENSOR;
 
-  public ndim = 0; // number of dimensions
-  public dim: number[] = []; // dimension length, for each dimension
-  public elem: T[] = []; // an array containing all the data
+  public ndim = 0;            // number of dimensions
+  public dim: number[] = [];  // dimension length, for each dimension
+  public elem: T[] = [];      // an array containing all the data
 
   public get nelem() {
     return this.elem.length;
@@ -194,10 +189,10 @@ export class Sym extends BaseAtom {
     super();
   }
 
-  public keyword:(p1:Cons)=>U;
+  public keyword: (p1: Cons) => U;
 }
 
-export type U = Cons | Num | Double | Str | Tensor | Sym;
+export type U = Cons|Num|Double|Str|Tensor|Sym;
 
 // the following enum is for struct U, member k
 
@@ -288,7 +283,7 @@ export const INVG = 'invg';
 export const ISINTEGER = 'isinteger';
 export const ISPRIME = 'isprime';
 export const LAGUERRE = 'laguerre';
-//  LAPLACE = 
+//  LAPLACE =
 export const LCM = 'lcm';
 export const LEADING = 'leading';
 export const LEGENDRE = 'legendre';
@@ -352,7 +347,7 @@ export const ZERO = 'zero';
 
 // ALL THE SYMBOLS ABOVE NIL ARE KEYWORDS,
 // WHICH MEANS THAT USER CANNOT REDEFINE THEM
-export const NIL = 'nil'; // nil goes here, after standard functions
+export const NIL = 'nil';  // nil goes here, after standard functions
 export const LAST = 'last';
 
 export const LAST_PRINT = 'lastprint';
@@ -369,9 +364,9 @@ export const TRACE = 'trace';
 export const FORCE_FIXED_PRINTOUT = 'forceFixedPrintout';
 export const MAX_FIXED_PRINTOUT_DIGITS = 'maxFixedPrintoutDigits';
 
-export const YYE = '~'; // tilde so sort puts it after other symbols
+export const YYE = '~';  // tilde so sort puts it after other symbols
 
-export const DRAWX = '$DRAWX'; // special purpose internal symbols
+export const DRAWX = '$DRAWX';  // special purpose internal symbols
 export const METAA = '$METAA';
 export const METAB = '$METAB';
 export const METAX = '$METAX';
@@ -412,36 +407,16 @@ export const MAXPRIMETAB = 10000;
 export const MAX_CONSECUTIVE_APPLICATIONS_OF_ALL_RULES = 5;
 export const MAX_CONSECUTIVE_APPLICATIONS_OF_SINGLE_RULE = 10;
 
-//define _USE_MATH_DEFINES // for MS C++
+// define _USE_MATH_DEFINES // for MS C++
 
 export const MAXDIM = 24;
 
 export const predefinedSymbolsInGlobalScope_doNotTrackInDependencies = [
-  'rationalize',
-  'abs',
-  'e',
-  'i',
-  'pi',
-  'sin',
-  'ceiling',
-  'cos',
-  'roots',
-  'integral',
-  'derivative',
-  'defint',
-  'sqrt',
-  'eig',
-  'cov',
-  'deig',
-  'dcov',
-  'float',
-  'floor',
-  'product',
-  'root',
-  'round',
-  'sum',
-  'test',
-  'unit',
+  'rationalize', 'abs',     'e',     'i',     'pi',
+  'sin',         'ceiling', 'cos',   'roots', 'integral',
+  'derivative',  'defint',  'sqrt',  'eig',   'cov',
+  'deig',        'dcov',    'float', 'floor', 'product',
+  'root',        'round',   'sum',   'test',  'unit',
 ];
 
 // you can do some little simplifications
@@ -451,7 +426,7 @@ export const predefinedSymbolsInGlobalScope_doNotTrackInDependencies = [
 // etc.
 export const parse_time_simplifications = true;
 
-export const primetab = (function () {
+export const primetab = (function() {
   const primes = [2];
   let i = 3;
   while (primes.length < MAXPRIMETAB) {
@@ -477,9 +452,9 @@ let draw_flag = false;
 export const mtotal = 0;
 export const logbuf = '';
 
-const arglist = []; // will contain U
+const arglist = [];  // will contain U
 
-const draw_stop_return = null; // extern jmp_buf ?????
+const draw_stop_return = null;  // extern jmp_buf ?????
 
 export const transpose_unicode = 7488;
 export const dotprod_unicode = 183;
@@ -496,7 +471,7 @@ export function isdouble(p: BaseAtom): p is Double {
   return p.k === DOUBLE;
 }
 
-export function isNumericAtom(p: BaseAtom): p is Double | Num {
+export function isNumericAtom(p: BaseAtom): p is Double|Num {
   return isrational(p) || isdouble(p);
 }
 
@@ -508,7 +483,7 @@ export function istensor(p: BaseAtom): p is Tensor {
   return p.k === TENSOR;
 }
 
-export type NumbericTensor = Double | Num | Tensor<NumbericTensor>;
+export type NumbericTensor = Double|Num|Tensor<NumbericTensor>;
 
 // because of recursion, we consider a scalar to be
 // a tensor, so a numeric scalar will return true
@@ -518,7 +493,7 @@ export function isNumericAtomOrTensor(p: U): p is NumbericTensor {
   }
 
   if (!istensor(p)) {
-    //console.log "p not an atom nor a tensor: " + p
+    // console.log "p not an atom nor a tensor: " + p
     return false;
   }
 
@@ -527,7 +502,7 @@ export function isNumericAtomOrTensor(p: U): p is NumbericTensor {
 
   for (let i = 0; i < n; i++) {
     if (!isNumericAtomOrTensor(a[i])) {
-      //console.log "non-numeric element: " + a[i]
+      // console.log "non-numeric element: " + a[i]
       return false;
     }
   }
@@ -642,19 +617,19 @@ export function caddaddr(p: BaseAtom): U {
   return car(cdr(cdr(car(cdr(cdr(p))))));
 }
 
-export function isadd(p: BaseAtom): p is Cons & { __ts_sym: '+' } {
+export function isadd(p: BaseAtom): p is Cons&{__ts_sym: '+'} {
   return car(p) === symbol(ADD);
 }
 
-export function ismultiply(p: BaseAtom): p is Cons & { __ts_sym: '*' } {
+export function ismultiply(p: BaseAtom): p is Cons&{__ts_sym: '*'} {
   return car(p) === symbol(MULTIPLY);
 }
 
-export function ispower(p: BaseAtom): p is Cons & { __ts_sym: '^' } {
+export function ispower(p: BaseAtom): p is Cons&{__ts_sym: '^'} {
   return car(p) === symbol(POWER);
 }
 
-export function isfactorial(p: BaseAtom): p is Cons & { __ts_sym: '!' } {
+export function isfactorial(p: BaseAtom): p is Cons&{__ts_sym: '!'} {
   return car(p) === symbol(FACTORIAL);
 }
 
@@ -673,11 +648,11 @@ export function isinv(p: BaseAtom): boolean {
 // TODO this is a bit of a shallow check, we should
 // check when we are passed an actual tensor and possibly
 // cache the test result.
-export function isidentitymatrix(p: BaseAtom): p is Sym & { identity: true } {
+export function isidentitymatrix(p: BaseAtom): p is Sym&{identity: true} {
   return p === symbol(SYMBOL_IDENTITY_MATRIX);
 }
 
-export type Sign = -1 | 0 | 1;
+export type Sign = -1|0|1;
 export function MSIGN(p: bigInt.BigInteger): Sign {
   if (p.isPositive()) {
     return 1;
@@ -704,13 +679,13 @@ export function MEQUAL(p: bigInt.BigInteger, n: number): boolean {
 }
 
 export function reset_after_error() {
-    defs.esc_flag = false;
+  defs.esc_flag = false;
   draw_flag = false;
   defs.evaluatingAsFloats = false;
   defs.evaluatingPolar = false;
 }
 
-export const $: { [key: string]: unknown } = {};
+export const $: {[key: string]: unknown} = {};
 
 export class Constants {
   public static readonly one = new Num(bigInt(1));
@@ -724,30 +699,27 @@ export class Constants {
   // i is the square root of -1 i.e. -1 ^ 1/2
   public static imaginaryunit: U;
 
-  public static One(): Num | Double {
+  public static One(): Num|Double {
     return defs.evaluatingAsFloats ? Constants.oneAsDouble : Constants.one;
   }
 
-  public static NegOne(): Num | Double {
-    return defs.evaluatingAsFloats
-      ? Constants.negOneAsDouble
-      : Constants.negOne;
+  public static NegOne(): Num|Double {
+    return defs.evaluatingAsFloats ? Constants.negOneAsDouble :
+                                     Constants.negOne;
   }
 
-  public static Zero(): Num | Double {
+  public static Zero(): Num|Double {
     return defs.evaluatingAsFloats ? Constants.zeroAsDouble : Constants.zero;
   }
 
-  public static Pi(): Sym | Double {
+  public static Pi(): Sym|Double {
     return defs.evaluatingAsFloats ? Constants.piAsDouble : symbol(PI);
   }
 }
 
 // Call a function temporarily setting "expanding" to false
 export function noexpand<T extends any[], V>(
-  func: (...args: T) => V,
-  ...args: T
-): V {
+    func: (...args: T) => V, ...args: T): V {
   const prev_expanding = defs.expanding;
   defs.expanding = false;
   try {
@@ -759,9 +731,7 @@ export function noexpand<T extends any[], V>(
 
 // Call a function temporarily setting "expanding" to true
 export function doexpand<T extends any[], V>(
-  func: (...args: T) => V,
-  ...args: T
-): V {
+    func: (...args: T) => V, ...args: T): V {
   const prev_expanding = defs.expanding;
   defs.expanding = true;
   try {
@@ -773,9 +743,7 @@ export function doexpand<T extends any[], V>(
 
 // Call a function temporarily setting "evaluatingPolar" to true
 export function evalPolar<T extends any[], V>(
-  func: (...args: T) => V,
-  ...args: T
-): V {
+    func: (...args: T) => V, ...args: T): V {
   const prev_evaluatingPolar = defs.evaluatingPolar;
   defs.evaluatingPolar = true;
   try {
@@ -787,9 +755,7 @@ export function evalPolar<T extends any[], V>(
 
 // Call a function temporarily setting "evaluatingAsFloats" to true
 export function evalFloats<T extends any[], V>(
-  func: (...args: T) => V,
-  ...args: T
-): V {
+    func: (...args: T) => V, ...args: T): V {
   const prev_evaluatingAsFloats = defs.evaluatingAsFloats;
   defs.evaluatingAsFloats = true;
   try {

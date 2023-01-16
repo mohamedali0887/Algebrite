@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const test_harness_1 = require("../test-harness");
-test_harness_1.run_test([
+const test_harness_js_1 = require("../test-harness.js");
+(0, test_harness_js_1.run_test)([
     'pattern(dot(transpose(a_),a_), cov(a_))',
     'dot(transpose(a_),a_)->cov(a_)',
     'pattern(dot(a_,transpose(a_)), cov(a_))',

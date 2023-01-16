@@ -1,14 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.determinant = exports.det = void 0;
-const defs_1 = require("../runtime/defs");
-const misc_1 = require("../sources/misc");
-const add_1 = require("./add");
-const bignum_1 = require("./bignum");
-const list_1 = require("./list");
-const multiply_1 = require("./multiply");
-const tensor_1 = require("./tensor");
-const symbol_1 = require("../runtime/symbol");
+const defs_js_1 = require("../runtime/defs.js");
+const misc_js_1 = require("../sources/misc.js");
+const add_js_1 = require("./add.js");
+const bignum_js_1 = require("./bignum.js");
+const list_js_1 = require("./list.js");
+const multiply_js_1 = require("./multiply.js");
+const tensor_js_1 = require("./tensor.js");
+const symbol_js_1 = require("../runtime/symbol.js");
 /* det =====================================================================
 
 Tags
@@ -31,11 +31,11 @@ Example:
 
 */
 function det(p1) {
-    if (!tensor_1.is_square_matrix(p1)) {
-        return list_1.makeList(symbol_1.symbol(defs_1.DET), p1);
+    if (!(0, tensor_js_1.is_square_matrix)(p1)) {
+        return (0, list_js_1.makeList)((0, symbol_js_1.symbol)(defs_js_1.DET), p1);
     }
     const a = p1.tensor.elem;
-    const isNumeric = a.every((element) => defs_1.isNumericAtom(element));
+    const isNumeric = a.every((element) => (0, defs_js_1.isNumericAtom)(element));
     if (isNumeric) {
         return yydetg(p1);
     }
@@ -58,14 +58,14 @@ function determinant(elements, n) {
         a[i + n + n] = 1;
     }
     let sign_ = 1;
-    let outerTemp = defs_1.Constants.zero;
+    let outerTemp = defs_js_1.Constants.zero;
     while (true) {
-        let temp = bignum_1.integer(sign_);
+        let temp = (0, bignum_js_1.integer)(sign_);
         for (let i = 0; i < n; i++) {
             const k = n * a[i] + i;
-            temp = multiply_1.multiply(temp, elements[k]); // FIXME -- problem here
+            temp = (0, multiply_js_1.multiply)(temp, elements[k]); // FIXME -- problem here
         }
-        outerTemp = add_1.add(outerTemp, temp);
+        outerTemp = (0, add_js_1.add)(outerTemp, temp);
         // next permutation (Knuth's algorithm P)
         let j = n - 1;
         let s = 0;
@@ -116,8 +116,8 @@ exports.determinant = determinant;
 //
 //-----------------------------------------------------------------------------
 function detg(p1) {
-    if (!tensor_1.is_square_matrix(p1)) {
-        return list_1.makeList(symbol_1.symbol(defs_1.DET), p1);
+    if (!(0, tensor_js_1.is_square_matrix)(p1)) {
+        return (0, list_js_1.makeList)((0, symbol_js_1.symbol)(defs_js_1.DET), p1);
     }
     return yydetg(p1);
 }
@@ -141,17 +141,17 @@ function setM(arr, n, i, j, value) {
 //
 //-----------------------------------------------------------------------------
 function lu_decomp(elements, n) {
-    let p1 = defs_1.Constants.one;
+    let p1 = defs_js_1.Constants.one;
     for (let d = 0; d < n - 1; d++) {
-        if (misc_1.equal(getM(elements, n, d, d), defs_1.Constants.zero)) {
+        if ((0, misc_js_1.equal)(getM(elements, n, d, d), defs_js_1.Constants.zero)) {
             let i = 0;
             for (i = d + 1; i < n; i++) {
-                if (!misc_1.equal(getM(elements, n, i, d), defs_1.Constants.zero)) {
+                if (!(0, misc_js_1.equal)(getM(elements, n, i, d), defs_js_1.Constants.zero)) {
                     break;
                 }
             }
             if (i === n) {
-                p1 = defs_1.Constants.zero;
+                p1 = defs_js_1.Constants.zero;
                 break;
             }
             // exchange rows
@@ -161,21 +161,21 @@ function lu_decomp(elements, n) {
                 setM(elements, n, i, j, p2);
             }
             // negate det
-            p1 = multiply_1.negate(p1);
+            p1 = (0, multiply_js_1.negate)(p1);
         }
         // update det
-        p1 = multiply_1.multiply(p1, getM(elements, n, d, d));
+        p1 = (0, multiply_js_1.multiply)(p1, getM(elements, n, d, d));
         // update lower diagonal matrix
         for (let i = d + 1; i < n; i++) {
-            const p2 = multiply_1.negate(multiply_1.divide(getM(elements, n, i, d), getM(elements, n, d, d)));
+            const p2 = (0, multiply_js_1.negate)((0, multiply_js_1.divide)(getM(elements, n, i, d), getM(elements, n, d, d)));
             // update one row
-            setM(elements, n, i, d, defs_1.Constants.zero); // clear column below pivot d
+            setM(elements, n, i, d, defs_js_1.Constants.zero); // clear column below pivot d
             for (let j = d + 1; j < n; j++) {
-                const added = add_1.add(multiply_1.multiply(getM(elements, n, d, j), p2), getM(elements, n, i, j));
+                const added = (0, add_js_1.add)((0, multiply_js_1.multiply)(getM(elements, n, d, j), p2), getM(elements, n, i, j));
                 setM(elements, n, i, j, added);
             }
         }
     }
     // last diagonal element
-    return multiply_1.multiply(p1, getM(elements, n, n - 1, n - 1));
+    return (0, multiply_js_1.multiply)(p1, getM(elements, n, n - 1, n - 1));
 }

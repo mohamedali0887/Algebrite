@@ -1,14 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Eval_contract = void 0;
-const alloc_1 = require("../runtime/alloc");
-const defs_1 = require("../runtime/defs");
-const run_1 = require("../runtime/run");
-const symbol_1 = require("../runtime/symbol");
-const add_1 = require("./add");
-const bignum_1 = require("./bignum");
-const eval_1 = require("./eval");
-const is_1 = require("./is");
+const alloc_js_1 = require("../runtime/alloc.js");
+const defs_js_1 = require("../runtime/defs.js");
+const run_js_1 = require("../runtime/run.js");
+const symbol_js_1 = require("../runtime/symbol.js");
+const add_js_1 = require("./add.js");
+const bignum_js_1 = require("./bignum.js");
+const eval_js_1 = require("./eval.js");
+const is_js_1 = require("./is.js");
 /* contract =====================================================================
 
 Tags
@@ -27,15 +27,15 @@ contract(m) is equivalent to the trace of matrix m.
 
 */
 function Eval_contract(p1) {
-    const p1_prime = eval_1.Eval(defs_1.cadr(p1));
+    const p1_prime = (0, eval_js_1.Eval)((0, defs_js_1.cadr)(p1));
     let p2, p3;
-    if (defs_1.cddr(p1) === symbol_1.symbol(defs_1.NIL)) {
-        p2 = defs_1.Constants.one;
-        p3 = bignum_1.integer(2);
+    if ((0, defs_js_1.cddr)(p1) === (0, symbol_js_1.symbol)(defs_js_1.NIL)) {
+        p2 = defs_js_1.Constants.one;
+        p3 = (0, bignum_js_1.integer)(2);
     }
     else {
-        p2 = eval_1.Eval(defs_1.caddr(p1));
-        p3 = eval_1.Eval(defs_1.cadddr(p1));
+        p2 = (0, eval_js_1.Eval)((0, defs_js_1.caddr)(p1));
+        p3 = (0, eval_js_1.Eval)((0, defs_js_1.cadddr)(p1));
     }
     return contract(p1_prime, p2, p3);
 }
@@ -43,14 +43,14 @@ exports.Eval_contract = Eval_contract;
 function contract(p1, p2, p3) {
     const ai = [];
     const an = [];
-    if (!defs_1.istensor(p1)) {
-        if (!is_1.isZeroAtomOrTensor(p1)) {
-            run_1.stop('contract: tensor expected, 1st arg is not a tensor');
+    if (!(0, defs_js_1.istensor)(p1)) {
+        if (!(0, is_js_1.isZeroAtomOrTensor)(p1)) {
+            (0, run_js_1.stop)('contract: tensor expected, 1st arg is not a tensor');
         }
-        return defs_1.Constants.zero;
+        return defs_js_1.Constants.zero;
     }
-    let l = bignum_1.nativeInt(p2);
-    let m = bignum_1.nativeInt(p3);
+    let l = (0, bignum_js_1.nativeInt)(p2);
+    let m = (0, bignum_js_1.nativeInt)(p3);
     const { ndim } = p1.tensor;
     if (l < 1 ||
         l > ndim ||
@@ -58,7 +58,7 @@ function contract(p1, p2, p3) {
         m > ndim ||
         l === m ||
         p1.tensor.dim[l - 1] !== p1.tensor.dim[m - 1]) {
-        run_1.stop('contract: index out of range');
+        (0, run_js_1.stop)('contract: index out of range');
     }
     l--;
     m--;
@@ -70,7 +70,7 @@ function contract(p1, p2, p3) {
             nelem *= p1.tensor.dim[i];
         }
     }
-    p2 = alloc_1.alloc_tensor(nelem);
+    p2 = (0, alloc_js_1.alloc_tensor)(nelem);
     p2.tensor.ndim = ndim - 2;
     let j = 0;
     for (let i = 0; i < ndim; i++) {
@@ -85,7 +85,7 @@ function contract(p1, p2, p3) {
         an[i] = p1.tensor.dim[i];
     }
     for (let i = 0; i < nelem; i++) {
-        let temp = defs_1.Constants.zero;
+        let temp = defs_js_1.Constants.zero;
         for (let j = 0; j < n; j++) {
             ai[l] = j;
             ai[m] = j;
@@ -94,7 +94,7 @@ function contract(p1, p2, p3) {
                 h = h * an[k] + ai[k];
             }
             //console.log "a[h]: " + a[h]
-            temp = add_1.add(temp, a[h]);
+            temp = (0, add_js_1.add)(temp, a[h]);
         }
         //console.log "tos: " + stack[tos-1]
         b[i] = temp;

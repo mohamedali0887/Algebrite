@@ -6,11 +6,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ava_run = exports.run_test = exports.run_shardable_test = exports.setup_test = exports.test = void 0;
 const process_1 = __importDefault(require("process"));
 const fs_1 = __importDefault(require("fs"));
-const defs_1 = require("./runtime/defs");
-const run_1 = require("./runtime/run");
-const init_1 = require("./runtime/init");
-if (!defs_1.defs.inited) {
-    init_1.init();
+const defs_js_1 = require("./runtime/defs.js");
+const run_js_1 = require("./runtime/run.js");
+const init_js_1 = require("./runtime/init.js");
+if (!defs_js_1.defs.inited) {
+    (0, init_js_1.init)();
 }
 const shardCount = Number(process_1.default.env['TEST_TOTAL_SHARDS']) || 1;
 const shardIndex = Number(process_1.default.env['TEST_SHARD_INDEX']) || 0;
@@ -124,14 +124,14 @@ test.failing = function failing(name, f, ...args) {
     }
 };
 function setup_test(f) {
-    defs_1.defs.test_flag = true;
-    run_1.run('clearall');
-    run_1.run('e=quote(e)');
+    defs_js_1.defs.test_flag = true;
+    (0, run_js_1.run)('clearall');
+    (0, run_js_1.run)('e=quote(e)');
     try {
         f();
     }
     finally {
-        defs_1.defs.test_flag = false;
+        defs_js_1.defs.test_flag = false;
     }
 }
 exports.setup_test = setup_test;
@@ -141,8 +141,8 @@ function run_shardable_test(s, prefix = '') {
     setup_test(() => {
         for (let i = 0; i < s.length; i += 2) {
             test((prefix || `${testIndex}: `) + s[i], t => {
-                defs_1.defs.out_count = 0;
-                t.is(s[i + 1], run_1.run(s[i]));
+                defs_js_1.defs.out_count = 0;
+                t.is(s[i + 1], (0, run_js_1.run)(s[i]));
             });
         }
     });
@@ -152,14 +152,14 @@ function run_test(s, name) {
     setup_test(() => {
         test(name || `${testIndex}`, t => {
             for (let i = 0; i < s.length; i += 2) {
-                defs_1.defs.out_count = 0;
-                t.is(s[i + 1], run_1.run(s[i]), `${i}: ${s[i]}`);
+                defs_js_1.defs.out_count = 0;
+                t.is(s[i + 1], (0, run_js_1.run)(s[i]), `${i}: ${s[i]}`);
             }
         });
     });
 }
 exports.run_test = run_test;
 function ava_run(t, input, expected) {
-    setup_test(() => t.is(expected, run_1.run(input)));
+    setup_test(() => t.is(expected, (0, run_js_1.run)(input)));
 }
 exports.ava_run = ava_run;

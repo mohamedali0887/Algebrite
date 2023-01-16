@@ -1,16 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.scan_meta = exports.scan = void 0;
-const alloc_1 = require("../runtime/alloc");
-const defs_1 = require("../runtime/defs");
-const otherCFunctions_1 = require("../runtime/otherCFunctions");
-const run_1 = require("../runtime/run");
-const symbol_1 = require("../runtime/symbol");
-const bignum_1 = require("./bignum");
-const is_1 = require("./is");
-const list_1 = require("./list");
-const multiply_1 = require("./multiply");
-const tensor_1 = require("./tensor");
+const alloc_js_1 = require("../runtime/alloc.js");
+const defs_js_1 = require("../runtime/defs.js");
+const otherCFunctions_js_1 = require("../runtime/otherCFunctions.js");
+const run_js_1 = require("../runtime/run.js");
+const symbol_js_1 = require("../runtime/symbol.js");
+const bignum_js_1 = require("./bignum.js");
+const is_js_1 = require("./is.js");
+const list_js_1 = require("./list.js");
+const multiply_js_1 = require("./multiply.js");
+const tensor_js_1 = require("./tensor.js");
 // This scanner uses the recursive descent method.
 //
 // The char pointers token_str and scan_str are pointers to the input string as
@@ -83,7 +83,7 @@ let assignmentFound = null;
 // Returns zero when nothing left to scan.
 let scanned = '';
 function scan(s) {
-    if (defs_1.DEBUG) {
+    if (defs_js_1.DEBUG) {
         console.log(`#### scanning ${s}`);
     }
     //if s=="y=x"
@@ -101,19 +101,19 @@ function scan(s) {
     assignmentFound = false;
     scanned = s;
     meta_mode = 0;
-    const prev_expanding = defs_1.defs.expanding;
-    defs_1.defs.expanding = true;
+    const prev_expanding = defs_js_1.defs.expanding;
+    defs_js_1.defs.expanding = true;
     input_str = 0;
     scan_str = 0;
     get_next_token();
     if (token === '') {
-        defs_1.defs.expanding = prev_expanding;
-        return [0, symbol_1.symbol(defs_1.NIL)];
+        defs_js_1.defs.expanding = prev_expanding;
+        return [0, (0, symbol_js_1.symbol)(defs_js_1.NIL)];
     }
     const expr = scan_stmt();
-    defs_1.defs.expanding = prev_expanding;
+    defs_js_1.defs.expanding = prev_expanding;
     if (!assignmentFound) {
-        defs_1.defs.symbolsInExpressionsWithoutAssignments = defs_1.defs.symbolsInExpressionsWithoutAssignments.concat(symbolsLeftOfAssignment);
+        defs_js_1.defs.symbolsInExpressionsWithoutAssignments = defs_js_1.defs.symbolsInExpressionsWithoutAssignments.concat(symbolsLeftOfAssignment);
     }
     return [token_str - input_str, expr];
 }
@@ -121,17 +121,17 @@ exports.scan = scan;
 function scan_meta(s) {
     scanned = s;
     meta_mode = 1;
-    const prev_expanding = defs_1.defs.expanding;
-    defs_1.defs.expanding = true;
+    const prev_expanding = defs_js_1.defs.expanding;
+    defs_js_1.defs.expanding = true;
     input_str = 0;
     scan_str = 0;
     get_next_token();
     if (token === '') {
-        defs_1.defs.expanding = prev_expanding;
-        return symbol_1.symbol(defs_1.NIL);
+        defs_js_1.defs.expanding = prev_expanding;
+        return (0, symbol_js_1.symbol)(defs_js_1.NIL);
     }
     const stmt = scan_stmt();
-    defs_1.defs.expanding = prev_expanding;
+    defs_js_1.defs.expanding = prev_expanding;
     return stmt;
 }
 exports.scan_meta = scan_meta;
@@ -143,7 +143,7 @@ function scan_stmt() {
     }
     if (token === T_QUOTASSIGN || token === '=') {
         const symbolLeftOfAssignment = lastFoundSymbol;
-        if (defs_1.DEBUG) {
+        if (defs_js_1.DEBUG) {
             console.log('assignment!');
         }
         assignmentFound = true;
@@ -152,11 +152,11 @@ function scan_stmt() {
         let rhs = scan_relation();
         // if it's a := then add a quote
         if (assignmentIsOfQuotedType) {
-            rhs = list_1.makeList(symbol_1.symbol(defs_1.QUOTE), rhs);
+            rhs = (0, list_js_1.makeList)((0, symbol_js_1.symbol)(defs_js_1.QUOTE), rhs);
         }
-        result = list_1.makeList(symbol_1.symbol(defs_1.SETQ), result, rhs);
+        result = (0, list_js_1.makeList)((0, symbol_js_1.symbol)(defs_js_1.SETQ), result, rhs);
         isSymbolLeftOfAssignment = true;
-        if (defs_1.defs.codeGen) {
+        if (defs_js_1.defs.codeGen) {
             // in case of re-assignment, the symbol on the
             // left will also be in the set of the symbols
             // on the right. In that case just remove it from
@@ -164,10 +164,10 @@ function scan_stmt() {
             const indexOfSymbolLeftOfAssignment = symbolsRightOfAssignment.indexOf(symbolLeftOfAssignment);
             if (indexOfSymbolLeftOfAssignment !== -1) {
                 symbolsRightOfAssignment.splice(indexOfSymbolLeftOfAssignment, 1);
-                defs_1.defs.symbolsHavingReassignments.push(symbolLeftOfAssignment);
+                defs_js_1.defs.symbolsHavingReassignments.push(symbolLeftOfAssignment);
             }
             // print out the immediate dependencies
-            if (defs_1.DEBUG) {
+            if (defs_js_1.DEBUG) {
                 console.log(`locally, ${symbolLeftOfAssignment} depends on: `);
                 for (const i of Array.from(symbolsRightOfAssignment)) {
                     console.log(`  ${i}`);
@@ -176,10 +176,10 @@ function scan_stmt() {
             // ok add the local dependencies to the existing
             // dependencies of this left-value symbol
             // create the exiting dependencies list if it doesn't exist
-            if (defs_1.defs.symbolsDependencies[symbolLeftOfAssignment] == null) {
-                defs_1.defs.symbolsDependencies[symbolLeftOfAssignment] = [];
+            if (defs_js_1.defs.symbolsDependencies[symbolLeftOfAssignment] == null) {
+                defs_js_1.defs.symbolsDependencies[symbolLeftOfAssignment] = [];
             }
-            const existingDependencies = defs_1.defs.symbolsDependencies[symbolLeftOfAssignment];
+            const existingDependencies = defs_js_1.defs.symbolsDependencies[symbolLeftOfAssignment];
             // copy over the new dependencies to the existing
             // dependencies avoiding repetitions
             for (const i of Array.from(symbolsRightOfAssignment)) {
@@ -199,32 +199,32 @@ function scan_relation() {
         case T_EQ:
             get_next_token();
             rhs = scan_expression();
-            return list_1.makeList(symbol_1.symbol(defs_1.TESTEQ), result, rhs);
+            return (0, list_js_1.makeList)((0, symbol_js_1.symbol)(defs_js_1.TESTEQ), result, rhs);
         case T_NEQ:
             get_next_token();
             rhs = scan_expression();
-            return list_1.makeList(symbol_1.symbol(defs_1.NOT), list_1.makeList(symbol_1.symbol(defs_1.TESTEQ), result, rhs));
+            return (0, list_js_1.makeList)((0, symbol_js_1.symbol)(defs_js_1.NOT), (0, list_js_1.makeList)((0, symbol_js_1.symbol)(defs_js_1.TESTEQ), result, rhs));
         case T_LTEQ:
             get_next_token();
             rhs = scan_expression();
-            return list_1.makeList(symbol_1.symbol(defs_1.TESTLE), result, rhs);
+            return (0, list_js_1.makeList)((0, symbol_js_1.symbol)(defs_js_1.TESTLE), result, rhs);
         case T_GTEQ:
             get_next_token();
             rhs = scan_expression();
-            return list_1.makeList(symbol_1.symbol(defs_1.TESTGE), result, rhs);
+            return (0, list_js_1.makeList)((0, symbol_js_1.symbol)(defs_js_1.TESTGE), result, rhs);
         case '<':
             get_next_token();
             rhs = scan_expression();
-            return list_1.makeList(symbol_1.symbol(defs_1.TESTLT), result, rhs);
+            return (0, list_js_1.makeList)((0, symbol_js_1.symbol)(defs_js_1.TESTLT), result, rhs);
         case '>':
             get_next_token();
             rhs = scan_expression();
-            return list_1.makeList(symbol_1.symbol(defs_1.TESTGT), result, rhs);
+            return (0, list_js_1.makeList)((0, symbol_js_1.symbol)(defs_js_1.TESTGT), result, rhs);
     }
     return result;
 }
 function scan_expression() {
-    const terms = [symbol_1.symbol(defs_1.ADD)];
+    const terms = [(0, symbol_js_1.symbol)(defs_js_1.ADD)];
     switch (token) {
         case '+':
             get_next_token();
@@ -232,7 +232,7 @@ function scan_expression() {
             break;
         case '-':
             get_next_token();
-            terms.push(multiply_1.negate(scan_term()));
+            terms.push((0, multiply_js_1.negate)(scan_term()));
             break;
         default:
             terms.push(scan_term());
@@ -244,13 +244,13 @@ function scan_expression() {
         }
         else {
             get_next_token();
-            terms.push(multiply_1.negate(scan_term()));
+            terms.push((0, multiply_js_1.negate)(scan_term()));
         }
     }
     if (terms.length === 2) {
         return terms[1];
     }
-    return list_1.makeList(...terms);
+    return (0, list_js_1.makeList)(...terms);
 }
 function tokenCharCode() {
     if (typeof token == 'string') {
@@ -259,7 +259,7 @@ function tokenCharCode() {
     return undefined;
 }
 function is_factor() {
-    if (tokenCharCode() === defs_1.dotprod_unicode) {
+    if (tokenCharCode() === defs_js_1.dotprod_unicode) {
         return true;
     }
     switch (token) {
@@ -285,24 +285,24 @@ function is_factor() {
 }
 function simplify_1_in_products(factors) {
     if (factors.length > 0 &&
-        defs_1.isrational(factors[factors.length - 1]) &&
-        is_1.equaln(factors[factors.length - 1], 1)) {
+        (0, defs_js_1.isrational)(factors[factors.length - 1]) &&
+        (0, is_js_1.equaln)(factors[factors.length - 1], 1)) {
         factors.pop();
     }
 }
 // calculate away consecutive constants
 function multiply_consecutive_constants(factors) {
     if (factors.length > 1 &&
-        defs_1.isNumericAtom(factors[factors.length - 2]) &&
-        defs_1.isNumericAtom(factors[factors.length - 1])) {
+        (0, defs_js_1.isNumericAtom)(factors[factors.length - 2]) &&
+        (0, defs_js_1.isNumericAtom)(factors[factors.length - 1])) {
         const arg2 = factors.pop();
         const arg1 = factors.pop();
-        factors.push(multiply_1.multiply(arg1, arg2));
+        factors.push((0, multiply_js_1.multiply)(arg1, arg2));
     }
 }
 function scan_term() {
     let results = [scan_factor()];
-    if (defs_1.parse_time_simplifications) {
+    if (defs_js_1.parse_time_simplifications) {
         simplify_1_in_products(results);
     }
     while (is_factor()) {
@@ -319,39 +319,39 @@ function scan_term() {
             // 1/(2*a) become 1*(1/(2*a))
             simplify_1_in_products(results);
             get_next_token();
-            results.push(multiply_1.inverse(scan_factor()));
+            results.push((0, multiply_js_1.inverse)(scan_factor()));
         }
-        else if (tokenCharCode() === defs_1.dotprod_unicode) {
+        else if (tokenCharCode() === defs_js_1.dotprod_unicode) {
             get_next_token();
-            results.push(list_1.makeList(symbol_1.symbol(defs_1.INNER), results.pop(), scan_factor()));
+            results.push((0, list_js_1.makeList)((0, symbol_js_1.symbol)(defs_js_1.INNER), results.pop(), scan_factor()));
         }
         else {
             results.push(scan_factor());
         }
-        if (defs_1.parse_time_simplifications) {
+        if (defs_js_1.parse_time_simplifications) {
             multiply_consecutive_constants(results);
             simplify_1_in_products(results);
         }
     }
     if (results.length === 0) {
-        return defs_1.Constants.one;
+        return defs_js_1.Constants.one;
     }
     else if (results.length == 1) {
         return results[0];
     }
-    return list_1.makeList(symbol_1.symbol(defs_1.MULTIPLY), ...results);
+    return (0, list_js_1.makeList)((0, symbol_js_1.symbol)(defs_js_1.MULTIPLY), ...results);
 }
 function scan_power(lhs) {
     if (token === '^') {
         get_next_token();
-        return list_1.makeList(symbol_1.symbol(defs_1.POWER), lhs, scan_factor());
+        return (0, list_js_1.makeList)((0, symbol_js_1.symbol)(defs_js_1.POWER), lhs, scan_factor());
     }
     return lhs;
 }
 function scan_index(lhs) {
     //console.log "[ as index"
     get_next_token();
-    const items = [symbol_1.symbol(defs_1.INDEX), lhs, scan_expression()];
+    const items = [(0, symbol_js_1.symbol)(defs_js_1.INDEX), lhs, scan_expression()];
     while (token === ',') {
         get_next_token();
         items.push(scan_expression());
@@ -360,7 +360,7 @@ function scan_index(lhs) {
         scan_error('] expected');
     }
     get_next_token();
-    return list_1.makeList(...items);
+    return (0, list_js_1.makeList)(...items);
 }
 function scan_factor() {
     //console.log "scan_factor token: " + token
@@ -382,12 +382,12 @@ function scan_factor() {
     }
     else if (token === T_INTEGER) {
         firstFactorIsNumber = true;
-        result = bignum_1.bignum_scan_integer(token_buf);
+        result = (0, bignum_js_1.bignum_scan_integer)(token_buf);
         token = get_next_token();
     }
     else if (token === T_DOUBLE) {
         firstFactorIsNumber = true;
-        result = bignum_1.bignum_scan_float(token_buf);
+        result = (0, bignum_js_1.bignum_scan_float)(token_buf);
         token = get_next_token();
     }
     else if (token === T_STRING) {
@@ -418,25 +418,25 @@ function scan_factor() {
     }
     while (token === '!') {
         get_next_token();
-        result = list_1.makeList(symbol_1.symbol(defs_1.FACTORIAL), result);
+        result = (0, list_js_1.makeList)((0, symbol_js_1.symbol)(defs_js_1.FACTORIAL), result);
     }
     // in theory we could already count the
     // number of transposes and simplify them
     // away, but it's not that clean to have
     // multiple places where that happens, and
     // the parser is not the place.
-    while (tokenCharCode() === defs_1.transpose_unicode) {
+    while (tokenCharCode() === defs_js_1.transpose_unicode) {
         get_next_token();
-        result = list_1.makeList(symbol_1.symbol(defs_1.TRANSPOSE), result);
+        result = (0, list_js_1.makeList)((0, symbol_js_1.symbol)(defs_js_1.TRANSPOSE), result);
     }
     return scan_power(result);
 }
 function addSymbolRightOfAssignment(theSymbol) {
-    if (defs_1.predefinedSymbolsInGlobalScope_doNotTrackInDependencies.indexOf(theSymbol) === -1 &&
+    if (defs_js_1.predefinedSymbolsInGlobalScope_doNotTrackInDependencies.indexOf(theSymbol) === -1 &&
         symbolsRightOfAssignment.indexOf(theSymbol) === -1 &&
         symbolsRightOfAssignment.indexOf("'" + theSymbol) === -1 &&
         !skipRootVariableToBeSolved) {
-        if (defs_1.DEBUG) {
+        if (defs_js_1.DEBUG) {
             console.log(`... adding symbol: ${theSymbol} to the set of the symbols right of assignment`);
         }
         let prefixVar = '';
@@ -450,11 +450,11 @@ function addSymbolRightOfAssignment(theSymbol) {
     }
 }
 function addSymbolLeftOfAssignment(theSymbol) {
-    if (defs_1.predefinedSymbolsInGlobalScope_doNotTrackInDependencies.indexOf(theSymbol) === -1 &&
+    if (defs_js_1.predefinedSymbolsInGlobalScope_doNotTrackInDependencies.indexOf(theSymbol) === -1 &&
         symbolsLeftOfAssignment.indexOf(theSymbol) === -1 &&
         symbolsLeftOfAssignment.indexOf("'" + theSymbol) === -1 &&
         !skipRootVariableToBeSolved) {
-        if (defs_1.DEBUG) {
+        if (defs_js_1.DEBUG) {
             console.log(`... adding symbol: ${theSymbol} to the set of the symbols left of assignment`);
         }
         let prefixVar = '';
@@ -475,24 +475,24 @@ function scan_symbol() {
     if (meta_mode && typeof token_buf == 'string' && token_buf.length === 1) {
         switch (token_buf[0]) {
             case 'a':
-                result = (symbol_1.symbol(defs_1.METAA));
+                result = ((0, symbol_js_1.symbol)(defs_js_1.METAA));
                 break;
             case 'b':
-                result = (symbol_1.symbol(defs_1.METAB));
+                result = ((0, symbol_js_1.symbol)(defs_js_1.METAB));
                 break;
             case 'x':
-                result = (symbol_1.symbol(defs_1.METAX));
+                result = ((0, symbol_js_1.symbol)(defs_js_1.METAX));
                 break;
             default:
-                result = (symbol_1.usr_symbol(token_buf));
+                result = ((0, symbol_js_1.usr_symbol)(token_buf));
         }
     }
     else {
-        result = (symbol_1.usr_symbol(token_buf));
+        result = ((0, symbol_js_1.usr_symbol)(token_buf));
     }
     //console.log "found symbol: " + token_buf
     if (scanningParameters.length === 0) {
-        if (defs_1.DEBUG) {
+        if (defs_js_1.DEBUG) {
             console.log(`out of scanning parameters, processing ${token_buf}`);
         }
         lastFoundSymbol = token_buf;
@@ -501,14 +501,14 @@ function scan_symbol() {
         }
     }
     else {
-        if (defs_1.DEBUG) {
+        if (defs_js_1.DEBUG) {
             console.log(`still scanning parameters, skipping ${token_buf}`);
         }
         if (isSymbolLeftOfAssignment) {
             addSymbolRightOfAssignment("'" + token_buf);
         }
     }
-    if (defs_1.DEBUG) {
+    if (defs_js_1.DEBUG) {
         console.log(`found symbol: ${token_buf} left of assignment: ${isSymbolLeftOfAssignment}`);
     }
     // if we were looking at the right part of an assignment while we
@@ -521,16 +521,16 @@ function scan_symbol() {
     return result;
 }
 function scan_string() {
-    const result = new defs_1.Str(token_buf);
+    const result = new defs_js_1.Str(token_buf);
     get_next_token();
     return result;
 }
 function scan_function_call_with_function_name() {
-    if (defs_1.DEBUG) {
+    if (defs_js_1.DEBUG) {
         console.log('-- scan_function_call_with_function_name start');
     }
     let n = 1; // the parameter number as we scan parameters
-    const p = symbol_1.usr_symbol(token_buf);
+    const p = (0, symbol_js_1.usr_symbol)(token_buf);
     const fcall = [p];
     const functionName = token_buf;
     if (functionName === 'roots' ||
@@ -639,23 +639,23 @@ function scan_function_call_with_function_name() {
         functionName === 'for') {
         functionInvokationsScanningStack.pop();
     }
-    if (functionName === symbol_1.symbol(defs_1.PATTERN).printname) {
-        defs_1.defs.patternHasBeenFound = true;
+    if (functionName === (0, symbol_js_1.symbol)(defs_js_1.PATTERN).printname) {
+        defs_js_1.defs.patternHasBeenFound = true;
     }
-    if (defs_1.DEBUG) {
+    if (defs_js_1.DEBUG) {
         console.log('-- scan_function_call_with_function_name end');
     }
-    return list_1.makeList(...fcall);
+    return (0, list_js_1.makeList)(...fcall);
 }
 function scan_function_call_without_function_name(lhs) {
-    if (defs_1.DEBUG) {
+    if (defs_js_1.DEBUG) {
         console.log('-- scan_function_call_without_function_name start');
     }
     // the function will have to be looked up
     // at runtime (i.e. we need to evaulate something to find it
     // e.g. it might be inside a tensor, so we'd need to evaluate
     // a tensor element access in that case)
-    const func = list_1.makeList(symbol_1.symbol(defs_1.EVAL), lhs);
+    const func = (0, list_js_1.makeList)((0, symbol_js_1.symbol)(defs_js_1.EVAL), lhs);
     const fcall = [func];
     get_next_token(); // left paren
     scanningParameters.push(true);
@@ -671,10 +671,10 @@ function scan_function_call_without_function_name(lhs) {
         scan_error(') expected');
     }
     get_next_token();
-    if (defs_1.DEBUG) {
+    if (defs_js_1.DEBUG) {
         console.log(`-- scan_function_call_without_function_name end: ${fcall[fcall.length - 1]}`);
     }
-    return list_1.makeList(...fcall);
+    return (0, list_js_1.makeList)(...fcall);
 }
 // scan subexpression
 function scan_subexpr() {
@@ -710,23 +710,23 @@ function scan_tensor() {
     return result;
 }
 function scan_error(errmsg) {
-    defs_1.defs.errorMessage = '';
+    defs_js_1.defs.errorMessage = '';
     // try not to put question mark on orphan line
     while (input_str !== scan_str) {
         if ((scanned[input_str] === '\n' || scanned[input_str] === '\r') &&
             input_str + 1 === scan_str) {
             break;
         }
-        defs_1.defs.errorMessage += scanned[input_str++];
+        defs_js_1.defs.errorMessage += scanned[input_str++];
     }
-    defs_1.defs.errorMessage += ' ? ';
+    defs_js_1.defs.errorMessage += ' ? ';
     while (scanned[input_str] &&
         scanned[input_str] !== '\n' &&
         scanned[input_str] !== '\r') {
-        defs_1.defs.errorMessage += scanned[input_str++];
+        defs_js_1.defs.errorMessage += scanned[input_str++];
     }
-    defs_1.defs.errorMessage += '\n';
-    run_1.stop(errmsg);
+    defs_js_1.defs.errorMessage += '\n';
+    (0, run_js_1.stop)(errmsg);
 }
 // There are n expressions on the stack, possibly tensors.
 //
@@ -736,13 +736,13 @@ function scan_error(errmsg) {
 // (a,b) and (c,d) would be on the stack.
 // takes an integer
 function build_tensor(elements) {
-    const p2 = alloc_1.alloc_tensor(elements.length);
+    const p2 = (0, alloc_js_1.alloc_tensor)(elements.length);
     p2.tensor.ndim = 1;
     p2.tensor.dim[0] = elements.length;
     for (let i = 0; i < elements.length; i++) {
         p2.tensor.elem[i] = elements[i];
     }
-    tensor_1.check_tensor_dimensions(p2);
+    (0, tensor_js_1.check_tensor_dimensions)(p2);
     return p2;
 }
 function get_next_token() {
@@ -754,7 +754,7 @@ function get_next_token() {
         }
         newline_flag = 1;
     }
-    if (defs_1.DEBUG) {
+    if (defs_js_1.DEBUG) {
         console.log(`get_next_token token: ${token}`);
     }
     return token;
@@ -763,7 +763,7 @@ function get_next_token() {
 //  breakpoint
 function get_token() {
     // skip spaces
-    while (otherCFunctions_1.isspace(scanned[scan_str])) {
+    while ((0, otherCFunctions_js_1.isspace)(scanned[scan_str])) {
         if (scanned[scan_str] === '\n' || scanned[scan_str] === '\r') {
             token = T_NEWLINE;
             scan_str++;
@@ -778,21 +778,21 @@ function get_token() {
         return;
     }
     // number?
-    if (otherCFunctions_1.isdigit(scanned[scan_str]) || scanned[scan_str] === '.') {
-        while (otherCFunctions_1.isdigit(scanned[scan_str])) {
+    if ((0, otherCFunctions_js_1.isdigit)(scanned[scan_str]) || scanned[scan_str] === '.') {
+        while ((0, otherCFunctions_js_1.isdigit)(scanned[scan_str])) {
             scan_str++;
         }
         if (scanned[scan_str] === '.') {
             scan_str++;
-            while (otherCFunctions_1.isdigit(scanned[scan_str])) {
+            while ((0, otherCFunctions_js_1.isdigit)(scanned[scan_str])) {
                 scan_str++;
             }
             if (scanned[scan_str] === 'e' &&
                 (scanned[scan_str + 1] === '+' ||
                     scanned[scan_str + 1] === '-' ||
-                    otherCFunctions_1.isdigit(scanned[scan_str + 1]))) {
+                    (0, otherCFunctions_js_1.isdigit)(scanned[scan_str + 1]))) {
                 scan_str += 2;
-                while (otherCFunctions_1.isdigit(scanned[scan_str])) {
+                while ((0, otherCFunctions_js_1.isdigit)(scanned[scan_str])) {
                     scan_str++;
                 }
             }
@@ -805,8 +805,8 @@ function get_token() {
         return;
     }
     // symbol?
-    if (otherCFunctions_1.isalpha(scanned[scan_str])) {
-        while (otherCFunctions_1.isalnumorunderscore(scanned[scan_str])) {
+    if ((0, otherCFunctions_js_1.isalpha)(scanned[scan_str])) {
+        while ((0, otherCFunctions_js_1.isalnumorunderscore)(scanned[scan_str])) {
             scan_str++;
         }
         if (scanned[scan_str] === '(') {

@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Eval_clear = exports.do_clearall = exports.Eval_clearall = void 0;
-const defs_1 = require("../runtime/defs");
-const init_1 = require("../runtime/init");
-const otherCFunctions_1 = require("../runtime/otherCFunctions");
-const run_1 = require("../runtime/run");
-const symbol_1 = require("../runtime/symbol");
-const pattern_1 = require("./pattern");
+const defs_js_1 = require("../runtime/defs.js");
+const init_js_1 = require("../runtime/init.js");
+const otherCFunctions_js_1 = require("../runtime/otherCFunctions.js");
+const run_js_1 = require("../runtime/run.js");
+const symbol_js_1 = require("../runtime/symbol.js");
+const pattern_js_1 = require("./pattern.js");
 /* clearall =====================================================================
 
 Tags
@@ -21,22 +21,22 @@ Completely wipes all variables from the environment.
 */
 function Eval_clearall() {
     do_clearall();
-    return symbol_1.symbol(defs_1.NIL);
+    return (0, symbol_js_1.symbol)(defs_js_1.NIL);
 }
 exports.Eval_clearall = Eval_clearall;
 function do_clearall() {
-    if (!defs_1.defs.test_flag) {
-        otherCFunctions_1.clear_term();
+    if (!defs_js_1.defs.test_flag) {
+        (0, otherCFunctions_js_1.clear_term)();
     }
-    pattern_1.do_clearPatterns();
-    symbol_1.clear_symbols();
-    init_1.defn();
-    return (defs_1.defs.codeGen = false);
+    (0, pattern_js_1.do_clearPatterns)();
+    (0, symbol_js_1.clear_symbols)();
+    (0, init_js_1.defn)();
+    return (defs_js_1.defs.codeGen = false);
 }
 exports.do_clearall = do_clearall;
 // clearall from application GUI code
 function clearall() {
-    return run_1.run('clearall');
+    return (0, run_js_1.run)('clearall');
 }
 /* clear =====================================================================
 
@@ -56,19 +56,19 @@ Completely wipes a variable from the environment (while doing x = quote(x) just 
 */
 function Eval_clear(p1) {
     let p2;
-    p2 = defs_1.cdr(p1);
-    while (defs_1.iscons(p2)) {
-        const variableToBeCleared = defs_1.car(p2);
+    p2 = (0, defs_js_1.cdr)(p1);
+    while ((0, defs_js_1.iscons)(p2)) {
+        const variableToBeCleared = (0, defs_js_1.car)(p2);
         //console.log variableToBeCleared + ""
-        if (variableToBeCleared.k !== defs_1.SYM) {
-            run_1.stop('symbol error');
+        if (variableToBeCleared.k !== defs_js_1.SYM) {
+            (0, run_js_1.stop)('symbol error');
         }
         //console.log "getting binding of " + p.toString()
         //if p.toString() == "aaa"
         //  breakpoint
-        symbol_1.clear_symbol(variableToBeCleared);
-        p2 = defs_1.cdr(p2);
+        (0, symbol_js_1.clear_symbol)(variableToBeCleared);
+        p2 = (0, defs_js_1.cdr)(p2);
     }
-    return symbol_1.symbol(defs_1.NIL);
+    return (0, symbol_js_1.symbol)(defs_js_1.NIL);
 }
 exports.Eval_clear = Eval_clear;

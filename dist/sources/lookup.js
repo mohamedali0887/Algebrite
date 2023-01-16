@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Eval_lookup = void 0;
-const defs_1 = require("../runtime/defs");
-const symbol_1 = require("../runtime/symbol");
+const defs_js_1 = require("../runtime/defs.js");
+const symbol_js_1 = require("../runtime/symbol.js");
 // now this might be a little confusing, so a
 // clarification is in order.
 // First off, at the scripting level most things
@@ -117,9 +117,9 @@ const symbol_1 = require("../runtime/symbol");
 //    lookup(x)
 //       => gives z
 function Eval_lookup(p1) {
-    p1 = defs_1.cadr(p1);
-    if (!defs_1.iscons(p1) && defs_1.cadr(p1).k === defs_1.SYM) {
-        p1 = symbol_1.get_binding(p1);
+    p1 = (0, defs_js_1.cadr)(p1);
+    if (!(0, defs_js_1.iscons)(p1) && (0, defs_js_1.cadr)(p1).k === defs_js_1.SYM) {
+        p1 = (0, symbol_js_1.get_binding)(p1);
     }
     return p1;
 }

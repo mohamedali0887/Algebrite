@@ -1,0 +1,111 @@
+import { cadddr, caddr, cadr, car, Constants, COS, issymbol, LEGENDRE, NIL, SECRETX, SIN } from '../runtime/defs.js';
+import { symbol } from '../runtime/symbol.js';
+import { square } from '../sources/misc.js';
+import { subtract } from './add.js';
+import { integer, nativeInt, rational } from './bignum.js';
+import { cosine } from './cos.js';
+import { derivative } from './derivative.js';
+import { Eval } from './eval.js';
+import { makeList } from './list.js';
+import { divide, multiply, negate } from './multiply.js';
+import { power } from './power.js';
+import { sine } from './sin.js';
+import { subst } from './subst.js';
+/*
+ Legendre function
+
+Example
+
+  legendre(x,3,0)
+
+Result
+
+   5   3    3
+  --- x  - --- x
+   2        2
+
+The computation uses the following recurrence relation.
+
+  P(x,0) = 1
+
+  P(x,1) = x
+
+  n*P(x,n) = (2*(n-1)+1)*x*P(x,n-1) - (n-1)*P(x,n-2)
+
+In the "for" loop we have i = n-1 so the recurrence relation becomes
+
+  (i+1)*P(x,n) = (2*i+1)*x*P(x,n-1) - i*P(x,n-2)
+
+For m > 0
+
+  P(x,n,m) = (-1)^m * (1-x^2)^(m/2) * d^m/dx^m P(x,n)
+*/
+export function Eval_legendre(p1) {
+    const X = Eval(cadr(p1));
+    const N = Eval(caddr(p1));
+    const p2 = Eval(cadddr(p1));
+    const M = p2 === symbol(NIL) ? Constants.zero : p2;
+    return legendre(X, N, M);
+}
+function legendre(X, N, M) {
+    return __legendre(X, N, M);
+}
+function __legendre(X, N, M) {
+    let n = nativeInt(N);
+    let m = nativeInt(M);
+    if (n < 0 || isNaN(n) || m < 0 || isNaN(m)) {
+        return makeList(symbol(LEGENDRE), X, N, M);
+    }
+    let result;
+    if (issymbol(X)) {
+        result = __legendre2(n, m, X);
+    }
+    else {
+        const expr = __legendre2(n, m, symbol(SECRETX));
+        result = Eval(subst(expr, symbol(SECRETX), X));
+    }
+    result = __legendre3(result, m, X) || result;
+    return result;
+}
+function __legendre2(n, m, X) {
+    let Y0 = Constants.zero;
+    let Y1 = Constants.one;
+    //  i=1  Y0 = 0
+    //    Y1 = 1
+    //    ((2*i+1)*x*Y1 - i*Y0) / i = x
+    //
+    //  i=2  Y0 = 1
+    //    Y1 = x
+    //    ((2*i+1)*x*Y1 - i*Y0) / i = -1/2 + 3/2*x^2
+    //
+    //  i=3  Y0 = x
+    //    Y1 = -1/2 + 3/2*x^2
+    //    ((2*i+1)*x*Y1 - i*Y0) / i = -3/2*x + 5/2*x^3
+    for (let i = 0; i < n; i++) {
+        const divided = divide(subtract(multiply(multiply(integer(2 * i + 1), X), Y1), multiply(integer(i), Y0)), integer(i + 1));
+        Y0 = Y1;
+        Y1 = divided;
+    }
+    for (let i = 0; i < m; i++) {
+        Y1 = derivative(Y1, X);
+    }
+    return Y1;
+}
+// moveTos tos * (-1)^m * (1-x^2)^(m/2)
+function __legendre3(p1, m, X) {
+    if (m === 0) {
+        return;
+    }
+    let base = subtract(Constants.one, square(X));
+    if (car(X) === symbol(COS)) {
+        base = square(sine(cadr(X)));
+    }
+    else if (car(X) === symbol(SIN)) {
+        base = square(cosine(cadr(X)));
+    }
+    let result = multiply(p1, power(base, multiply(integer(m), rational(1, 2))));
+    if (m % 2) {
+        result = negate(result);
+    }
+    return result;
+}

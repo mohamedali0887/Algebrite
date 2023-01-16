@@ -1,16 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Eval_circexp = void 0;
-const defs_1 = require("../runtime/defs");
-const symbol_1 = require("../runtime/symbol");
-const misc_1 = require("../sources/misc");
-const add_1 = require("./add");
-const bignum_1 = require("./bignum");
-const eval_1 = require("./eval");
-const expcos_1 = require("./expcos");
-const expsin_1 = require("./expsin");
-const multiply_1 = require("./multiply");
-const tensor_1 = require("./tensor");
+const defs_js_1 = require("../runtime/defs.js");
+const symbol_js_1 = require("../runtime/symbol.js");
+const misc_js_1 = require("../sources/misc.js");
+const add_js_1 = require("./add.js");
+const bignum_js_1 = require("./bignum.js");
+const eval_js_1 = require("./eval.js");
+const expcos_js_1 = require("./expcos.js");
+const expsin_js_1 = require("./expsin.js");
+const multiply_js_1 = require("./multiply.js");
+const tensor_js_1 = require("./tensor.js");
 /* circexp =====================================================================
 
 Tags
@@ -28,40 +28,40 @@ Returns expression x with circular and hyperbolic functions converted to exponen
 
 */
 function Eval_circexp(p1) {
-    const result = circexp(eval_1.Eval(defs_1.cadr(p1)));
-    return eval_1.Eval(result);
+    const result = circexp((0, eval_js_1.Eval)((0, defs_js_1.cadr)(p1)));
+    return (0, eval_js_1.Eval)(result);
 }
 exports.Eval_circexp = Eval_circexp;
 function circexp(p1) {
-    if (defs_1.car(p1) === symbol_1.symbol(defs_1.COS)) {
-        return expcos_1.expcos(defs_1.cadr(p1));
+    if ((0, defs_js_1.car)(p1) === (0, symbol_js_1.symbol)(defs_js_1.COS)) {
+        return (0, expcos_js_1.expcos)((0, defs_js_1.cadr)(p1));
     }
-    if (defs_1.car(p1) === symbol_1.symbol(defs_1.SIN)) {
-        return expsin_1.expsin(defs_1.cadr(p1));
+    if ((0, defs_js_1.car)(p1) === (0, symbol_js_1.symbol)(defs_js_1.SIN)) {
+        return (0, expsin_js_1.expsin)((0, defs_js_1.cadr)(p1));
     }
-    if (defs_1.car(p1) === symbol_1.symbol(defs_1.TAN)) {
-        p1 = defs_1.cadr(p1);
-        const p2 = misc_1.exponential(multiply_1.multiply(defs_1.Constants.imaginaryunit, p1));
-        const p3 = misc_1.exponential(multiply_1.negate(multiply_1.multiply(defs_1.Constants.imaginaryunit, p1)));
-        return multiply_1.divide(multiply_1.multiply(add_1.subtract(p3, p2), defs_1.Constants.imaginaryunit), add_1.add(p2, p3));
+    if ((0, defs_js_1.car)(p1) === (0, symbol_js_1.symbol)(defs_js_1.TAN)) {
+        p1 = (0, defs_js_1.cadr)(p1);
+        const p2 = (0, misc_js_1.exponential)((0, multiply_js_1.multiply)(defs_js_1.Constants.imaginaryunit, p1));
+        const p3 = (0, misc_js_1.exponential)((0, multiply_js_1.negate)((0, multiply_js_1.multiply)(defs_js_1.Constants.imaginaryunit, p1)));
+        return (0, multiply_js_1.divide)((0, multiply_js_1.multiply)((0, add_js_1.subtract)(p3, p2), defs_js_1.Constants.imaginaryunit), (0, add_js_1.add)(p2, p3));
     }
-    if (defs_1.car(p1) === symbol_1.symbol(defs_1.COSH)) {
-        p1 = defs_1.cadr(p1);
-        return multiply_1.multiply(add_1.add(misc_1.exponential(p1), misc_1.exponential(multiply_1.negate(p1))), bignum_1.rational(1, 2));
+    if ((0, defs_js_1.car)(p1) === (0, symbol_js_1.symbol)(defs_js_1.COSH)) {
+        p1 = (0, defs_js_1.cadr)(p1);
+        return (0, multiply_js_1.multiply)((0, add_js_1.add)((0, misc_js_1.exponential)(p1), (0, misc_js_1.exponential)((0, multiply_js_1.negate)(p1))), (0, bignum_js_1.rational)(1, 2));
     }
-    if (defs_1.car(p1) === symbol_1.symbol(defs_1.SINH)) {
-        p1 = defs_1.cadr(p1);
-        return multiply_1.multiply(add_1.subtract(misc_1.exponential(p1), misc_1.exponential(multiply_1.negate(p1))), bignum_1.rational(1, 2));
+    if ((0, defs_js_1.car)(p1) === (0, symbol_js_1.symbol)(defs_js_1.SINH)) {
+        p1 = (0, defs_js_1.cadr)(p1);
+        return (0, multiply_js_1.multiply)((0, add_js_1.subtract)((0, misc_js_1.exponential)(p1), (0, misc_js_1.exponential)((0, multiply_js_1.negate)(p1))), (0, bignum_js_1.rational)(1, 2));
     }
-    if (defs_1.car(p1) === symbol_1.symbol(defs_1.TANH)) {
-        p1 = misc_1.exponential(multiply_1.multiply(defs_1.cadr(p1), bignum_1.integer(2)));
-        return multiply_1.divide(add_1.subtract(p1, defs_1.Constants.one), add_1.add(p1, defs_1.Constants.one));
+    if ((0, defs_js_1.car)(p1) === (0, symbol_js_1.symbol)(defs_js_1.TANH)) {
+        p1 = (0, misc_js_1.exponential)((0, multiply_js_1.multiply)((0, defs_js_1.cadr)(p1), (0, bignum_js_1.integer)(2)));
+        return (0, multiply_js_1.divide)((0, add_js_1.subtract)(p1, defs_js_1.Constants.one), (0, add_js_1.add)(p1, defs_js_1.Constants.one));
     }
-    if (defs_1.iscons(p1)) {
+    if ((0, defs_js_1.iscons)(p1)) {
         return p1.map(circexp);
     }
-    if (p1.k === defs_1.TENSOR) {
-        p1 = tensor_1.copy_tensor(p1);
+    if (p1.k === defs_js_1.TENSOR) {
+        p1 = (0, tensor_js_1.copy_tensor)(p1);
         p1.tensor.elem = p1.tensor.elem.map(circexp);
         return p1;
     }

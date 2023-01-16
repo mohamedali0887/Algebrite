@@ -1,0 +1,45 @@
+import { caddr, cadr, Constants, isNumericAtom } from '../runtime/defs.js';
+import { lessp } from '../sources/misc.js';
+import { subtract } from './add.js';
+import { Eval } from './eval.js';
+import { factorial } from './factorial.js';
+import { divide } from './multiply.js';
+//  Binomial coefficient
+//
+//  Input:    tos-2    n
+//
+//      tos-1    k
+//
+//  Output:    Binomial coefficient on stack
+//
+//  binomial(n, k) = n! / k! / (n - k)!
+//
+//  The binomial coefficient vanishes for k < 0 or k > n. (A=B, p. 19)
+export function Eval_binomial(p1) {
+    const N = Eval(cadr(p1));
+    const K = Eval(caddr(p1));
+    return binomial(N, K);
+}
+function binomial(N, K) {
+    return ybinomial(N, K);
+}
+function ybinomial(N, K) {
+    if (!BINOM_check_args(N, K)) {
+        return Constants.zero;
+    }
+    return divide(divide(factorial(N), factorial(K)), factorial(subtract(N, K)));
+}
+function BINOM_check_args(N, K) {
+    if (isNumericAtom(N) && lessp(N, Constants.zero)) {
+        return false;
+    }
+    else if (isNumericAtom(K) && lessp(K, Constants.zero)) {
+        return false;
+    }
+    else if (isNumericAtom(N) && isNumericAtom(K) && lessp(N, K)) {
+        return false;
+    }
+    else {
+        return true;
+    }
+}

@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.erfc = exports.Eval_erfc = void 0;
-const defs_1 = require("../runtime/defs");
-const symbol_1 = require("../runtime/symbol");
-const bignum_1 = require("./bignum");
-const eval_1 = require("./eval");
-const is_1 = require("./is");
-const list_1 = require("./list");
+const defs_js_1 = require("../runtime/defs.js");
+const symbol_js_1 = require("../runtime/symbol.js");
+const bignum_js_1 = require("./bignum.js");
+const eval_js_1 = require("./eval.js");
+const is_js_1 = require("./is.js");
+const list_js_1 = require("./list.js");
 //-----------------------------------------------------------------------------
 //
 //  Author : philippe.billet@noos.fr
@@ -17,18 +17,18 @@ const list_1 = require("./list");
 //
 //-----------------------------------------------------------------------------
 function Eval_erfc(p1) {
-    return yerfc(eval_1.Eval(defs_1.cadr(p1)));
+    return yerfc((0, eval_js_1.Eval)((0, defs_js_1.cadr)(p1)));
 }
 exports.Eval_erfc = Eval_erfc;
 function yerfc(p1) {
-    if (defs_1.isdouble(p1)) {
+    if ((0, defs_js_1.isdouble)(p1)) {
         const d = erfc(p1.d);
-        return bignum_1.double(d);
+        return (0, bignum_js_1.double)(d);
     }
-    if (is_1.isZeroAtomOrTensor(p1)) {
-        return defs_1.Constants.one;
+    if ((0, is_js_1.isZeroAtomOrTensor)(p1)) {
+        return defs_js_1.Constants.one;
     }
-    return list_1.makeList(symbol_1.symbol(defs_1.ERFC), p1);
+    return (0, list_js_1.makeList)((0, symbol_js_1.symbol)(defs_js_1.ERFC), p1);
 }
 // from Numerical Recipes in C
 function erfc(x) {

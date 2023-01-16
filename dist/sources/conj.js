@@ -1,13 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.conjugate = exports.Eval_conj = void 0;
-const defs_1 = require("../runtime/defs");
-const find_1 = require("../runtime/find");
-const clock_1 = require("./clock");
-const eval_1 = require("./eval");
-const multiply_1 = require("./multiply");
-const polar_1 = require("./polar");
-const subst_1 = require("./subst");
+const defs_js_1 = require("../runtime/defs.js");
+const find_js_1 = require("../runtime/find.js");
+const clock_js_1 = require("./clock.js");
+const eval_js_1 = require("./eval.js");
+const multiply_js_1 = require("./multiply.js");
+const polar_js_1 = require("./polar.js");
+const subst_js_1 = require("./subst.js");
 /* conj =====================================================================
 
 Tags
@@ -24,10 +24,10 @@ Returns the complex conjugate of z.
 
 */
 function Eval_conj(p1) {
-    p1 = eval_1.Eval(defs_1.cadr(p1));
-    if (!find_1.Find(p1, defs_1.Constants.imaginaryunit)) {
+    p1 = (0, eval_js_1.Eval)((0, defs_js_1.cadr)(p1));
+    if (!(0, find_js_1.Find)(p1, defs_js_1.Constants.imaginaryunit)) {
         // example: (-1)^(1/3)
-        return clock_1.clockform(conjugate(polar_1.polar(p1)));
+        return (0, clock_js_1.clockform)(conjugate((0, polar_js_1.polar)(p1)));
     }
     else {
         return conjugate(p1);
@@ -37,6 +37,6 @@ exports.Eval_conj = Eval_conj;
 // careful is you pass this one an expression with
 // i (instead of (-1)^(1/2)) then this doesn't work!
 function conjugate(p1) {
-    return eval_1.Eval(subst_1.subst(p1, defs_1.Constants.imaginaryunit, multiply_1.negate(defs_1.Constants.imaginaryunit)));
+    return (0, eval_js_1.Eval)((0, subst_js_1.subst)(p1, defs_js_1.Constants.imaginaryunit, (0, multiply_js_1.negate)(defs_js_1.Constants.imaginaryunit)));
 }
 exports.conjugate = conjugate;

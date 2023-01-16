@@ -1,14 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.simfac = void 0;
-const defs_1 = require("../runtime/defs");
-const symbol_1 = require("../runtime/symbol");
-const misc_1 = require("../sources/misc");
-const add_1 = require("./add");
-const eval_1 = require("./eval");
-const factorial_1 = require("./factorial");
-const is_1 = require("./is");
-const multiply_1 = require("./multiply");
+const defs_js_1 = require("../runtime/defs.js");
+const symbol_js_1 = require("../runtime/symbol.js");
+const misc_js_1 = require("../sources/misc.js");
+const add_js_1 = require("./add.js");
+const eval_js_1 = require("./eval.js");
+const factorial_js_1 = require("./factorial.js");
+const is_js_1 = require("./is.js");
+const multiply_js_1 = require("./multiply.js");
 /*
  Simplify factorials
 
@@ -38,13 +38,13 @@ Then simplify the sum to get
 */
 // simplify factorials term-by-term
 function Eval_simfac(p1) {
-    return simfac(eval_1.Eval(defs_1.cadr(p1)));
+    return simfac((0, eval_js_1.Eval)((0, defs_js_1.cadr)(p1)));
 }
 //if 1
 function simfac(p1) {
-    if (defs_1.isadd(p1)) {
+    if ((0, defs_js_1.isadd)(p1)) {
         const terms = p1.tail().map(simfac_term);
-        return add_1.add_all(terms);
+        return (0, add_js_1.add_all)(terms);
     }
     return simfac_term(p1);
 }
@@ -85,7 +85,7 @@ simfac(void)
 */
 function simfac_term(p1) {
     // if not a product of factors then done
-    if (!defs_1.ismultiply(p1)) {
+    if (!(0, defs_js_1.ismultiply)(p1)) {
         return p1;
     }
     // push all factors
@@ -94,7 +94,7 @@ function simfac_term(p1) {
     while (yysimfac(factors)) {
         // do nothing
     }
-    return multiply_1.multiply_all_noexpand(factors);
+    return (0, multiply_js_1.multiply_all_noexpand)(factors);
 }
 // try all pairs of factors
 function yysimfac(stack) {
@@ -106,70 +106,70 @@ function yysimfac(stack) {
             }
             let p2 = stack[j];
             //  n! / n    ->  (n - 1)!
-            if (defs_1.isfactorial(p1) &&
-                defs_1.ispower(p2) &&
-                is_1.isminusone(defs_1.caddr(p2)) &&
-                misc_1.equal(defs_1.cadr(p1), defs_1.cadr(p2))) {
-                stack[i] = factorial_1.factorial(add_1.subtract(defs_1.cadr(p1), defs_1.Constants.one));
-                stack[j] = defs_1.Constants.one;
+            if ((0, defs_js_1.isfactorial)(p1) &&
+                (0, defs_js_1.ispower)(p2) &&
+                (0, is_js_1.isminusone)((0, defs_js_1.caddr)(p2)) &&
+                (0, misc_js_1.equal)((0, defs_js_1.cadr)(p1), (0, defs_js_1.cadr)(p2))) {
+                stack[i] = (0, factorial_js_1.factorial)((0, add_js_1.subtract)((0, defs_js_1.cadr)(p1), defs_js_1.Constants.one));
+                stack[j] = defs_js_1.Constants.one;
                 return true;
             }
             //  n / n!    ->  1 / (n - 1)!
-            if (defs_1.ispower(p2) &&
-                is_1.isminusone(defs_1.caddr(p2)) &&
-                defs_1.caadr(p2) === symbol_1.symbol(defs_1.FACTORIAL) &&
-                misc_1.equal(p1, defs_1.cadadr(p2))) {
-                stack[i] = multiply_1.reciprocate(factorial_1.factorial(add_1.add(p1, defs_1.Constants.negOne)));
-                stack[j] = defs_1.Constants.one;
+            if ((0, defs_js_1.ispower)(p2) &&
+                (0, is_js_1.isminusone)((0, defs_js_1.caddr)(p2)) &&
+                (0, defs_js_1.caadr)(p2) === (0, symbol_js_1.symbol)(defs_js_1.FACTORIAL) &&
+                (0, misc_js_1.equal)(p1, (0, defs_js_1.cadadr)(p2))) {
+                stack[i] = (0, multiply_js_1.reciprocate)((0, factorial_js_1.factorial)((0, add_js_1.add)(p1, defs_js_1.Constants.negOne)));
+                stack[j] = defs_js_1.Constants.one;
                 return true;
             }
             //  (n + 1) n!  ->  (n + 1)!
-            if (defs_1.isfactorial(p2)) {
-                const p3 = add_1.subtract(p1, defs_1.cadr(p2));
-                if (is_1.isplusone(p3)) {
-                    stack[i] = factorial_1.factorial(p1);
-                    stack[j] = defs_1.Constants.one;
+            if ((0, defs_js_1.isfactorial)(p2)) {
+                const p3 = (0, add_js_1.subtract)(p1, (0, defs_js_1.cadr)(p2));
+                if ((0, is_js_1.isplusone)(p3)) {
+                    stack[i] = (0, factorial_js_1.factorial)(p1);
+                    stack[j] = defs_js_1.Constants.one;
                     return true;
                 }
             }
             //  1 / ((n + 1) n!)  ->  1 / (n + 1)!
-            if (defs_1.ispower(p1) &&
-                is_1.isminusone(defs_1.caddr(p1)) &&
-                defs_1.ispower(p2) &&
-                is_1.isminusone(defs_1.caddr(p2)) &&
-                defs_1.caadr(p2) === symbol_1.symbol(defs_1.FACTORIAL)) {
-                const p3 = add_1.subtract(defs_1.cadr(p1), defs_1.cadr(defs_1.cadr(p2)));
-                if (is_1.isplusone(p3)) {
-                    stack[i] = multiply_1.reciprocate(factorial_1.factorial(defs_1.cadr(p1)));
-                    stack[j] = defs_1.Constants.one;
+            if ((0, defs_js_1.ispower)(p1) &&
+                (0, is_js_1.isminusone)((0, defs_js_1.caddr)(p1)) &&
+                (0, defs_js_1.ispower)(p2) &&
+                (0, is_js_1.isminusone)((0, defs_js_1.caddr)(p2)) &&
+                (0, defs_js_1.caadr)(p2) === (0, symbol_js_1.symbol)(defs_js_1.FACTORIAL)) {
+                const p3 = (0, add_js_1.subtract)((0, defs_js_1.cadr)(p1), (0, defs_js_1.cadr)((0, defs_js_1.cadr)(p2)));
+                if ((0, is_js_1.isplusone)(p3)) {
+                    stack[i] = (0, multiply_js_1.reciprocate)((0, factorial_js_1.factorial)((0, defs_js_1.cadr)(p1)));
+                    stack[j] = defs_js_1.Constants.one;
                     return true;
                 }
             }
             //  (n + 1)! / n!  ->  n + 1
             //  n! / (n + 1)!  ->  1 / (n + 1)
-            if (defs_1.isfactorial(p1) &&
-                defs_1.ispower(p2) &&
-                is_1.isminusone(defs_1.caddr(p2)) &&
-                defs_1.caadr(p2) === symbol_1.symbol(defs_1.FACTORIAL)) {
-                const p3 = add_1.subtract(defs_1.cadr(p1), defs_1.cadr(defs_1.cadr(p2)));
-                if (is_1.isplusone(p3)) {
-                    stack[i] = defs_1.cadr(p1);
-                    stack[j] = defs_1.Constants.one;
+            if ((0, defs_js_1.isfactorial)(p1) &&
+                (0, defs_js_1.ispower)(p2) &&
+                (0, is_js_1.isminusone)((0, defs_js_1.caddr)(p2)) &&
+                (0, defs_js_1.caadr)(p2) === (0, symbol_js_1.symbol)(defs_js_1.FACTORIAL)) {
+                const p3 = (0, add_js_1.subtract)((0, defs_js_1.cadr)(p1), (0, defs_js_1.cadr)((0, defs_js_1.cadr)(p2)));
+                if ((0, is_js_1.isplusone)(p3)) {
+                    stack[i] = (0, defs_js_1.cadr)(p1);
+                    stack[j] = defs_js_1.Constants.one;
                     return true;
                 }
-                if (is_1.isminusone(p3)) {
-                    stack[i] = multiply_1.reciprocate(defs_1.cadr(defs_1.cadr(p2)));
-                    stack[j] = defs_1.Constants.one;
+                if ((0, is_js_1.isminusone)(p3)) {
+                    stack[i] = (0, multiply_js_1.reciprocate)((0, defs_js_1.cadr)((0, defs_js_1.cadr)(p2)));
+                    stack[j] = defs_js_1.Constants.one;
                     return true;
                 }
-                if (is_1.equaln(p3, 2)) {
-                    stack[i] = defs_1.cadr(p1);
-                    stack[j] = add_1.add(defs_1.cadr(p1), defs_1.Constants.negOne);
+                if ((0, is_js_1.equaln)(p3, 2)) {
+                    stack[i] = (0, defs_js_1.cadr)(p1);
+                    stack[j] = (0, add_js_1.add)((0, defs_js_1.cadr)(p1), defs_js_1.Constants.negOne);
                     return true;
                 }
-                if (is_1.equaln(p3, -2)) {
-                    stack[i] = multiply_1.reciprocate(defs_1.cadr(defs_1.cadr(p2)));
-                    stack[j] = multiply_1.reciprocate(add_1.add(defs_1.cadr(defs_1.cadr(p2)), defs_1.Constants.negOne));
+                if ((0, is_js_1.equaln)(p3, -2)) {
+                    stack[i] = (0, multiply_js_1.reciprocate)((0, defs_js_1.cadr)((0, defs_js_1.cadr)(p2)));
+                    stack[j] = (0, multiply_js_1.reciprocate)((0, add_js_1.add)((0, defs_js_1.cadr)((0, defs_js_1.cadr)(p2)), defs_js_1.Constants.negOne));
                     return true;
                 }
             }
