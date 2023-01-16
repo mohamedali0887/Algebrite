@@ -1,0 +1,55 @@
+import { caddr, cadr, Constants, isNumericAtom } from '../runtime/defs.js';
+import { lessp } from '../sources/misc.js';
+import { subtract } from './add.js';
+import { Eval } from './eval.js';
+import { factorial } from './factorial.js';
+import { divide } from './multiply.js';
+/* choose =====================================================================
+
+Tags
+----
+scripting, JS, internal, treenode, general concept
+
+Parameters
+----------
+n,k
+
+General description
+-------------------
+
+Returns the number of combinations of n items taken k at a time.
+
+For example, the number of five card hands is choose(52,5)
+
+```
+                          n!
+      choose(n,k) = -------------
+                     k! (n - k)!
+```
+*/
+export function Eval_choose(p1) {
+    const N = Eval(cadr(p1));
+    const K = Eval(caddr(p1));
+    return choose(N, K);
+}
+function choose(N, K) {
+    if (!choose_check_args(N, K)) {
+        return Constants.zero;
+    }
+    return divide(divide(factorial(N), factorial(K)), factorial(subtract(N, K)));
+}
+// Result vanishes for k < 0 or k > n. (A=B, p. 19)
+function choose_check_args(N, K) {
+    if (isNumericAtom(N) && lessp(N, Constants.zero)) {
+        return false;
+    }
+    else if (isNumericAtom(K) && lessp(K, Constants.zero)) {
+        return false;
+    }
+    else if (isNumericAtom(N) && isNumericAtom(K) && lessp(N, K)) {
+        return false;
+    }
+    else {
+        return true;
+    }
+}

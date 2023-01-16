@@ -16,7 +16,7 @@ function mcmp(a, b) {
 exports.mcmp = mcmp;
 // a is a bigint, n is a normal int
 function mcmpint(a, n) {
-    const b = big_integer_1.default(n);
+    const b = (0, big_integer_1.default)(n);
     const t = mcmp(a, b);
     return t;
 }

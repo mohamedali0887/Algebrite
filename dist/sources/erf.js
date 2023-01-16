@@ -1,14 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Eval_erf = void 0;
-const defs_1 = require("../runtime/defs");
-const symbol_1 = require("../runtime/symbol");
-const bignum_1 = require("./bignum");
-const erfc_1 = require("./erfc");
-const eval_1 = require("./eval");
-const is_1 = require("./is");
-const list_1 = require("./list");
-const multiply_1 = require("./multiply");
+const defs_js_1 = require("../runtime/defs.js");
+const symbol_js_1 = require("../runtime/symbol.js");
+const bignum_js_1 = require("./bignum.js");
+const erfc_js_1 = require("./erfc.js");
+const eval_js_1 = require("./eval.js");
+const is_js_1 = require("./is.js");
+const list_js_1 = require("./list.js");
+const multiply_js_1 = require("./multiply.js");
 /* erf =====================================================================
 
 Tags
@@ -30,18 +30,18 @@ erf(-x)=erf(x)
 
 */
 function Eval_erf(p1) {
-    return yerf(eval_1.Eval(defs_1.cadr(p1)));
+    return yerf((0, eval_js_1.Eval)((0, defs_js_1.cadr)(p1)));
 }
 exports.Eval_erf = Eval_erf;
 function yerf(p1) {
-    if (defs_1.isdouble(p1)) {
-        return bignum_1.double(1.0 - erfc_1.erfc(p1.d));
+    if ((0, defs_js_1.isdouble)(p1)) {
+        return (0, bignum_js_1.double)(1.0 - (0, erfc_js_1.erfc)(p1.d));
     }
-    if (is_1.isZeroAtomOrTensor(p1)) {
-        return defs_1.Constants.zero;
+    if ((0, is_js_1.isZeroAtomOrTensor)(p1)) {
+        return defs_js_1.Constants.zero;
     }
-    if (is_1.isnegativeterm(p1)) {
-        return multiply_1.negate(list_1.makeList(symbol_1.symbol(defs_1.ERF), multiply_1.negate(p1)));
+    if ((0, is_js_1.isnegativeterm)(p1)) {
+        return (0, multiply_js_1.negate)((0, list_js_1.makeList)((0, symbol_js_1.symbol)(defs_js_1.ERF), (0, multiply_js_1.negate)(p1)));
     }
-    return list_1.makeList(symbol_1.symbol(defs_1.ERF), p1);
+    return (0, list_js_1.makeList)((0, symbol_js_1.symbol)(defs_js_1.ERF), p1);
 }

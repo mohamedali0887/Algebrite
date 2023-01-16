@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const test_harness_1 = require("../test-harness");
+const test_harness_js_1 = require("../test-harness.js");
 const gcdTests = [];
 const GCD_TESTS_DONT_TEST_FACTOR = 1;
 function addGcdTest(arg1, arg2, result, dontTestFactor) {
@@ -69,6 +69,6 @@ addGcdTest('2*a^2*x^2+2*a*x+2*a*b', '4*a', '2*a');
 // gcd factor factor
 addGcdTest('x', 'x^2', 'x');
 addGcdTest('x', 'x^a', '1');
-test_harness_1.run_test(gcdTests);
+(0, test_harness_js_1.run_test)(gcdTests);
 // multiple arguments
-test_harness_1.run_test(['gcd(12,18,9)', '3']);
+(0, test_harness_js_1.run_test)(['gcd(12,18,9)', '3']);

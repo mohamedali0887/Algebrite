@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const test_harness_1 = require("../test-harness");
-test_harness_1.run_test([
+const test_harness_js_1 = require("../test-harness.js");
+(0, test_harness_js_1.run_test)([
     'A=[[A11,A12],[A21,A22]]',
     '',
     'A[1,1]',

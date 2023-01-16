@@ -1,18 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.expcos = exports.Eval_expcos = void 0;
-const defs_1 = require("../runtime/defs");
-const misc_1 = require("../sources/misc");
-const add_1 = require("./add");
-const bignum_1 = require("./bignum");
-const eval_1 = require("./eval");
-const multiply_1 = require("./multiply");
+const defs_js_1 = require("../runtime/defs.js");
+const misc_js_1 = require("../sources/misc.js");
+const add_js_1 = require("./add.js");
+const bignum_js_1 = require("./bignum.js");
+const eval_js_1 = require("./eval.js");
+const multiply_js_1 = require("./multiply.js");
 // Do the exponential cosine function.
 function Eval_expcos(p1) {
-    return expcos(eval_1.Eval(defs_1.cadr(p1)));
+    return expcos((0, eval_js_1.Eval)((0, defs_js_1.cadr)(p1)));
 }
 exports.Eval_expcos = Eval_expcos;
 function expcos(p1) {
-    return add_1.add(multiply_1.multiply(misc_1.exponential(multiply_1.multiply(defs_1.Constants.imaginaryunit, p1)), bignum_1.rational(1, 2)), multiply_1.multiply(misc_1.exponential(multiply_1.multiply(multiply_1.negate(defs_1.Constants.imaginaryunit), p1)), bignum_1.rational(1, 2)));
+    return (0, add_js_1.add)((0, multiply_js_1.multiply)((0, misc_js_1.exponential)((0, multiply_js_1.multiply)(defs_js_1.Constants.imaginaryunit, p1)), (0, bignum_js_1.rational)(1, 2)), (0, multiply_js_1.multiply)((0, misc_js_1.exponential)((0, multiply_js_1.multiply)((0, multiply_js_1.negate)(defs_js_1.Constants.imaginaryunit), p1)), (0, bignum_js_1.rational)(1, 2)));
 }
 exports.expcos = expcos;

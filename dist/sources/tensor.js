@@ -1,20 +1,20 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.copy_tensor = exports.power_tensor = exports.compare_tensors = exports.d_tensor_scalar = exports.d_scalar_tensor = exports.d_tensor_tensor = exports.is_square_matrix = exports.check_tensor_dimensions = exports.scalar_times_tensor = exports.tensor_times_scalar = exports.tensor_plus_tensor = exports.Eval_tensor = void 0;
-const alloc_1 = require("../runtime/alloc");
-const defs_1 = require("../runtime/defs");
-const run_1 = require("../runtime/run");
-const symbol_1 = require("../runtime/symbol");
-const misc_1 = require("../sources/misc");
-const add_1 = require("./add");
-const bignum_1 = require("./bignum");
-const derivative_1 = require("./derivative");
-const eval_1 = require("./eval");
-const inner_1 = require("./inner");
-const inv_1 = require("./inv");
-const is_1 = require("./is");
-const list_1 = require("./list");
-const multiply_1 = require("./multiply");
+const alloc_js_1 = require("../runtime/alloc.js");
+const defs_js_1 = require("../runtime/defs.js");
+const run_js_1 = require("../runtime/run.js");
+const symbol_js_1 = require("../runtime/symbol.js");
+const misc_js_1 = require("../sources/misc.js");
+const add_js_1 = require("./add.js");
+const bignum_js_1 = require("./bignum.js");
+const derivative_js_1 = require("./derivative.js");
+const eval_js_1 = require("./eval.js");
+const inner_js_1 = require("./inner.js");
+const inv_js_1 = require("./inv.js");
+const is_js_1 = require("./is.js");
+const list_js_1 = require("./list.js");
+const multiply_js_1 = require("./multiply.js");
 //(docs are generated from top-level comments, keep an eye on the formatting!)
 /* tensor =====================================================================
 
@@ -77,7 +77,7 @@ function Eval_tensor(a) {
     //---------------------------------------------------------------------
     check_tensor_dimensions(a);
     const { nelem, ndim } = a.tensor;
-    const b = alloc_1.alloc_tensor(nelem);
+    const b = (0, alloc_js_1.alloc_tensor)(nelem);
     b.tensor.ndim = ndim;
     b.tensor.dim = Array.from(a.tensor.dim);
     //---------------------------------------------------------------------
@@ -86,7 +86,7 @@ function Eval_tensor(a) {
     //
     //---------------------------------------------------------------------
     check_tensor_dimensions(b);
-    b.tensor.elem = a.tensor.elem.map(eval_1.Eval);
+    b.tensor.elem = a.tensor.elem.map(eval_js_1.Eval);
     check_tensor_dimensions(a);
     check_tensor_dimensions(b);
     return promote_tensor(b);
@@ -104,14 +104,14 @@ exports.Eval_tensor = Eval_tensor;
 function tensor_plus_tensor(p1, p2) {
     // are the dimension lists equal?
     if (p1.tensor.ndim !== p2.tensor.ndim) {
-        return symbol_1.symbol(defs_1.NIL);
+        return (0, symbol_js_1.symbol)(defs_js_1.NIL);
     }
     if (p1.tensor.dim.some((n, i) => n !== p2.tensor.dim[i])) {
-        return symbol_1.symbol(defs_1.NIL);
+        return (0, symbol_js_1.symbol)(defs_js_1.NIL);
     }
     // create a new tensor for the result
     const { nelem, ndim } = p1.tensor;
-    const p3 = alloc_1.alloc_tensor(nelem);
+    const p3 = (0, alloc_js_1.alloc_tensor)(nelem);
     p3.tensor.ndim = ndim;
     p3.tensor.dim = Array.from(p1.tensor.dim);
     // c = a + b
@@ -119,7 +119,7 @@ function tensor_plus_tensor(p1, p2) {
     const b = p2.tensor.elem;
     const c = p3.tensor.elem;
     for (let i = 0; i < nelem; i++) {
-        c[i] = add_1.add(a[i], b[i]);
+        c[i] = (0, add_js_1.add)(a[i], b[i]);
     }
     return p3;
 }
@@ -131,31 +131,31 @@ exports.tensor_plus_tensor = tensor_plus_tensor;
 //-----------------------------------------------------------------------------
 function tensor_times_scalar(a, p2) {
     const { ndim, nelem } = a.tensor;
-    const b = alloc_1.alloc_tensor(nelem);
+    const b = (0, alloc_js_1.alloc_tensor)(nelem);
     b.tensor.ndim = ndim;
     b.tensor.dim = Array.from(a.tensor.dim);
-    b.tensor.elem = a.tensor.elem.map((a_i) => multiply_1.multiply(a_i, p2));
+    b.tensor.elem = a.tensor.elem.map((a_i) => (0, multiply_js_1.multiply)(a_i, p2));
     return b;
 }
 exports.tensor_times_scalar = tensor_times_scalar;
 function scalar_times_tensor(p1, a) {
     const { ndim, nelem } = a.tensor;
-    const b = alloc_1.alloc_tensor(nelem);
+    const b = (0, alloc_js_1.alloc_tensor)(nelem);
     b.tensor.ndim = ndim;
     b.tensor.dim = Array.from(a.tensor.dim);
-    b.tensor.elem = a.tensor.elem.map((a_i) => multiply_1.multiply(p1, a_i));
+    b.tensor.elem = a.tensor.elem.map((a_i) => (0, multiply_js_1.multiply)(p1, a_i));
     return b;
 }
 exports.scalar_times_tensor = scalar_times_tensor;
 function check_tensor_dimensions(p) {
     if (p.tensor.nelem !== p.tensor.elem.length) {
         console.log('something wrong in tensor dimensions');
-        return defs_1.breakpoint;
+        return defs_js_1.breakpoint;
     }
 }
 exports.check_tensor_dimensions = check_tensor_dimensions;
 function is_square_matrix(p) {
-    return (defs_1.istensor(p) && p.tensor.ndim === 2 && p.tensor.dim[0] === p.tensor.dim[1]);
+    return ((0, defs_js_1.istensor)(p) && p.tensor.ndim === 2 && p.tensor.dim[0] === p.tensor.dim[1]);
 }
 exports.is_square_matrix = is_square_matrix;
 //-----------------------------------------------------------------------------
@@ -166,10 +166,10 @@ exports.is_square_matrix = is_square_matrix;
 function d_tensor_tensor(p1, p2) {
     //U **a, **b, **c
     const { ndim, nelem } = p1.tensor;
-    if (ndim + 1 >= defs_1.MAXDIM) {
-        return list_1.makeList(symbol_1.symbol(defs_1.DERIVATIVE), p1, p2);
+    if (ndim + 1 >= defs_js_1.MAXDIM) {
+        return (0, list_js_1.makeList)((0, symbol_js_1.symbol)(defs_js_1.DERIVATIVE), p1, p2);
     }
-    const p3 = alloc_1.alloc_tensor(nelem * p2.tensor.nelem);
+    const p3 = (0, alloc_js_1.alloc_tensor)(nelem * p2.tensor.nelem);
     p3.tensor.ndim = ndim + 1;
     p3.tensor.dim = [...p1.tensor.dim, p2.tensor.dim[0]];
     const a = p1.tensor.elem;
@@ -177,7 +177,7 @@ function d_tensor_tensor(p1, p2) {
     const c = p3.tensor.elem;
     for (let i = 0; i < nelem; i++) {
         for (let j = 0; j < p2.tensor.nelem; j++) {
-            c[i * p2.tensor.nelem + j] = derivative_1.derivative(a[i], b[j]);
+            c[i * p2.tensor.nelem + j] = (0, derivative_js_1.derivative)(a[i], b[j]);
         }
     }
     return p3;
@@ -189,10 +189,10 @@ exports.d_tensor_tensor = d_tensor_tensor;
 //
 //-----------------------------------------------------------------------------
 function d_scalar_tensor(p1, p2) {
-    const p3 = alloc_1.alloc_tensor(p2.tensor.nelem);
+    const p3 = (0, alloc_js_1.alloc_tensor)(p2.tensor.nelem);
     p3.tensor.ndim = 1;
     p3.tensor.dim[0] = p2.tensor.dim[0];
-    p3.tensor.elem = p2.tensor.elem.map((a_i) => derivative_1.derivative(p1, a_i));
+    p3.tensor.elem = p2.tensor.elem.map((a_i) => (0, derivative_js_1.derivative)(p1, a_i));
     return p3;
 }
 exports.d_scalar_tensor = d_scalar_tensor;
@@ -202,10 +202,10 @@ exports.d_scalar_tensor = d_scalar_tensor;
 //
 //-----------------------------------------------------------------------------
 function d_tensor_scalar(p1, p2) {
-    const p3 = alloc_1.alloc_tensor(p1.tensor.nelem);
+    const p3 = (0, alloc_js_1.alloc_tensor)(p1.tensor.nelem);
     p3.tensor.ndim = p1.tensor.ndim;
     p3.tensor.dim = [...p1.tensor.dim];
-    p3.tensor.elem = p1.tensor.elem.map((a_i) => derivative_1.derivative(a_i, p2));
+    p3.tensor.elem = p1.tensor.elem.map((a_i) => (0, derivative_js_1.derivative)(a_i, p2));
     return p3;
 }
 exports.d_tensor_scalar = d_tensor_scalar;
@@ -225,10 +225,10 @@ function compare_tensors(p1, p2) {
         }
     }
     for (let i = 0; i < p1.tensor.nelem; i++) {
-        if (misc_1.equal(p1.tensor.elem[i], p2.tensor.elem[i])) {
+        if ((0, misc_js_1.equal)(p1.tensor.elem[i], p2.tensor.elem[i])) {
             continue;
         }
-        if (misc_1.lessp(p1.tensor.elem[i], p2.tensor.elem[i])) {
+        if ((0, misc_js_1.lessp)(p1.tensor.elem[i], p2.tensor.elem[i])) {
             return -1;
         }
         else {
@@ -252,23 +252,23 @@ function power_tensor(p1, p2) {
     // first and last dims must be equal
     let k = p1.tensor.ndim - 1;
     if (p1.tensor.dim[0] !== p1.tensor.dim[k]) {
-        return list_1.makeList(symbol_1.symbol(defs_1.POWER), p1, p2);
+        return (0, list_js_1.makeList)((0, symbol_js_1.symbol)(defs_js_1.POWER), p1, p2);
     }
-    let n = bignum_1.nativeInt(p2);
+    let n = (0, bignum_js_1.nativeInt)(p2);
     if (isNaN(n)) {
-        return list_1.makeList(symbol_1.symbol(defs_1.POWER), p1, p2);
+        return (0, list_js_1.makeList)((0, symbol_js_1.symbol)(defs_js_1.POWER), p1, p2);
     }
     if (n === 0) {
         if (p1.tensor.ndim !== 2) {
-            run_1.stop('power(tensor,0) with tensor rank not equal to 2');
+            (0, run_js_1.stop)('power(tensor,0) with tensor rank not equal to 2');
         }
         n = p1.tensor.dim[0];
-        p1 = alloc_1.alloc_tensor(n * n);
+        p1 = (0, alloc_js_1.alloc_tensor)(n * n);
         p1.tensor.ndim = 2;
         p1.tensor.dim[0] = n;
         p1.tensor.dim[1] = n;
         for (let i = 0; i < n; i++) {
-            p1.tensor.elem[n * i + i] = defs_1.Constants.one;
+            p1.tensor.elem[n * i + i] = defs_js_1.Constants.one;
         }
         check_tensor_dimensions(p1);
         return p1;
@@ -276,12 +276,12 @@ function power_tensor(p1, p2) {
     let p3 = p1;
     if (n < 0) {
         n = -n;
-        p3 = inv_1.inv(p3);
+        p3 = (0, inv_js_1.inv)(p3);
     }
     let prev = p3;
     for (let i = 1; i < n; i++) {
-        prev = inner_1.inner(prev, p3);
-        if (is_1.isZeroAtomOrTensor(prev)) {
+        prev = (0, inner_js_1.inner)(prev, p3);
+        if ((0, is_js_1.isZeroAtomOrTensor)(prev)) {
             break;
         }
     }
@@ -289,7 +289,7 @@ function power_tensor(p1, p2) {
 }
 exports.power_tensor = power_tensor;
 function copy_tensor(p1) {
-    let p2 = alloc_1.alloc_tensor(p1.tensor.nelem);
+    let p2 = (0, alloc_js_1.alloc_tensor)(p1.tensor.nelem);
     p2.tensor.ndim = p1.tensor.ndim;
     p2.tensor.dim = [...p1.tensor.dim];
     p2.tensor.elem = [...p1.tensor.elem];
@@ -300,22 +300,22 @@ function copy_tensor(p1) {
 exports.copy_tensor = copy_tensor;
 // Tensors with elements that are also tensors get promoted to a higher rank.
 function promote_tensor(p1) {
-    if (!defs_1.istensor(p1)) {
+    if (!(0, defs_js_1.istensor)(p1)) {
         return p1;
     }
     let p2 = p1.tensor.elem[0];
     if (p1.tensor.elem.some((elem) => !compatible(p2, elem))) {
-        run_1.stop('Cannot promote tensor due to inconsistent tensor components.');
+        (0, run_js_1.stop)('Cannot promote tensor due to inconsistent tensor components.');
     }
-    if (!defs_1.istensor(p2)) {
+    if (!(0, defs_js_1.istensor)(p2)) {
         return p1;
     }
     const ndim = p1.tensor.ndim + p2.tensor.ndim;
-    if (ndim > defs_1.MAXDIM) {
-        run_1.stop('tensor rank > ' + defs_1.MAXDIM);
+    if (ndim > defs_js_1.MAXDIM) {
+        (0, run_js_1.stop)('tensor rank > ' + defs_js_1.MAXDIM);
     }
     const nelem = p1.tensor.nelem * p2.tensor.nelem;
-    const p3 = alloc_1.alloc_tensor(nelem);
+    const p3 = (0, alloc_js_1.alloc_tensor)(nelem);
     p3.tensor.ndim = ndim;
     p3.tensor.dim = [...p1.tensor.dim, ...p2.tensor.dim];
     p3.tensor.elem = [].concat(...p1.tensor.elem.map((el) => el.tensor.elem));
@@ -324,10 +324,10 @@ function promote_tensor(p1) {
     return p3;
 }
 function compatible(p, q) {
-    if (!defs_1.istensor(p) && !defs_1.istensor(q)) {
+    if (!(0, defs_js_1.istensor)(p) && !(0, defs_js_1.istensor)(q)) {
         return true;
     }
-    if (!defs_1.istensor(p) || !defs_1.istensor(q)) {
+    if (!(0, defs_js_1.istensor)(p) || !(0, defs_js_1.istensor)(q)) {
         return false;
     }
     if (p.tensor.ndim !== q.tensor.ndim) {

@@ -1,18 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.clear_symbol = exports.clearRenamedVariablesToAvoidBindingToExternalScope = exports.iskeyword = exports.symbol = exports.collectUserSymbols = exports.clear_symbols = exports.reset_symbols = exports.get_binding = exports.set_binding = exports.get_printname = exports.usr_symbol = exports.std_symbol = exports.inChildScope = exports.Eval_symbolsinfo = void 0;
-const count_1 = require("./count");
-const defs_1 = require("./defs");
-const run_1 = require("./run");
+const count_js_1 = require("./count.js");
+const defs_js_1 = require("./defs.js");
+const run_js_1 = require("./run.js");
 // The symbol table is a simple array of struct U.
 // put symbol at index n
 function Eval_symbolsinfo() {
     const symbolsinfoToBePrinted = symbolsinfo();
     if (symbolsinfoToBePrinted !== '') {
-        return new defs_1.Str(symbolsinfoToBePrinted);
+        return new defs_js_1.Str(symbolsinfoToBePrinted);
     }
     else {
-        return symbol(defs_1.NIL);
+        return symbol(defs_js_1.NIL);
     }
 }
 exports.Eval_symbolsinfo = Eval_symbolsinfo;
@@ -29,7 +29,7 @@ class Scope {
         const existing = this.getExisting(name);
         if (existing)
             return existing;
-        const sym = new defs_1.Sym(name);
+        const sym = new defs_js_1.Sym(name);
         this.symbols.set(name, sym);
         return sym;
     }
@@ -39,7 +39,7 @@ class Scope {
     }
     mustGet(name) {
         var _a;
-        return this.symbols.get(name) || ((_a = this.parent) === null || _a === void 0 ? void 0 : _a.mustGet(name)) || run_1.stop(`${name} not defined`);
+        return this.symbols.get(name) || ((_a = this.parent) === null || _a === void 0 ? void 0 : _a.mustGet(name)) || (0, run_js_1.stop)(`${name} not defined`);
     }
     has(s) {
         return this.symbols.has(s.printname);
@@ -67,7 +67,7 @@ class Scope {
         for (const [name, sym] of this.symbols.entries()) {
             const binding = this.bindings.get(name) || sym;
             const bindingi = (binding + '').substring(0, 4);
-            yield `symbol: ${sym} size: ${count_1.countsize(binding)} value: ${bindingi}...`;
+            yield `symbol: ${sym} size: ${(0, count_js_1.countsize)(binding)} value: ${bindingi}...`;
         }
     }
     clearRenamedVariablesToAvoidBindingToExternalScope() {
@@ -136,8 +136,8 @@ function usr_symbol(s) {
 exports.usr_symbol = usr_symbol;
 // get the symbol's printname
 function get_printname(p) {
-    if (p.k !== defs_1.SYM) {
-        run_1.stop('symbol error');
+    if (p.k !== defs_js_1.SYM) {
+        (0, run_js_1.stop)('symbol error');
     }
     return p.printname;
 }
@@ -147,15 +147,15 @@ exports.get_printname = get_printname;
 // The other one is the U with the content, and that
 // one will go in the corresponding "binding" array entry.
 function set_binding(p, q) {
-    if (p.k !== defs_1.SYM) {
-        run_1.stop('symbol error');
+    if (p.k !== defs_js_1.SYM) {
+        (0, run_js_1.stop)('symbol error');
     }
     userScope.set(p, q);
 }
 exports.set_binding = set_binding;
 function get_binding(p) {
-    if (p.k !== defs_1.SYM) {
-        run_1.stop('symbol error');
+    if (p.k !== defs_js_1.SYM) {
+        (0, run_js_1.stop)('symbol error');
     }
     return userScope.binding(p);
 }
@@ -164,7 +164,7 @@ exports.get_binding = get_binding;
 // beucase mathematics is full of symbols that actually
 // have a special meaning, e.g. e,i,I in some cases j...
 function is_usr_symbol(p) {
-    if (p.k !== defs_1.SYM) {
+    if (p.k !== defs_js_1.SYM) {
         return false;
     }
     return /^[abcdjnrstxyz]_?$/.test(p.printname) || !keywordScope.has(p);
@@ -191,15 +191,15 @@ function collectUserSymbols(p, accumulator) {
             return;
         }
     }
-    if (defs_1.istensor(p)) {
+    if ((0, defs_js_1.istensor)(p)) {
         for (let i = 0; i < p.tensor.nelem; i++) {
             collectUserSymbols(p.tensor.elem[i], accumulator);
         }
         return;
     }
-    while (defs_1.iscons(p)) {
-        collectUserSymbols(defs_1.car(p), accumulator);
-        p = defs_1.cdr(p);
+    while ((0, defs_js_1.iscons)(p)) {
+        collectUserSymbols((0, defs_js_1.car)(p), accumulator);
+        p = (0, defs_js_1.cdr)(p);
     }
 }
 exports.collectUserSymbols = collectUserSymbols;
@@ -209,7 +209,7 @@ function symbol(name) {
 }
 exports.symbol = symbol;
 function iskeyword(p) {
-    return defs_1.issymbol(p) && p.keyword != null;
+    return (0, defs_js_1.issymbol)(p) && p.keyword != null;
 } // this transformation is done in run.coffee, see there
 exports.iskeyword = iskeyword;
 // for more info.

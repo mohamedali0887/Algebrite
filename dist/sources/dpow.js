@@ -1,20 +1,20 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.dpow = void 0;
-const defs_1 = require("../runtime/defs");
-const run_1 = require("../runtime/run");
-const add_1 = require("./add");
-const bignum_1 = require("./bignum");
-const multiply_1 = require("./multiply");
+const defs_js_1 = require("../runtime/defs.js");
+const run_js_1 = require("../runtime/run.js");
+const add_js_1 = require("./add.js");
+const bignum_js_1 = require("./bignum.js");
+const multiply_js_1 = require("./multiply.js");
 // power function for double precision floating point
 function dpow(base, expo) {
     // divide by zero?
     if (base === 0.0 && expo < 0.0) {
-        run_1.stop('divide by zero');
+        (0, run_js_1.stop)('divide by zero');
     }
     // nonnegative base or integer power?
     if (base >= 0.0 || expo % 1.0 === 0.0) {
-        return bignum_1.double(Math.pow(base, expo));
+        return (0, bignum_js_1.double)(Math.pow(base, expo));
     }
     const result = Math.pow(Math.abs(base), expo);
     const theta = Math.PI * expo;
@@ -29,6 +29,6 @@ function dpow(base, expo) {
         a = Math.cos(theta);
         b = Math.sin(theta);
     }
-    return add_1.add(bignum_1.double(a * result), multiply_1.multiply(bignum_1.double(b * result), defs_1.Constants.imaginaryunit));
+    return (0, add_js_1.add)((0, bignum_js_1.double)(a * result), (0, multiply_js_1.multiply)((0, bignum_js_1.double)(b * result), defs_js_1.Constants.imaginaryunit));
 }
 exports.dpow = dpow;

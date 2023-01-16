@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.denominator = exports.Eval_denominator = void 0;
-const defs_1 = require("../runtime/defs");
-const bignum_1 = require("./bignum");
-const eval_1 = require("./eval");
-const is_1 = require("./is");
-const multiply_1 = require("./multiply");
-const rationalize_1 = require("./rationalize");
+const defs_js_1 = require("../runtime/defs.js");
+const bignum_js_1 = require("./bignum.js");
+const eval_js_1 = require("./eval.js");
+const is_js_1 = require("./is.js");
+const multiply_js_1 = require("./multiply.js");
+const rationalize_js_1 = require("./rationalize.js");
 /* denominator =====================================================================
 
 Tags
@@ -23,23 +23,23 @@ Returns the denominator of expression x.
 
 */
 function Eval_denominator(p1) {
-    return denominator(eval_1.Eval(defs_1.cadr(p1)));
+    return denominator((0, eval_js_1.Eval)((0, defs_js_1.cadr)(p1)));
 }
 exports.Eval_denominator = Eval_denominator;
 function denominator(p1) {
     //console.trace "denominator of: " + p1
-    if (defs_1.isadd(p1)) {
-        p1 = rationalize_1.rationalize(p1);
+    if ((0, defs_js_1.isadd)(p1)) {
+        p1 = (0, rationalize_js_1.rationalize)(p1);
     }
-    if (defs_1.ismultiply(p1) && !is_1.isplusone(defs_1.car(defs_1.cdr(p1)))) {
-        return multiply_1.multiply_all(p1.tail().map(denominator));
+    if ((0, defs_js_1.ismultiply)(p1) && !(0, is_js_1.isplusone)((0, defs_js_1.car)((0, defs_js_1.cdr)(p1)))) {
+        return (0, multiply_js_1.multiply_all)(p1.tail().map(denominator));
     }
-    if (defs_1.isrational(p1)) {
-        return bignum_1.mp_denominator(p1);
+    if ((0, defs_js_1.isrational)(p1)) {
+        return (0, bignum_js_1.mp_denominator)(p1);
     }
-    if (defs_1.ispower(p1) && is_1.isnegativeterm(defs_1.caddr(p1))) {
-        return multiply_1.reciprocate(p1);
+    if ((0, defs_js_1.ispower)(p1) && (0, is_js_1.isnegativeterm)((0, defs_js_1.caddr)(p1))) {
+        return (0, multiply_js_1.reciprocate)(p1);
     }
-    return defs_1.Constants.one;
+    return defs_js_1.Constants.one;
 }
 exports.denominator = denominator;

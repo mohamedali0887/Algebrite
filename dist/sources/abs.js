@@ -1,27 +1,27 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.absval = exports.abs = exports.absValFloat = exports.Eval_abs = void 0;
-const defs_1 = require("../runtime/defs");
-const find_1 = require("../runtime/find");
-const run_1 = require("../runtime/run");
-const symbol_1 = require("../runtime/symbol");
-const misc_1 = require("../sources/misc");
-const add_1 = require("./add");
-const bignum_1 = require("./bignum");
-const conj_1 = require("./conj");
-const denominator_1 = require("./denominator");
-const eval_1 = require("./eval");
-const float_1 = require("./float");
-const imag_1 = require("./imag");
-const inner_1 = require("./inner");
-const is_1 = require("./is");
-const list_1 = require("./list");
-const multiply_1 = require("./multiply");
-const numerator_1 = require("./numerator");
-const power_1 = require("./power");
-const real_1 = require("./real");
-const rect_1 = require("./rect");
-const simplify_1 = require("./simplify");
+const defs_js_1 = require("../runtime/defs.js");
+const find_js_1 = require("../runtime/find.js");
+const run_js_1 = require("../runtime/run.js");
+const symbol_js_1 = require("../runtime/symbol.js");
+const misc_js_1 = require("../sources/misc.js");
+const add_js_1 = require("./add.js");
+const bignum_js_1 = require("./bignum.js");
+const conj_js_1 = require("./conj.js");
+const denominator_js_1 = require("./denominator.js");
+const eval_js_1 = require("./eval.js");
+const float_js_1 = require("./float.js");
+const imag_js_1 = require("./imag.js");
+const inner_js_1 = require("./inner.js");
+const is_js_1 = require("./is.js");
+const list_js_1 = require("./list.js");
+const multiply_js_1 = require("./multiply.js");
+const numerator_js_1 = require("./numerator.js");
+const power_js_1 = require("./power.js");
+const real_js_1 = require("./real.js");
+const rect_js_1 = require("./rect.js");
+const simplify_js_1 = require("./simplify.js");
 //(docs are generated from top-level comments, keep an eye on the formatting!)
 /* abs =====================================================================
 
@@ -69,11 +69,11 @@ Notes
 */
 const DEBUG_ABS = false;
 function Eval_abs(p1) {
-    return abs(eval_1.Eval(defs_1.cadr(p1)));
+    return abs((0, eval_js_1.Eval)((0, defs_js_1.cadr)(p1)));
 }
 exports.Eval_abs = Eval_abs;
 function absValFloat(p1) {
-    return float_1.zzfloat(eval_1.Eval(absval(eval_1.Eval(p1))));
+    return (0, float_js_1.zzfloat)((0, eval_js_1.Eval)(absval((0, eval_js_1.Eval)(p1))));
 }
 exports.absValFloat = absValFloat;
 // zzfloat of an abs doesn't necessarily result in a double
@@ -84,11 +84,11 @@ exports.absValFloat = absValFloat;
 //if !isdouble(stack[tos-1])
 //  stop("absValFloat should return a double and instead got: " + stack[tos-1])
 function abs(p1) {
-    const numer = numerator_1.numerator(p1);
+    const numer = (0, numerator_js_1.numerator)(p1);
     const absNumer = absval(numer);
-    const denom = denominator_1.denominator(p1);
+    const denom = (0, denominator_js_1.denominator)(p1);
     const absDenom = absval(denom);
-    const result = multiply_1.divide(absNumer, absDenom);
+    const result = (0, multiply_js_1.divide)(absNumer, absDenom);
     if (DEBUG_ABS) {
         console.trace('>>>>  ABS of ' + p1);
         console.log(`ABS numerator ${numer}`);
@@ -107,27 +107,27 @@ function absval(p1) {
         console.log(`ABS of ${p1}`);
     }
     // handle all the "number" cases first -----------------------------------------
-    if (is_1.isZeroAtomOrTensor(p1)) {
+    if ((0, is_js_1.isZeroAtomOrTensor)(p1)) {
         if (DEBUG_ABS) {
             console.log(` abs: ${p1} just zero`);
-            console.log(' --> ABS of ' + input + ' : ' + defs_1.Constants.zero);
+            console.log(' --> ABS of ' + input + ' : ' + defs_js_1.Constants.zero);
         }
-        return defs_1.Constants.zero;
+        return defs_js_1.Constants.zero;
     }
-    if (is_1.isnegativenumber(p1)) {
+    if ((0, is_js_1.isnegativenumber)(p1)) {
         if (DEBUG_ABS) {
             console.log(` abs: ${p1} just a negative`);
         }
-        return multiply_1.negate(p1);
+        return (0, multiply_js_1.negate)(p1);
     }
-    if (is_1.ispositivenumber(p1)) {
+    if ((0, is_js_1.ispositivenumber)(p1)) {
         if (DEBUG_ABS) {
             console.log(` abs: ${p1} just a positive`);
             console.log(` --> ABS of ${input} : ${p1}`);
         }
         return p1;
     }
-    if (p1 === symbol_1.symbol(defs_1.PI)) {
+    if (p1 === (0, symbol_js_1.symbol)(defs_js_1.PI)) {
         if (DEBUG_ABS) {
             console.log(` abs: ${p1} of PI`);
             console.log(` --> ABS of ${input} : ${p1}`);
@@ -143,30 +143,30 @@ function absval(p1) {
     // Note that for this routine to give a correct result, this
     // must be a sum where a complex number appears.
     // If we apply this to "a+b", we get an incorrect result.
-    if (defs_1.isadd(p1) &&
-        (find_1.findPossibleClockForm(p1, p1) ||
-            find_1.findPossibleExponentialForm(p1) ||
-            find_1.Find(p1, defs_1.Constants.imaginaryunit))) {
+    if ((0, defs_js_1.isadd)(p1) &&
+        ((0, find_js_1.findPossibleClockForm)(p1, p1) ||
+            (0, find_js_1.findPossibleExponentialForm)(p1) ||
+            (0, find_js_1.Find)(p1, defs_js_1.Constants.imaginaryunit))) {
         if (DEBUG_ABS) {
             console.log(` abs: ${p1} is a sum`);
             console.log('abs of a sum');
         }
         // sum
-        p1 = rect_1.rect(p1); // convert polar terms, if any
-        const result = simplify_1.simplify_trig(power_1.power(
+        p1 = (0, rect_js_1.rect)(p1); // convert polar terms, if any
+        const result = (0, simplify_js_1.simplify_trig)((0, power_js_1.power)(
         // prettier-ignore
-        add_1.add(power_1.power(real_1.real(p1), bignum_1.integer(2)), power_1.power(imag_1.imag(p1), bignum_1.integer(2))), bignum_1.rational(1, 2)));
+        (0, add_js_1.add)((0, power_js_1.power)((0, real_js_1.real)(p1), (0, bignum_js_1.integer)(2)), (0, power_js_1.power)((0, imag_js_1.imag)(p1), (0, bignum_js_1.integer)(2))), (0, bignum_js_1.rational)(1, 2)));
         if (DEBUG_ABS) {
             console.log(` --> ABS of ${input} : ${result}`);
         }
         return result;
     }
-    if (defs_1.ispower(p1) && is_1.equaln(defs_1.cadr(p1), -1)) {
+    if ((0, defs_js_1.ispower)(p1) && (0, is_js_1.equaln)((0, defs_js_1.cadr)(p1), -1)) {
         // -1 to any power
-        const one = defs_1.Constants.One();
+        const one = defs_js_1.Constants.One();
         if (DEBUG_ABS) {
             console.log(` abs: ${p1} is -1 to any power`);
-            const msg = defs_1.defs.evaluatingAsFloats
+            const msg = defs_js_1.defs.evaluatingAsFloats
                 ? ' abs: numeric, so result is 1.0'
                 : ' abs: symbolic, so result is 1';
             console.log(msg);
@@ -175,8 +175,8 @@ function absval(p1) {
         return one;
     }
     // abs(a^b) is equal to abs(a)^b IF b is positive
-    if (defs_1.ispower(p1) && is_1.ispositivenumber(defs_1.caddr(p1))) {
-        const result = power_1.power(abs(defs_1.cadr(p1)), defs_1.caddr(p1));
+    if ((0, defs_js_1.ispower)(p1) && (0, is_js_1.ispositivenumber)((0, defs_js_1.caddr)(p1))) {
+        const result = (0, power_js_1.power)(abs((0, defs_js_1.cadr)(p1)), (0, defs_js_1.caddr)(p1));
         if (DEBUG_ABS) {
             console.log(` abs: ${p1} is something to the power of a positive number`);
             console.log(` --> ABS of ${input} : ${result}`);
@@ -184,26 +184,26 @@ function absval(p1) {
         return result;
     }
     // abs(e^something)
-    if (defs_1.ispower(p1) && defs_1.cadr(p1) === symbol_1.symbol(defs_1.E)) {
+    if ((0, defs_js_1.ispower)(p1) && (0, defs_js_1.cadr)(p1) === (0, symbol_js_1.symbol)(defs_js_1.E)) {
         // exponential
-        const result = misc_1.exponential(real_1.real(defs_1.caddr(p1)));
+        const result = (0, misc_js_1.exponential)((0, real_js_1.real)((0, defs_js_1.caddr)(p1)));
         if (DEBUG_ABS) {
             console.log(` abs: ${p1} is an exponential`);
             console.log(` --> ABS of ${input} : ${result}`);
         }
         return result;
     }
-    if (defs_1.ismultiply(p1)) {
+    if ((0, defs_js_1.ismultiply)(p1)) {
         // product
-        const result = p1.tail().map(absval).reduce(multiply_1.multiply);
+        const result = p1.tail().map(absval).reduce(multiply_js_1.multiply);
         if (DEBUG_ABS) {
             console.log(` abs: ${p1} is a product`);
             console.log(` --> ABS of ${input} : ${result}`);
         }
         return result;
     }
-    if (defs_1.car(p1) === symbol_1.symbol(defs_1.ABS)) {
-        const absOfAbs = list_1.makeList(symbol_1.symbol(defs_1.ABS), defs_1.cadr(p1));
+    if ((0, defs_js_1.car)(p1) === (0, symbol_js_1.symbol)(defs_js_1.ABS)) {
+        const absOfAbs = (0, list_js_1.makeList)((0, symbol_js_1.symbol)(defs_js_1.ABS), (0, defs_js_1.cadr)(p1));
         if (DEBUG_ABS) {
             console.log(` abs: ${p1} is abs of a abs`);
             console.log(` --> ABS of ${input} : ${absOfAbs}`);
@@ -240,13 +240,13 @@ function absval(p1) {
       restore()
       return
     */
-    if (defs_1.istensor(p1)) {
+    if ((0, defs_js_1.istensor)(p1)) {
         return absval_tensor(p1);
     }
-    if (is_1.isnegativeterm(p1) || (defs_1.isadd(p1) && is_1.isnegativeterm(defs_1.cadr(p1)))) {
-        p1 = multiply_1.negate(p1);
+    if ((0, is_js_1.isnegativeterm)(p1) || ((0, defs_js_1.isadd)(p1) && (0, is_js_1.isnegativeterm)((0, defs_js_1.cadr)(p1)))) {
+        p1 = (0, multiply_js_1.negate)(p1);
     }
-    const l = list_1.makeList(symbol_1.symbol(defs_1.ABS), p1);
+    const l = (0, list_js_1.makeList)((0, symbol_js_1.symbol)(defs_js_1.ABS), p1);
     if (DEBUG_ABS) {
         console.log(` abs: ${p1} is nothing decomposable`);
         console.log(` --> ABS of ${input} : ${l}`);
@@ -257,7 +257,7 @@ exports.absval = absval;
 // also called the "norm" of a vector
 function absval_tensor(p1) {
     if (p1.tensor.ndim !== 1) {
-        run_1.stop('abs(tensor) with tensor rank > 1');
+        (0, run_js_1.stop)('abs(tensor) with tensor rank > 1');
     }
-    return eval_1.Eval(simplify_1.simplify(power_1.power(inner_1.inner(p1, conj_1.conjugate(p1)), bignum_1.rational(1, 2))));
+    return (0, eval_js_1.Eval)((0, simplify_js_1.simplify)((0, power_js_1.power)((0, inner_js_1.inner)(p1, (0, conj_js_1.conjugate)(p1)), (0, bignum_js_1.rational)(1, 2))));
 }

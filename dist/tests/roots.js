@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const test_harness_1 = require("../test-harness");
-test_harness_1.run_shardable_test([
+const test_harness_js_1 = require("../test-harness.js");
+(0, test_harness_js_1.run_shardable_test)([
     'roots(x)',
     '0',
     'roots(2^x-y,y)',
@@ -32,7 +32,7 @@ test_harness_1.run_shardable_test([
     'roots(3 x + 12 == 24)',
     '4',
 ]);
-test_harness_1.run_test([
+(0, test_harness_js_1.run_test)([
     'y=roots(x^2+b*x+c/k)[1]',
     '',
     'y^2+b*y+c/k',
@@ -66,7 +66,7 @@ test_harness_1.run_test([
     "clearall",
     "",
 ]);
-test_harness_1.run_shardable_test([
+(0, test_harness_js_1.run_shardable_test)([
     // --------------------------------------------
     // some more tests with 3rd degree polynomials
     // including use of cubic formula.
@@ -85,8 +85,9 @@ test_harness_1.run_shardable_test([
     // also: "[-1,-(-1)^(2/3),(-1)^(1/3))",
     'roots(x^3 - 1)',
     '[1,-1/2-1/2*i*3^(1/2),-1/2+1/2*i*3^(1/2)]',
+    // also: "[1,-(-1)^(1/3),(-1)^(2/3))",
 ]);
-test_harness_1.run_test([
+(0, test_harness_js_1.run_test)([
     // DOES use cubic formula
     'thePoly = x^3 + d',
     '',
@@ -98,7 +99,7 @@ test_harness_1.run_test([
     'and((simplify(subst(last[1],x,thePoly)) == 0),(simplify(subst(last[2],x,thePoly)) == 0),(simplify(subst(last[3],x,thePoly)) == 0))',
     '1',
 ]);
-test_harness_1.run_shardable_test([
+(0, test_harness_js_1.run_shardable_test)([
     'roots(x^3 + 6x - 20)',
     '[2,-1-3*i,-1+3*i]',
     'roots(x^3 - 6x - 40)',
@@ -112,7 +113,7 @@ test_harness_1.run_shardable_test([
     'roots(x^3 - 18x + 35)',
     '[-5,5/2-1/2*i*3^(1/2),5/2+1/2*i*3^(1/2)]',
 ]);
-test_harness_1.run_test([
+(0, test_harness_js_1.run_test)([
     // DOES use cubic formula
     'thePoly = x^3 - 3x + 1',
     '',
@@ -122,7 +123,7 @@ test_harness_1.run_test([
     'and((abs(float(subst(float(last[1]),x,thePoly))) < float(2*10^(-15))),(abs(float(subst(float(last[2]),x,thePoly))) < float(2*10^(-15))), (abs(float(subst(float(last[3]),x,thePoly))) < float(2*10^(-15))))',
     '1',
 ]);
-test_harness_1.run_test([
+(0, test_harness_js_1.run_test)([
     // DOES use cubic formula
     'thePoly = x^3 - 3x - 1',
     '',
@@ -132,13 +133,13 @@ test_harness_1.run_test([
     'and((abs(float(subst(float(last[1]),x,thePoly))) < float(2*10^(-15))),(abs(float(subst(float(last[2]),x,thePoly))) < float(2*10^(-15))), (abs(float(subst(float(last[3]),x,thePoly))) < float(2*10^(-15))))',
     '1',
 ]);
-test_harness_1.run_shardable_test([
+(0, test_harness_js_1.run_shardable_test)([
     'roots(x^3 - 15x - 4)',
     '[4,-2-3^(1/2),-2+3^(1/2)]',
     'roots(2*x^3 - 4x^2 - 22*x + 24)',
     '[-3,1,4]',
 ]);
-test_harness_1.run_test([
+(0, test_harness_js_1.run_test)([
     // DOES use cubic formula
     'thePoly = 1*x^3 + 6*x^2 - 12*x + 8',
     '',
@@ -147,7 +148,7 @@ test_harness_1.run_test([
     'and((abs(float(subst(float(last[1]),x,thePoly))) < float(2*10^(-14))),(abs(float(subst(float(last[2]),x,thePoly))) < float(2*10^(-14))), (abs(float(subst(float(last[3]),x,thePoly))) < float(2*10^(-14))))',
     '1',
 ]);
-test_harness_1.run_shardable_test([
+(0, test_harness_js_1.run_shardable_test)([
     'roots(1*x^3 + 6*x^2 + 12*x + 8)',
     '-2',
     'roots(1*x^3 + 0*x^2 - 18*x + 35)',
@@ -157,7 +158,7 @@ test_harness_1.run_shardable_test([
     'roots(1*x^3 - 4*x^2 - 6*x + 5)',
     '[5,-1/2-1/2*5^(1/2),-1/2+1/2*5^(1/2)]',
 ]);
-test_harness_1.run_test([
+(0, test_harness_js_1.run_test)([
     // DOES use cubic formula
     'thePoly = 3*x^3 + 6*x^2 + 4*x + 9',
     '',
@@ -166,7 +167,7 @@ test_harness_1.run_test([
     'and((abs(float(subst(float(last[1]),x,thePoly))) < float(2*10^(-14))),(abs(float(subst(float(last[2]),x,thePoly))) < float(2*10^(-14))), (abs(float(subst(float(last[3]),x,thePoly))) < float(2*10^(-14))))',
     '1',
 ]);
-test_harness_1.run_test([
+(0, test_harness_js_1.run_test)([
     // DOES use cubic formula
     'thePoly = 3*x^3 - 6*x^2 + 4*x - 5',
     '',
@@ -179,13 +180,13 @@ test_harness_1.run_test([
     'and((abs(float(subst(float(last[1]),x,thePoly))) < float(2*10^(-14))),(abs(float(subst(float(last[2]),x,thePoly))) < float(2*10^(-14))), (abs(float(subst(float(last[3]),x,thePoly))) < float(2*10^(-14))))',
     '1',
 ]);
-test_harness_1.run_shardable_test([
+(0, test_harness_js_1.run_shardable_test)([
     'roots(8*x^3 - 36*x^2 + 54*x - 27)',
     '3/2',
     'roots(3*x^3 - 5*x^2 - 1*x - 2)',
     '[2,-1/6-1/6*i*11^(1/2),-1/6+1/6*i*11^(1/2)]',
 ]);
-test_harness_1.run_test([
+(0, test_harness_js_1.run_test)([
     // DOES use cubic formula
     'thePoly = x^3+i',
     '',
@@ -198,7 +199,7 @@ test_harness_1.run_test([
     'and((abs(float(subst(float(last[1]),x,thePoly))) < float(2*10^(-15))),(abs(float(subst(float(last[2]),x,thePoly))) < float(2*10^(-15))), (abs(float(subst(float(last[3]),x,thePoly))) < float(2*10^(-15))))',
     '1',
 ]);
-test_harness_1.run_test([
+(0, test_harness_js_1.run_test)([
     // DOES use cubic formula
     'thePoly = x^3-i',
     '',
@@ -210,7 +211,7 @@ test_harness_1.run_test([
     '1',
 ]);
 // some quartics
-test_harness_1.run_test([
+(0, test_harness_js_1.run_test)([
     'thePoly = x^4 + 1',
     '',
     'theRoots = roots(thePoly)',
@@ -221,7 +222,7 @@ test_harness_1.run_test([
     'and((abs(float(subst(float(last[1]),x,thePoly))) < float(2*10^(-15))),(abs(float(subst(float(last[2]),x,thePoly))) < float(2*10^(-15))), (abs(float(subst(float(last[3]),x,thePoly))) < float(2*10^(-15))), (abs(float(subst(float(last[4]),x,thePoly))) < float(2*10^(-15))))',
     '1',
 ]);
-test_harness_1.run_test([
+(0, test_harness_js_1.run_test)([
     'thePoly = x^5 + 1',
     '',
     'theRoots = roots(thePoly)',
@@ -232,7 +233,7 @@ test_harness_1.run_test([
     'and((abs(float(subst(float(last[1]),x,thePoly))) < float(2*10^(-12))),(abs(float(subst(float(last[2]),x,thePoly))) < float(2*10^(-12))), (abs(float(subst(float(last[3]),x,thePoly))) < float(2*10^(-12))), (abs(float(subst(float(last[4]),x,thePoly))) < float(2*10^(-12))), (abs(float(subst(float(last[5]),x,thePoly))) < float(2*10^(-12))))',
     '1',
 ]);
-test_harness_1.run_test([
+(0, test_harness_js_1.run_test)([
     'thePoly = a*x^5 + k',
     '',
     'theRoots = roots(thePoly)',
@@ -257,8 +258,16 @@ test_harness_1.run_test([
     '',
     'theRoots[5]',
     '-(k/a)^(1/5)',
+    // unfortunately the comparison here doesn't work,
+    // due to rounding errors float() produces expressions that still hve
+    // a and k, albeit with really small
+    // coefficients, and hence the "<" comparison finds variables with
+    // undefined values and
+    // fails.
+    //"and((abs(float(subst(float(last[1]),x,thePoly))) < float(2*10^(-12))),(abs(float(subst(float(last[2]),x,thePoly))) < float(2*10^(-12))), (abs(float(subst(float(last[3]),x,thePoly))) < float(2*10^(-12))), (abs(float(subst(float(last[4]),x,thePoly))) < float(2*10^(-12))), (abs(float(subst(float(last[5]),x,thePoly))) < float(2*10^(-12))))",
+    //"1",
 ]);
-test_harness_1.run_test([
+(0, test_harness_js_1.run_test)([
     'thePoly = x^3 - 7*x^2 + 41*x - 87',
     '',
     'theRoots = roots(thePoly)',
@@ -268,7 +277,7 @@ test_harness_1.run_test([
     'and((abs(float(subst(float(last[1]),x,thePoly))) < float(2*10^(-12))),(abs(float(subst(float(last[2]),x,thePoly))) < float(2*10^(-12))), (abs(float(subst(float(last[3]),x,thePoly))) < float(2*10^(-12))))',
     '1',
 ]);
-test_harness_1.run_test([
+(0, test_harness_js_1.run_test)([
     'thePoly = x^4 - 1*x^3 + 4*x^2 + 3*x + 5',
     '',
     'theRoots = roots(thePoly)',
@@ -278,7 +287,7 @@ test_harness_1.run_test([
     'and((abs(float(subst(float(last[1]),x,thePoly))) < float(2*10^(-12))),(abs(float(subst(float(last[2]),x,thePoly))) < float(2*10^(-12))), (abs(float(subst(float(last[3]),x,thePoly))) < float(2*10^(-12))), (abs(float(subst(float(last[4]),x,thePoly))) < float(2*10^(-12))))',
     '1',
 ]);
-test_harness_1.run_test([
+(0, test_harness_js_1.run_test)([
     'thePoly = x^4 - 2*x^3 - 7*x^2 + 8*x + 12',
     '',
     'theRoots = roots(thePoly)',
@@ -288,7 +297,7 @@ test_harness_1.run_test([
     'and((abs(float(subst(float(last[1]),x,thePoly))) < float(2*10^(-12))),(abs(float(subst(float(last[2]),x,thePoly))) < float(2*10^(-12))), (abs(float(subst(float(last[3]),x,thePoly))) < float(2*10^(-12))), (abs(float(subst(float(last[4]),x,thePoly))) < float(2*10^(-12))))',
     '1',
 ]);
-test_harness_1.run_test([
+(0, test_harness_js_1.run_test)([
     'thePoly = x^4+8*x^2+3',
     '',
     'theRoots = roots(thePoly)',
@@ -298,7 +307,7 @@ test_harness_1.run_test([
     'and((abs(float(subst(float(last[1]),x,thePoly))) < float(2*10^(-12))),(abs(float(subst(float(last[2]),x,thePoly))) < float(2*10^(-12))), (abs(float(subst(float(last[3]),x,thePoly))) < float(2*10^(-12))), (abs(float(subst(float(last[4]),x,thePoly))) < float(2*10^(-12))))',
     '1',
 ]);
-test_harness_1.run_test([
+(0, test_harness_js_1.run_test)([
     'thePoly = -1*x^3-1*x^2+10*x - 8',
     '',
     'theRoots = roots(thePoly)',
@@ -308,7 +317,7 @@ test_harness_1.run_test([
     'and((abs(float(subst(float(last[1]),x,thePoly))) < float(2*10^(-12))),(abs(float(subst(float(last[2]),x,thePoly))) < float(2*10^(-12))), (abs(float(subst(float(last[3]),x,thePoly))) < float(2*10^(-12))))',
     '1',
 ]);
-test_harness_1.run_test([
+(0, test_harness_js_1.run_test)([
     'thePoly = -3-9*x+3*x^2+x^3',
     '',
     'theRoots = roots(thePoly)',
@@ -326,7 +335,7 @@ test_harness_1.run_test([
     'and((abs(float(subst(float(last[1]),x,thePoly))) < float(2*10^(-12))),(abs(float(subst(float(last[2]),x,thePoly))) < float(2*10^(-12))), (abs(float(subst(float(last[3]),x,thePoly))) < float(2*10^(-12))))',
     '1',
 ]);
-test_harness_1.run_test([
+(0, test_harness_js_1.run_test)([
     'thePoly = x^3 + x - 2',
     '',
     'theRoots = roots(thePoly)',
@@ -337,7 +346,7 @@ test_harness_1.run_test([
     '1',
 ]);
 // some quartics
-test_harness_1.run_test([
+(0, test_harness_js_1.run_test)([
     'thePoly = x^4 + 8*x^2 + 3',
     '',
     'theRoots = roots(thePoly)',
@@ -347,7 +356,7 @@ test_harness_1.run_test([
     'and((abs(float(subst(float(last[1]),x,thePoly))) < float(8*10^(-15))),(abs(float(subst(float(last[2]),x,thePoly))) < float(2*10^(-15))), (abs(float(subst(float(last[3]),x,thePoly))) < float(8*10^(-15))), (abs(float(subst(float(last[4]),x,thePoly))) < float(2*10^(-15))))',
     '1',
 ]);
-test_harness_1.run_test([
+(0, test_harness_js_1.run_test)([
     'thePoly = x^4 - 10*x^3 + 21*x^2 + 40*x - 100',
     '',
     'theRoots = roots(thePoly)',
@@ -357,13 +366,13 @@ test_harness_1.run_test([
     'and((abs(float(subst(float(last[1]),x,thePoly))) < float(2*10^(-12))),(abs(float(subst(float(last[2]),x,thePoly))) < float(2*10^(-12))), (abs(float(subst(float(last[3]),x,thePoly))) < float(2*10^(-12))))',
     '1',
 ]);
-test_harness_1.run_test([
+(0, test_harness_js_1.run_test)([
     'thePoly = 2*x^4 - 8*x^3 + 2*x^2 + 24*x - 14',
     '',
     'theRoots = roots(thePoly)',
     '',
 ]);
-test_harness_1.run_test([
+(0, test_harness_js_1.run_test)([
     'thePoly = x^4 - 4*x^3 + x^2 + 12*x - 7',
     '',
     'theRoots = roots(thePoly)',
@@ -373,7 +382,7 @@ test_harness_1.run_test([
     'and((abs(float(subst(float(last[1]),x,thePoly))) < float(2*10^(-12))),(abs(float(subst(float(last[2]),x,thePoly))) < float(2*10^(-12))), (abs(float(subst(float(last[3]),x,thePoly))) < float(2*10^(-12))), (abs(float(subst(float(last[4]),x,thePoly))) < float(2*10^(-12))))',
     '1',
 ]);
-test_harness_1.run_test([
+(0, test_harness_js_1.run_test)([
     'thePoly = 2*x^4 - 8*x^3 + 2*x^2 + 24*x - 14',
     '',
     'theRoots = roots(thePoly)',
@@ -383,7 +392,7 @@ test_harness_1.run_test([
     'and((abs(float(subst(float(last[1]),x,thePoly))) < float(2*10^(-12))),(abs(float(subst(float(last[2]),x,thePoly))) < float(2*10^(-12))), (abs(float(subst(float(last[3]),x,thePoly))) < float(2*10^(-12))), (abs(float(subst(float(last[4]),x,thePoly))) < float(2*10^(-12))))',
     '1',
 ]);
-test_harness_1.run_test([
+(0, test_harness_js_1.run_test)([
     'thePoly = x^4 - 9*x^3 + 22*x^2 + 28*x - 120',
     '',
     'theRoots = roots(thePoly)',
@@ -392,8 +401,28 @@ test_harness_1.run_test([
     '[-2,3,4-2*i,4+2*i]',
     'and((abs(float(subst(float(last[1]),x,thePoly))) < float(2*10^(-12))),(abs(float(subst(float(last[2]),x,thePoly))) < float(2*10^(-12))), (abs(float(subst(float(last[3]),x,thePoly))) < float(2*10^(-12))), (abs(float(subst(float(last[4]),x,thePoly))) < float(2*10^(-12))))',
     '1',
+    //"thePoly = 4* x^4 - 9*x^3 + 22*x^2 + 28*x - 120",
+    //"",
+    //
+    // these are really ugly - sympy or wolfram alpha don't give clean symbolic solutions either
+    //"theRoots = roots(thePoly)",
+    //"",
+    //
+    //"and((abs(float(subst(float(last[1]),x,thePoly))) < float(2*10^(-12))),(abs(float(subst(float(last[2]),x,thePoly))) < float(2*10^(-12))), (abs(float(subst(float(last[3]),x,thePoly))) < float(2*10^(-12))), (abs(float(subst(float(last[4]),x,thePoly))) < float(2*10^(-12))))",
+    //"1",
+    //
+    //"thePoly = -20*x^4 + 5*x^3 + 17*x^2 - 29*x + 87",
+    //"",
+    //
+    // these are really ugly - sympy or wolfram alpha don't give clean symbolic solutions either
+    //"theRoots = roots(thePoly)",
+    //"",
+    //
+    //"and((abs(float(subst(float(last[1]),x,thePoly))) < float(2*10^(-12))),(abs(float(subst(float(last[2]),x,thePoly))) < float(2*10^(-12))), (abs(float(subst(float(last[3]),x,thePoly))) < float(2*10^(-12))), (abs(float(subst(float(last[4]),x,thePoly))) < float(2*10^(-12))))",
+    //"1",
+    //
 ]);
-test_harness_1.run_test([
+(0, test_harness_js_1.run_test)([
     'thePoly = x^4 + 2*x^3 - 41*x^2 - 42*x + 360',
     '',
     'theRoots = roots(thePoly)',

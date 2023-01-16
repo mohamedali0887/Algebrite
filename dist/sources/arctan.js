@@ -1,17 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.arctan = exports.Eval_arctan = void 0;
-const defs_1 = require("../runtime/defs");
-const find_1 = require("../runtime/find");
-const symbol_1 = require("../runtime/symbol");
-const misc_1 = require("../sources/misc");
-const bignum_1 = require("./bignum");
-const denominator_1 = require("./denominator");
-const eval_1 = require("./eval");
-const is_1 = require("./is");
-const list_1 = require("./list");
-const multiply_1 = require("./multiply");
-const numerator_1 = require("./numerator");
+const defs_js_1 = require("../runtime/defs.js");
+const find_js_1 = require("../runtime/find.js");
+const symbol_js_1 = require("../runtime/symbol.js");
+const misc_js_1 = require("../sources/misc.js");
+const bignum_js_1 = require("./bignum.js");
+const denominator_js_1 = require("./denominator.js");
+const eval_js_1 = require("./eval.js");
+const is_js_1 = require("./is.js");
+const list_js_1 = require("./list.js");
+const multiply_js_1 = require("./multiply.js");
+const numerator_js_1 = require("./numerator.js");
 /* arctan =====================================================================
 
 Tags
@@ -28,50 +28,50 @@ Returns the inverse tangent of x.
 
 */
 function Eval_arctan(x) {
-    return arctan(eval_1.Eval(defs_1.cadr(x)));
+    return arctan((0, eval_js_1.Eval)((0, defs_js_1.cadr)(x)));
 }
 exports.Eval_arctan = Eval_arctan;
 function arctan(x) {
-    if (defs_1.car(x) === symbol_1.symbol(defs_1.TAN)) {
-        return defs_1.cadr(x);
+    if ((0, defs_js_1.car)(x) === (0, symbol_js_1.symbol)(defs_js_1.TAN)) {
+        return (0, defs_js_1.cadr)(x);
     }
-    if (defs_1.isdouble(x)) {
-        return bignum_1.double(Math.atan(x.d));
+    if ((0, defs_js_1.isdouble)(x)) {
+        return (0, bignum_js_1.double)(Math.atan(x.d));
     }
-    if (is_1.isZeroAtomOrTensor(x)) {
-        return defs_1.Constants.zero;
+    if ((0, is_js_1.isZeroAtomOrTensor)(x)) {
+        return defs_js_1.Constants.zero;
     }
-    if (is_1.isnegative(x)) {
-        return multiply_1.negate(arctan(multiply_1.negate(x)));
+    if ((0, is_js_1.isnegative)(x)) {
+        return (0, multiply_js_1.negate)(arctan((0, multiply_js_1.negate)(x)));
     }
     // arctan(sin(a) / cos(a)) ?
-    if (find_1.Find(x, symbol_1.symbol(defs_1.SIN)) && find_1.Find(x, symbol_1.symbol(defs_1.COS))) {
-        const p2 = numerator_1.numerator(x);
-        const p3 = denominator_1.denominator(x);
-        if (defs_1.car(p2) === symbol_1.symbol(defs_1.SIN) &&
-            defs_1.car(p3) === symbol_1.symbol(defs_1.COS) &&
-            misc_1.equal(defs_1.cadr(p2), defs_1.cadr(p3))) {
-            return defs_1.cadr(p2);
+    if ((0, find_js_1.Find)(x, (0, symbol_js_1.symbol)(defs_js_1.SIN)) && (0, find_js_1.Find)(x, (0, symbol_js_1.symbol)(defs_js_1.COS))) {
+        const p2 = (0, numerator_js_1.numerator)(x);
+        const p3 = (0, denominator_js_1.denominator)(x);
+        if ((0, defs_js_1.car)(p2) === (0, symbol_js_1.symbol)(defs_js_1.SIN) &&
+            (0, defs_js_1.car)(p3) === (0, symbol_js_1.symbol)(defs_js_1.COS) &&
+            (0, misc_js_1.equal)((0, defs_js_1.cadr)(p2), (0, defs_js_1.cadr)(p3))) {
+            return (0, defs_js_1.cadr)(p2);
         }
     }
     // arctan(1/sqrt(3)) -> pi/6
     // second if catches the other way of saying it, sqrt(3)/3
-    if ((defs_1.ispower(x) && is_1.equaln(defs_1.cadr(x), 3) && is_1.equalq(defs_1.caddr(x), -1, 2)) ||
-        (defs_1.ismultiply(x) &&
-            is_1.equalq(defs_1.car(defs_1.cdr(x)), 1, 3) &&
-            defs_1.car(defs_1.car(defs_1.cdr(defs_1.cdr(x)))) === symbol_1.symbol(defs_1.POWER) &&
-            is_1.equaln(defs_1.car(defs_1.cdr(defs_1.car(defs_1.cdr(defs_1.cdr(x))))), 3) &&
-            is_1.equalq(defs_1.car(defs_1.cdr(defs_1.cdr(defs_1.car(defs_1.cdr(defs_1.cdr(x)))))), 1, 2))) {
-        return multiply_1.multiply(bignum_1.rational(1, 6), defs_1.Constants.Pi());
+    if (((0, defs_js_1.ispower)(x) && (0, is_js_1.equaln)((0, defs_js_1.cadr)(x), 3) && (0, is_js_1.equalq)((0, defs_js_1.caddr)(x), -1, 2)) ||
+        ((0, defs_js_1.ismultiply)(x) &&
+            (0, is_js_1.equalq)((0, defs_js_1.car)((0, defs_js_1.cdr)(x)), 1, 3) &&
+            (0, defs_js_1.car)((0, defs_js_1.car)((0, defs_js_1.cdr)((0, defs_js_1.cdr)(x)))) === (0, symbol_js_1.symbol)(defs_js_1.POWER) &&
+            (0, is_js_1.equaln)((0, defs_js_1.car)((0, defs_js_1.cdr)((0, defs_js_1.car)((0, defs_js_1.cdr)((0, defs_js_1.cdr)(x))))), 3) &&
+            (0, is_js_1.equalq)((0, defs_js_1.car)((0, defs_js_1.cdr)((0, defs_js_1.cdr)((0, defs_js_1.car)((0, defs_js_1.cdr)((0, defs_js_1.cdr)(x)))))), 1, 2))) {
+        return (0, multiply_js_1.multiply)((0, bignum_js_1.rational)(1, 6), defs_js_1.Constants.Pi());
     }
     // arctan(1) -> pi/4
-    if (is_1.equaln(x, 1)) {
-        return multiply_1.multiply(bignum_1.rational(1, 4), defs_1.Constants.Pi());
+    if ((0, is_js_1.equaln)(x, 1)) {
+        return (0, multiply_js_1.multiply)((0, bignum_js_1.rational)(1, 4), defs_js_1.Constants.Pi());
     }
     // arctan(sqrt(3)) -> pi/3
-    if (defs_1.ispower(x) && is_1.equaln(defs_1.cadr(x), 3) && is_1.equalq(defs_1.caddr(x), 1, 2)) {
-        return multiply_1.multiply(bignum_1.rational(1, 3), defs_1.Constants.Pi());
+    if ((0, defs_js_1.ispower)(x) && (0, is_js_1.equaln)((0, defs_js_1.cadr)(x), 3) && (0, is_js_1.equalq)((0, defs_js_1.caddr)(x), 1, 2)) {
+        return (0, multiply_js_1.multiply)((0, bignum_js_1.rational)(1, 3), defs_js_1.Constants.Pi());
     }
-    return list_1.makeList(symbol_1.symbol(defs_1.ARCTAN), x);
+    return (0, list_js_1.makeList)((0, symbol_js_1.symbol)(defs_js_1.ARCTAN), x);
 }
 exports.arctan = arctan;

@@ -1,15 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Eval_eigenvec = exports.Eval_eigenval = exports.Eval_eigen = void 0;
-const defs_1 = require("../runtime/defs");
-const run_1 = require("../runtime/run");
-const symbol_1 = require("../runtime/symbol");
-const bignum_1 = require("./bignum");
-const eval_1 = require("./eval");
-const float_1 = require("./float");
-const list_1 = require("./list");
-const print_1 = require("./print");
-const tensor_1 = require("./tensor");
+const defs_js_1 = require("../runtime/defs.js");
+const run_js_1 = require("../runtime/run.js");
+const symbol_js_1 = require("../runtime/symbol.js");
+const bignum_js_1 = require("./bignum.js");
+const eval_js_1 = require("./eval.js");
+const float_js_1 = require("./float.js");
+const list_js_1 = require("./list.js");
+const print_js_1 = require("./print.js");
+const tensor_js_1 = require("./tensor.js");
 /* eigen =====================================================================
 
 Tags
@@ -69,9 +69,9 @@ Enter:
 Result:
 
      -1.16435e-14
- 
+
      -6.46705e-15
- 
+
      -4.55191e-15
 
 Example 2: Check the relation A = QTDQ.
@@ -83,9 +83,9 @@ Enter:
 Result:
 
   6.27365e-12    -1.58236e-11   1.81902e-11
- 
+
   -1.58236e-11   -1.95365e-11   2.56514e-12
- 
+
   1.81902e-11    2.56514e-12    1.32627e-11
 
 */
@@ -97,14 +97,14 @@ const EIG_yyqq = [];
 function Eval_eigen(p1) {
     const { arg } = EIG_check_arg(p1);
     if (!arg) {
-        run_1.stop('eigen: argument is not a square matrix');
+        (0, run_js_1.stop)('eigen: argument is not a square matrix');
     }
-    let [p2, p3] = eigen(defs_1.EIGEN, arg);
-    p1 = symbol_1.usr_symbol('D');
-    symbol_1.set_binding(p1, p2);
-    p1 = symbol_1.usr_symbol('Q');
-    symbol_1.set_binding(p1, p3);
-    return symbol_1.symbol(defs_1.NIL);
+    let [p2, p3] = eigen(defs_js_1.EIGEN, arg);
+    p1 = (0, symbol_js_1.usr_symbol)('D');
+    (0, symbol_js_1.set_binding)(p1, p2);
+    p1 = (0, symbol_js_1.usr_symbol)('Q');
+    (0, symbol_js_1.set_binding)(p1, p3);
+    return (0, symbol_js_1.symbol)(defs_js_1.NIL);
 }
 exports.Eval_eigen = Eval_eigen;
 /* eigenval =====================================================================
@@ -125,9 +125,9 @@ Compute eigenvalues of m. See "eigen" for more info.
 function Eval_eigenval(p1) {
     const { arg, invalid } = EIG_check_arg(p1);
     if (invalid) {
-        return list_1.makeList(symbol_1.symbol(defs_1.EIGENVAL), invalid);
+        return (0, list_js_1.makeList)((0, symbol_js_1.symbol)(defs_js_1.EIGENVAL), invalid);
     }
-    let [p2, p3] = eigen(defs_1.EIGENVAL, arg);
+    let [p2, p3] = eigen(defs_js_1.EIGENVAL, arg);
     return p2;
 }
 exports.Eval_eigenval = Eval_eigenval;
@@ -149,30 +149,30 @@ Compute eigenvectors of m. See "eigen" for more info.
 function Eval_eigenvec(p1) {
     const { arg, invalid } = EIG_check_arg(p1);
     if (invalid) {
-        return list_1.makeList(symbol_1.symbol(defs_1.EIGENVEC), invalid);
+        return (0, list_js_1.makeList)((0, symbol_js_1.symbol)(defs_js_1.EIGENVEC), invalid);
     }
-    let [_, p3] = eigen(defs_1.EIGENVEC, arg);
+    let [_, p3] = eigen(defs_js_1.EIGENVEC, arg);
     return p3;
 }
 exports.Eval_eigenvec = Eval_eigenvec;
 function EIG_check_arg(p1) {
-    p1 = eval_1.Eval(float_1.yyfloat(eval_1.Eval(defs_1.cadr(p1))));
-    if (!defs_1.istensor(p1)) {
+    p1 = (0, eval_js_1.Eval)((0, float_js_1.yyfloat)((0, eval_js_1.Eval)((0, defs_js_1.cadr)(p1))));
+    if (!(0, defs_js_1.istensor)(p1)) {
         return { invalid: p1 };
     }
     if (p1.tensor.ndim !== 2 || p1.tensor.dim[0] !== p1.tensor.dim[1]) {
-        run_1.stop('eigen: argument is not a square matrix');
+        (0, run_js_1.stop)('eigen: argument is not a square matrix');
     }
     EIG_N = p1.tensor.dim[0];
     if (!eigIsDoubleTensor(p1)) {
-        run_1.stop('eigen: matrix is not numerical');
+        (0, run_js_1.stop)('eigen: matrix is not numerical');
     }
     for (let i = 0; i < EIG_N - 1; i++) {
         for (let j = i + 1; j < EIG_N; j++) {
             const eli = p1.tensor.elem[EIG_N * i + j];
             const elj = p1.tensor.elem[EIG_N * j + i];
             if (Math.abs(eli.d - elj.d) > 1e-10) {
-                run_1.stop('eigen: matrix is not symmetrical');
+                (0, run_js_1.stop)('eigen: matrix is not symmetrical');
             }
         }
     }
@@ -181,7 +181,7 @@ function EIG_check_arg(p1) {
 function eigIsDoubleTensor(p1) {
     for (let i = 0; i < EIG_N; i++) {
         for (let j = 0; j < EIG_N; j++) {
-            if (!defs_1.isdouble(p1.tensor.elem[EIG_N * i + j])) {
+            if (!(0, defs_js_1.isdouble)(p1.tensor.elem[EIG_N * i + j])) {
                 return false;
             }
         }
@@ -235,23 +235,23 @@ function eigen(op, p1) {
         }
     }
     if (i === 100) {
-        print_1.print_str('\nnote: eigen did not converge\n');
+        (0, print_js_1.print_str)('\nnote: eigen did not converge\n');
     }
     let D;
-    if (op === defs_1.EIGEN || op === defs_1.EIGENVAL) {
-        D = tensor_1.copy_tensor(p1);
+    if (op === defs_js_1.EIGEN || op === defs_js_1.EIGENVAL) {
+        D = (0, tensor_js_1.copy_tensor)(p1);
         for (let i = 0; i < EIG_N; i++) {
             for (let j = 0; j < EIG_N; j++) {
-                D.tensor.elem[EIG_N * i + j] = bignum_1.double(EIG_yydd[EIG_N * i + j]);
+                D.tensor.elem[EIG_N * i + j] = (0, bignum_js_1.double)(EIG_yydd[EIG_N * i + j]);
             }
         }
     }
     let Q;
-    if (op === defs_1.EIGEN || op === defs_1.EIGENVEC) {
-        Q = tensor_1.copy_tensor(p1);
+    if (op === defs_js_1.EIGEN || op === defs_js_1.EIGENVEC) {
+        Q = (0, tensor_js_1.copy_tensor)(p1);
         for (let i = 0; i < EIG_N; i++) {
             for (let j = 0; j < EIG_N; j++) {
-                Q.tensor.elem[EIG_N * i + j] = bignum_1.double(EIG_yyqq[EIG_N * i + j]);
+                Q.tensor.elem[EIG_N * i + j] = (0, bignum_js_1.double)(EIG_yyqq[EIG_N * i + j]);
             }
         }
     }

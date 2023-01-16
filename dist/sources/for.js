@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Eval_for = void 0;
-const defs_1 = require("../runtime/defs");
-const run_1 = require("../runtime/run");
-const symbol_1 = require("../runtime/symbol");
-const bignum_1 = require("./bignum");
-const eval_1 = require("./eval");
+const defs_js_1 = require("../runtime/defs.js");
+const run_js_1 = require("../runtime/run.js");
+const symbol_js_1 = require("../runtime/symbol.js");
+const bignum_js_1 = require("./bignum.js");
+const eval_js_1 = require("./eval.js");
 // 'for' function
 /*
 x=0
@@ -26,28 +26,28 @@ B: 1...9
 //define I p5
 //define X p6
 function Eval_for(p1) {
-    const loopingVariable = defs_1.caddr(p1);
-    if (!defs_1.issymbol(loopingVariable)) {
-        run_1.stop('for: 2nd arg should be the variable to loop over');
+    const loopingVariable = (0, defs_js_1.caddr)(p1);
+    if (!(0, defs_js_1.issymbol)(loopingVariable)) {
+        (0, run_js_1.stop)('for: 2nd arg should be the variable to loop over');
     }
-    const j = eval_1.evaluate_integer(defs_1.cadddr(p1));
+    const j = (0, eval_js_1.evaluate_integer)((0, defs_js_1.cadddr)(p1));
     if (isNaN(j)) {
         return p1;
     }
-    const k = eval_1.evaluate_integer(defs_1.caddddr(p1));
+    const k = (0, eval_js_1.evaluate_integer)((0, defs_js_1.caddddr)(p1));
     if (isNaN(k)) {
         return p1;
     }
     // remember contents of the index
     // variable so we can put it back after the loop
-    const p4 = symbol_1.get_binding(loopingVariable);
+    const p4 = (0, symbol_js_1.get_binding)(loopingVariable);
     for (let i = j; i <= k; i++) {
-        symbol_1.set_binding(loopingVariable, bignum_1.integer(i));
-        eval_1.Eval(defs_1.cadr(p1));
+        (0, symbol_js_1.set_binding)(loopingVariable, (0, bignum_js_1.integer)(i));
+        (0, eval_js_1.Eval)((0, defs_js_1.cadr)(p1));
     }
     // put back the index variable to original content
-    symbol_1.set_binding(loopingVariable, p4);
+    (0, symbol_js_1.set_binding)(loopingVariable, p4);
     // return value
-    return symbol_1.symbol(defs_1.NIL);
+    return (0, symbol_js_1.symbol)(defs_js_1.NIL);
 }
 exports.Eval_for = Eval_for;

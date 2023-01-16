@@ -1,0 +1,44 @@
+import { alloc_tensor } from '../runtime/alloc.js';
+import { car, cdr, iscons, istensor, MAXDIM } from '../runtime/defs.js';
+import { stop } from '../runtime/run.js';
+import { Eval } from './eval.js';
+import { multiply } from './multiply.js';
+import { scalar_times_tensor, tensor_times_scalar } from './tensor.js';
+// Outer product of tensors
+export function Eval_outer(p1) {
+    p1 = cdr(p1);
+    let temp = Eval(car(p1));
+    const result = iscons(p1)
+        ? p1.tail().reduce((acc, p) => outer(acc, Eval(p)), temp)
+        : temp;
+    return result;
+}
+function outer(p1, p2) {
+    if (istensor(p1) && istensor(p2)) {
+        return yyouter(p1, p2);
+    }
+    if (istensor(p1)) {
+        return tensor_times_scalar(p1, p2);
+    }
+    if (istensor(p2)) {
+        return scalar_times_tensor(p1, p2);
+    }
+    return multiply(p1, p2);
+}
+function yyouter(p1, p2) {
+    const ndim = p1.tensor.ndim + p2.tensor.ndim;
+    if (ndim > MAXDIM) {
+        stop('outer: rank of result exceeds maximum');
+    }
+    const nelem = p1.tensor.nelem * p2.tensor.nelem;
+    const p3 = alloc_tensor(nelem);
+    p3.tensor.ndim = ndim;
+    p3.tensor.dim = [...p1.tensor.dim, ...p2.tensor.dim];
+    let k = 0;
+    for (let i = 0; i < p1.tensor.nelem; i++) {
+        for (let j = 0; j < p2.tensor.nelem; j++) {
+            p3.tensor.elem[k++] = multiply(p1.tensor.elem[i], p2.tensor.elem[j]);
+        }
+    }
+    return p3;
+}

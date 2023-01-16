@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Eval_arcsinh = void 0;
-const defs_1 = require("../runtime/defs");
-const symbol_1 = require("../runtime/symbol");
-const bignum_1 = require("./bignum");
-const eval_1 = require("./eval");
-const is_1 = require("./is");
-const list_1 = require("./list");
+const defs_js_1 = require("../runtime/defs.js");
+const symbol_js_1 = require("../runtime/symbol.js");
+const bignum_js_1 = require("./bignum.js");
+const eval_js_1 = require("./eval.js");
+const is_js_1 = require("./is.js");
+const list_js_1 = require("./list.js");
 /* arcsinh =====================================================================
 
 Tags
@@ -23,20 +23,20 @@ Returns the inverse hyperbolic sine of x.
 
 */
 function Eval_arcsinh(x) {
-    return arcsinh(eval_1.Eval(defs_1.cadr(x)));
+    return arcsinh((0, eval_js_1.Eval)((0, defs_js_1.cadr)(x)));
 }
 exports.Eval_arcsinh = Eval_arcsinh;
 function arcsinh(x) {
-    if (defs_1.car(x) === symbol_1.symbol(defs_1.SINH)) {
-        return defs_1.cadr(x);
+    if ((0, defs_js_1.car)(x) === (0, symbol_js_1.symbol)(defs_js_1.SINH)) {
+        return (0, defs_js_1.cadr)(x);
     }
-    if (defs_1.isdouble(x)) {
+    if ((0, defs_js_1.isdouble)(x)) {
         let { d } = x;
         d = Math.log(d + Math.sqrt(d * d + 1.0));
-        return bignum_1.double(d);
+        return (0, bignum_js_1.double)(d);
     }
-    if (is_1.isZeroAtomOrTensor(x)) {
-        return defs_1.Constants.zero;
+    if ((0, is_js_1.isZeroAtomOrTensor)(x)) {
+        return defs_js_1.Constants.zero;
     }
-    return list_1.makeList(symbol_1.symbol(defs_1.ARCSINH), x);
+    return (0, list_js_1.makeList)((0, symbol_js_1.symbol)(defs_js_1.ARCSINH), x);
 }

@@ -1,18 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.expsin = exports.Eval_expsin = void 0;
-const defs_1 = require("../runtime/defs");
-const misc_1 = require("../sources/misc");
-const add_1 = require("./add");
-const bignum_1 = require("./bignum");
-const eval_1 = require("./eval");
-const multiply_1 = require("./multiply");
+const defs_js_1 = require("../runtime/defs.js");
+const misc_js_1 = require("../sources/misc.js");
+const add_js_1 = require("./add.js");
+const bignum_js_1 = require("./bignum.js");
+const eval_js_1 = require("./eval.js");
+const multiply_js_1 = require("./multiply.js");
 // Do the exponential sine function.
 function Eval_expsin(p1) {
-    return expsin(eval_1.Eval(defs_1.cadr(p1)));
+    return expsin((0, eval_js_1.Eval)((0, defs_js_1.cadr)(p1)));
 }
 exports.Eval_expsin = Eval_expsin;
 function expsin(p1) {
-    return add_1.subtract(multiply_1.multiply(multiply_1.divide(misc_1.exponential(multiply_1.multiply(defs_1.Constants.imaginaryunit, p1)), defs_1.Constants.imaginaryunit), bignum_1.rational(1, 2)), multiply_1.multiply(multiply_1.divide(misc_1.exponential(multiply_1.multiply(multiply_1.negate(defs_1.Constants.imaginaryunit), p1)), defs_1.Constants.imaginaryunit), bignum_1.rational(1, 2)));
+    return (0, add_js_1.subtract)((0, multiply_js_1.multiply)((0, multiply_js_1.divide)((0, misc_js_1.exponential)((0, multiply_js_1.multiply)(defs_js_1.Constants.imaginaryunit, p1)), defs_js_1.Constants.imaginaryunit), (0, bignum_js_1.rational)(1, 2)), (0, multiply_js_1.multiply)((0, multiply_js_1.divide)((0, misc_js_1.exponential)((0, multiply_js_1.multiply)((0, multiply_js_1.negate)(defs_js_1.Constants.imaginaryunit), p1)), defs_js_1.Constants.imaginaryunit), (0, bignum_js_1.rational)(1, 2)));
 }
 exports.expsin = expsin;

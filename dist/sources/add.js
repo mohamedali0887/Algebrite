@@ -1,17 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.subtract = exports.add_all = exports.add = exports.Eval_add = void 0;
-const defs_1 = require("../runtime/defs");
-const run_1 = require("../runtime/run");
-const symbol_1 = require("../runtime/symbol");
-const bignum_1 = require("./bignum");
-const eval_1 = require("./eval");
-const is_1 = require("./is");
-const list_1 = require("./list");
-const misc_1 = require("./misc");
-const multiply_1 = require("./multiply");
-const print_1 = require("./print");
-const tensor_1 = require("./tensor");
+const defs_js_1 = require("../runtime/defs.js");
+const run_js_1 = require("../runtime/run.js");
+const symbol_js_1 = require("../runtime/symbol.js");
+const bignum_js_1 = require("./bignum.js");
+const eval_js_1 = require("./eval.js");
+const is_js_1 = require("./is.js");
+const list_js_1 = require("./list.js");
+const misc_js_1 = require("./misc.js");
+const multiply_js_1 = require("./multiply.js");
+const print_js_1 = require("./print.js");
+const tensor_js_1 = require("./tensor.js");
 /*
  Symbolic addition
 
@@ -37,9 +37,9 @@ const tensor_1 = require("./tensor");
 let flag = 0;
 function Eval_add(p1) {
     const terms = [];
-    p1 = defs_1.cdr(p1);
+    p1 = (0, defs_js_1.cdr)(p1);
     for (const t of p1) {
-        const p2 = eval_1.Eval(t);
+        const p2 = (0, eval_js_1.Eval)(t);
         push_terms(terms, p2);
     }
     return add_terms(terms);
@@ -48,9 +48,9 @@ exports.Eval_add = Eval_add;
 // Add terms, returns one expression.
 function add_terms(terms) {
     // ensure no infinite loop, use "for"
-    if (defs_1.DEBUG) {
+    if (defs_js_1.DEBUG) {
         for (const term of terms) {
-            console.log(print_1.print_list(term));
+            console.log((0, print_js_1.print_list)(term));
         }
     }
     for (let i = 0; i < 10; i++) {
@@ -66,12 +66,12 @@ function add_terms(terms) {
     }
     switch (terms.length) {
         case 0:
-            return defs_1.Constants.Zero();
+            return defs_js_1.Constants.Zero();
         case 1:
             return terms[0];
         default:
-            terms.unshift(symbol_1.symbol(defs_1.ADD));
-            return list_1.makeList(...terms);
+            terms.unshift((0, symbol_js_1.symbol)(defs_js_1.ADD));
+            return (0, list_js_1.makeList)(...terms);
     }
 }
 let cmp_terms_count = 0;
@@ -81,13 +81,13 @@ function cmp_terms(p1, p2) {
     //if cmp_terms_count == 52
     //  breakpoint
     // numbers can be combined
-    if (defs_1.isNumericAtom(p1) && defs_1.isNumericAtom(p2)) {
+    if ((0, defs_js_1.isNumericAtom)(p1) && (0, defs_js_1.isNumericAtom)(p2)) {
         flag = 1;
         //if DEBUG then console.log "cmp_terms #" + cmp_terms_count + " returns 0"
         return 0;
     }
     // congruent tensors can be combined
-    if (defs_1.istensor(p1) && defs_1.istensor(p2)) {
+    if ((0, defs_js_1.istensor)(p1) && (0, defs_js_1.istensor)(p2)) {
         if (p1.tensor.ndim < p2.tensor.ndim) {
             //if DEBUG then console.log "cmp_terms #" + cmp_terms_count + " returns -1"
             return -1;
@@ -110,25 +110,25 @@ function cmp_terms(p1, p2) {
         //if DEBUG then console.log "cmp_terms #" + cmp_terms_count + " returns 0"
         return 0;
     }
-    if (defs_1.ismultiply(p1)) {
-        p1 = defs_1.cdr(p1);
-        if (defs_1.isNumericAtom(defs_1.car(p1))) {
-            p1 = defs_1.cdr(p1);
-            if (defs_1.cdr(p1) === symbol_1.symbol(defs_1.NIL)) {
-                p1 = defs_1.car(p1);
+    if ((0, defs_js_1.ismultiply)(p1)) {
+        p1 = (0, defs_js_1.cdr)(p1);
+        if ((0, defs_js_1.isNumericAtom)((0, defs_js_1.car)(p1))) {
+            p1 = (0, defs_js_1.cdr)(p1);
+            if ((0, defs_js_1.cdr)(p1) === (0, symbol_js_1.symbol)(defs_js_1.NIL)) {
+                p1 = (0, defs_js_1.car)(p1);
             }
         }
     }
-    if (defs_1.ismultiply(p2)) {
-        p2 = defs_1.cdr(p2);
-        if (defs_1.isNumericAtom(defs_1.car(p2))) {
-            p2 = defs_1.cdr(p2);
-            if (defs_1.cdr(p2) === symbol_1.symbol(defs_1.NIL)) {
-                p2 = defs_1.car(p2);
+    if ((0, defs_js_1.ismultiply)(p2)) {
+        p2 = (0, defs_js_1.cdr)(p2);
+        if ((0, defs_js_1.isNumericAtom)((0, defs_js_1.car)(p2))) {
+            p2 = (0, defs_js_1.cdr)(p2);
+            if ((0, defs_js_1.cdr)(p2) === (0, symbol_js_1.symbol)(defs_js_1.NIL)) {
+                p2 = (0, defs_js_1.car)(p2);
             }
         }
     }
-    const t = misc_1.cmp_expr(p1, p2);
+    const t = (0, misc_js_1.cmp_expr)(p1, p2);
     if (t === 0) {
         flag = 1;
     }
@@ -148,26 +148,26 @@ function combine_terms(terms) {
     // the end of the body and before the "continue"s
     let i = 0;
     while (i < terms.length - 1) {
-        run_1.check_esc_flag();
+        (0, run_js_1.check_esc_flag)();
         let p1, p2;
         let p3 = terms[i];
         let p4 = terms[i + 1];
-        if (defs_1.istensor(p3) && defs_1.istensor(p4)) {
-            p1 = tensor_1.tensor_plus_tensor(p3, p4);
-            if (p1 !== symbol_1.symbol(defs_1.NIL)) {
+        if ((0, defs_js_1.istensor)(p3) && (0, defs_js_1.istensor)(p4)) {
+            p1 = (0, tensor_js_1.tensor_plus_tensor)(p3, p4);
+            if (p1 !== (0, symbol_js_1.symbol)(defs_js_1.NIL)) {
                 terms.splice(i, 2, p1);
                 i--;
             }
             i++;
             continue;
         }
-        if (defs_1.istensor(p3) || defs_1.istensor(p4)) {
+        if ((0, defs_js_1.istensor)(p3) || (0, defs_js_1.istensor)(p4)) {
             i++;
             continue;
         }
-        if (defs_1.isNumericAtom(p3) && defs_1.isNumericAtom(p4)) {
-            p1 = bignum_1.add_numbers(p3, p4);
-            if (is_1.isZeroAtomOrTensor(p1)) {
+        if ((0, defs_js_1.isNumericAtom)(p3) && (0, defs_js_1.isNumericAtom)(p4)) {
+            p1 = (0, bignum_js_1.add_numbers)(p3, p4);
+            if ((0, is_js_1.isZeroAtomOrTensor)(p1)) {
                 terms.splice(i, 2);
             }
             else {
@@ -177,58 +177,58 @@ function combine_terms(terms) {
             i++;
             continue;
         }
-        if (defs_1.isNumericAtom(p3) || defs_1.isNumericAtom(p4)) {
+        if ((0, defs_js_1.isNumericAtom)(p3) || (0, defs_js_1.isNumericAtom)(p4)) {
             i++;
             continue;
         }
-        p1 = defs_1.Constants.One();
-        p2 = defs_1.Constants.One();
+        p1 = defs_js_1.Constants.One();
+        p2 = defs_js_1.Constants.One();
         let t = 0;
-        if (defs_1.ismultiply(p3)) {
-            p3 = defs_1.cdr(p3);
+        if ((0, defs_js_1.ismultiply)(p3)) {
+            p3 = (0, defs_js_1.cdr)(p3);
             t = 1; // p3 is now denormal
-            if (defs_1.isNumericAtom(defs_1.car(p3))) {
-                p1 = defs_1.car(p3);
-                p3 = defs_1.cdr(p3);
-                if (defs_1.cdr(p3) === symbol_1.symbol(defs_1.NIL)) {
-                    p3 = defs_1.car(p3);
+            if ((0, defs_js_1.isNumericAtom)((0, defs_js_1.car)(p3))) {
+                p1 = (0, defs_js_1.car)(p3);
+                p3 = (0, defs_js_1.cdr)(p3);
+                if ((0, defs_js_1.cdr)(p3) === (0, symbol_js_1.symbol)(defs_js_1.NIL)) {
+                    p3 = (0, defs_js_1.car)(p3);
                     t = 0;
                 }
             }
         }
-        if (defs_1.ismultiply(p4)) {
-            p4 = defs_1.cdr(p4);
-            if (defs_1.isNumericAtom(defs_1.car(p4))) {
-                p2 = defs_1.car(p4);
-                p4 = defs_1.cdr(p4);
-                if (defs_1.cdr(p4) === symbol_1.symbol(defs_1.NIL)) {
-                    p4 = defs_1.car(p4);
+        if ((0, defs_js_1.ismultiply)(p4)) {
+            p4 = (0, defs_js_1.cdr)(p4);
+            if ((0, defs_js_1.isNumericAtom)((0, defs_js_1.car)(p4))) {
+                p2 = (0, defs_js_1.car)(p4);
+                p4 = (0, defs_js_1.cdr)(p4);
+                if ((0, defs_js_1.cdr)(p4) === (0, symbol_js_1.symbol)(defs_js_1.NIL)) {
+                    p4 = (0, defs_js_1.car)(p4);
                 }
             }
         }
-        if (!misc_1.equal(p3, p4)) {
+        if (!(0, misc_js_1.equal)(p3, p4)) {
             i++;
             continue;
         }
-        p1 = bignum_1.add_numbers(p1, p2);
-        if (is_1.isZeroAtomOrTensor(p1)) {
+        p1 = (0, bignum_js_1.add_numbers)(p1, p2);
+        if ((0, is_js_1.isZeroAtomOrTensor)(p1)) {
             terms.splice(i, 2);
             i--;
             i++;
             continue;
         }
-        const arg2 = t ? new defs_1.Cons(symbol_1.symbol(defs_1.MULTIPLY), p3) : p3;
-        terms.splice(i, 2, multiply_1.multiply(p1, arg2));
+        const arg2 = t ? new defs_js_1.Cons((0, symbol_js_1.symbol)(defs_js_1.MULTIPLY), p3) : p3;
+        terms.splice(i, 2, (0, multiply_js_1.multiply)(p1, arg2));
         i--;
         // this i++ is to match the while
         i++;
     }
 }
 function push_terms(array, p) {
-    if (defs_1.isadd(p)) {
+    if ((0, defs_js_1.isadd)(p)) {
         array.push(...p.tail());
     }
-    else if (!is_1.isZeroAtom(p)) {
+    else if (!(0, is_js_1.isZeroAtom)(p)) {
         // omit zeroes
         array.push(p);
     }
@@ -250,6 +250,6 @@ function add_all(terms) {
 }
 exports.add_all = add_all;
 function subtract(p1, p2) {
-    return add(p1, multiply_1.negate(p2));
+    return add(p1, (0, multiply_js_1.negate)(p2));
 }
 exports.subtract = subtract;

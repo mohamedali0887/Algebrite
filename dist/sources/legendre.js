@@ -1,19 +1,19 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Eval_legendre = void 0;
-const defs_1 = require("../runtime/defs");
-const symbol_1 = require("../runtime/symbol");
-const misc_1 = require("../sources/misc");
-const add_1 = require("./add");
-const bignum_1 = require("./bignum");
-const cos_1 = require("./cos");
-const derivative_1 = require("./derivative");
-const eval_1 = require("./eval");
-const list_1 = require("./list");
-const multiply_1 = require("./multiply");
-const power_1 = require("./power");
-const sin_1 = require("./sin");
-const subst_1 = require("./subst");
+const defs_js_1 = require("../runtime/defs.js");
+const symbol_js_1 = require("../runtime/symbol.js");
+const misc_js_1 = require("../sources/misc.js");
+const add_js_1 = require("./add.js");
+const bignum_js_1 = require("./bignum.js");
+const cos_js_1 = require("./cos.js");
+const derivative_js_1 = require("./derivative.js");
+const eval_js_1 = require("./eval.js");
+const list_js_1 = require("./list.js");
+const multiply_js_1 = require("./multiply.js");
+const power_js_1 = require("./power.js");
+const sin_js_1 = require("./sin.js");
+const subst_js_1 = require("./subst.js");
 /*
  Legendre function
 
@@ -44,10 +44,10 @@ For m > 0
   P(x,n,m) = (-1)^m * (1-x^2)^(m/2) * d^m/dx^m P(x,n)
 */
 function Eval_legendre(p1) {
-    const X = eval_1.Eval(defs_1.cadr(p1));
-    const N = eval_1.Eval(defs_1.caddr(p1));
-    const p2 = eval_1.Eval(defs_1.cadddr(p1));
-    const M = p2 === symbol_1.symbol(defs_1.NIL) ? defs_1.Constants.zero : p2;
+    const X = (0, eval_js_1.Eval)((0, defs_js_1.cadr)(p1));
+    const N = (0, eval_js_1.Eval)((0, defs_js_1.caddr)(p1));
+    const p2 = (0, eval_js_1.Eval)((0, defs_js_1.cadddr)(p1));
+    const M = p2 === (0, symbol_js_1.symbol)(defs_js_1.NIL) ? defs_js_1.Constants.zero : p2;
     return legendre(X, N, M);
 }
 exports.Eval_legendre = Eval_legendre;
@@ -55,25 +55,25 @@ function legendre(X, N, M) {
     return __legendre(X, N, M);
 }
 function __legendre(X, N, M) {
-    let n = bignum_1.nativeInt(N);
-    let m = bignum_1.nativeInt(M);
+    let n = (0, bignum_js_1.nativeInt)(N);
+    let m = (0, bignum_js_1.nativeInt)(M);
     if (n < 0 || isNaN(n) || m < 0 || isNaN(m)) {
-        return list_1.makeList(symbol_1.symbol(defs_1.LEGENDRE), X, N, M);
+        return (0, list_js_1.makeList)((0, symbol_js_1.symbol)(defs_js_1.LEGENDRE), X, N, M);
     }
     let result;
-    if (defs_1.issymbol(X)) {
+    if ((0, defs_js_1.issymbol)(X)) {
         result = __legendre2(n, m, X);
     }
     else {
-        const expr = __legendre2(n, m, symbol_1.symbol(defs_1.SECRETX));
-        result = eval_1.Eval(subst_1.subst(expr, symbol_1.symbol(defs_1.SECRETX), X));
+        const expr = __legendre2(n, m, (0, symbol_js_1.symbol)(defs_js_1.SECRETX));
+        result = (0, eval_js_1.Eval)((0, subst_js_1.subst)(expr, (0, symbol_js_1.symbol)(defs_js_1.SECRETX), X));
     }
     result = __legendre3(result, m, X) || result;
     return result;
 }
 function __legendre2(n, m, X) {
-    let Y0 = defs_1.Constants.zero;
-    let Y1 = defs_1.Constants.one;
+    let Y0 = defs_js_1.Constants.zero;
+    let Y1 = defs_js_1.Constants.one;
     //  i=1  Y0 = 0
     //    Y1 = 1
     //    ((2*i+1)*x*Y1 - i*Y0) / i = x
@@ -86,12 +86,12 @@ function __legendre2(n, m, X) {
     //    Y1 = -1/2 + 3/2*x^2
     //    ((2*i+1)*x*Y1 - i*Y0) / i = -3/2*x + 5/2*x^3
     for (let i = 0; i < n; i++) {
-        const divided = multiply_1.divide(add_1.subtract(multiply_1.multiply(multiply_1.multiply(bignum_1.integer(2 * i + 1), X), Y1), multiply_1.multiply(bignum_1.integer(i), Y0)), bignum_1.integer(i + 1));
+        const divided = (0, multiply_js_1.divide)((0, add_js_1.subtract)((0, multiply_js_1.multiply)((0, multiply_js_1.multiply)((0, bignum_js_1.integer)(2 * i + 1), X), Y1), (0, multiply_js_1.multiply)((0, bignum_js_1.integer)(i), Y0)), (0, bignum_js_1.integer)(i + 1));
         Y0 = Y1;
         Y1 = divided;
     }
     for (let i = 0; i < m; i++) {
-        Y1 = derivative_1.derivative(Y1, X);
+        Y1 = (0, derivative_js_1.derivative)(Y1, X);
     }
     return Y1;
 }
@@ -100,16 +100,16 @@ function __legendre3(p1, m, X) {
     if (m === 0) {
         return;
     }
-    let base = add_1.subtract(defs_1.Constants.one, misc_1.square(X));
-    if (defs_1.car(X) === symbol_1.symbol(defs_1.COS)) {
-        base = misc_1.square(sin_1.sine(defs_1.cadr(X)));
+    let base = (0, add_js_1.subtract)(defs_js_1.Constants.one, (0, misc_js_1.square)(X));
+    if ((0, defs_js_1.car)(X) === (0, symbol_js_1.symbol)(defs_js_1.COS)) {
+        base = (0, misc_js_1.square)((0, sin_js_1.sine)((0, defs_js_1.cadr)(X)));
     }
-    else if (defs_1.car(X) === symbol_1.symbol(defs_1.SIN)) {
-        base = misc_1.square(cos_1.cosine(defs_1.cadr(X)));
+    else if ((0, defs_js_1.car)(X) === (0, symbol_js_1.symbol)(defs_js_1.SIN)) {
+        base = (0, misc_js_1.square)((0, cos_js_1.cosine)((0, defs_js_1.cadr)(X)));
     }
-    let result = multiply_1.multiply(p1, power_1.power(base, multiply_1.multiply(bignum_1.integer(m), bignum_1.rational(1, 2))));
+    let result = (0, multiply_js_1.multiply)(p1, (0, power_js_1.power)(base, (0, multiply_js_1.multiply)((0, bignum_js_1.integer)(m), (0, bignum_js_1.rational)(1, 2))));
     if (m % 2) {
-        result = multiply_1.negate(result);
+        result = (0, multiply_js_1.negate)(result);
     }
     return result;
 }

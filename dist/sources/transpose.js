@@ -1,26 +1,26 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.transpose = exports.Eval_transpose = void 0;
-const alloc_1 = require("../runtime/alloc");
-const defs_1 = require("../runtime/defs");
-const run_1 = require("../runtime/run");
-const symbol_1 = require("../runtime/symbol");
-const misc_1 = require("../sources/misc");
-const add_1 = require("./add");
-const bignum_1 = require("./bignum");
-const eval_1 = require("./eval");
-const inner_1 = require("./inner");
-const is_1 = require("./is");
-const list_1 = require("./list");
-const multiply_1 = require("./multiply");
+const alloc_js_1 = require("../runtime/alloc.js");
+const defs_js_1 = require("../runtime/defs.js");
+const run_js_1 = require("../runtime/run.js");
+const symbol_js_1 = require("../runtime/symbol.js");
+const misc_js_1 = require("../sources/misc.js");
+const add_js_1 = require("./add.js");
+const bignum_js_1 = require("./bignum.js");
+const eval_js_1 = require("./eval.js");
+const inner_js_1 = require("./inner.js");
+const is_js_1 = require("./is.js");
+const list_js_1 = require("./list.js");
+const multiply_js_1 = require("./multiply.js");
 // Transpose tensor indices
 function Eval_transpose(p1) {
-    const arg1 = eval_1.Eval(defs_1.cadr(p1));
-    let arg2 = defs_1.Constants.one;
-    let arg3 = bignum_1.integer(2);
-    if (defs_1.cddr(p1) !== symbol_1.symbol(defs_1.NIL)) {
-        arg2 = eval_1.Eval(defs_1.caddr(p1));
-        arg3 = eval_1.Eval(defs_1.cadddr(p1));
+    const arg1 = (0, eval_js_1.Eval)((0, defs_js_1.cadr)(p1));
+    let arg2 = defs_js_1.Constants.one;
+    let arg3 = (0, bignum_js_1.integer)(2);
+    if ((0, defs_js_1.cddr)(p1) !== (0, symbol_js_1.symbol)(defs_js_1.NIL)) {
+        arg2 = (0, eval_js_1.Eval)((0, defs_js_1.caddr)(p1));
+        arg3 = (0, eval_js_1.Eval)((0, defs_js_1.cadddr)(p1));
     }
     return transpose(arg1, arg2, arg3);
 }
@@ -31,68 +31,68 @@ exports.Eval_transpose = Eval_transpose;
 // p1: what needs to be transposed
 function transpose(p1, p2, p3) {
     let t = 0;
-    const ai = Array(defs_1.MAXDIM).fill(0);
-    const an = Array(defs_1.MAXDIM).fill(0);
+    const ai = Array(defs_js_1.MAXDIM).fill(0);
+    const an = Array(defs_js_1.MAXDIM).fill(0);
     // a transposition just goes away when applied to a scalar
-    if (defs_1.isNumericAtom(p1)) {
+    if ((0, defs_js_1.isNumericAtom)(p1)) {
         return p1;
     }
     // transposition goes away for identity matrix
-    if ((is_1.isplusone(p2) && is_1.isplustwo(p3)) || (is_1.isplusone(p3) && is_1.isplustwo(p2))) {
-        if (defs_1.isidentitymatrix(p1)) {
+    if (((0, is_js_1.isplusone)(p2) && (0, is_js_1.isplustwo)(p3)) || ((0, is_js_1.isplusone)(p3) && (0, is_js_1.isplustwo)(p2))) {
+        if ((0, defs_js_1.isidentitymatrix)(p1)) {
             return p1;
         }
     }
     // a transposition just goes away when applied to another transposition with
     // the same columns to be switched
-    if (defs_1.istranspose(p1)) {
-        const innerTranspSwitch1 = defs_1.car(defs_1.cdr(defs_1.cdr(p1)));
-        const innerTranspSwitch2 = defs_1.car(defs_1.cdr(defs_1.cdr(defs_1.cdr(p1))));
-        if ((misc_1.equal(innerTranspSwitch1, p3) && misc_1.equal(innerTranspSwitch2, p2)) ||
-            (misc_1.equal(innerTranspSwitch2, p3) && misc_1.equal(innerTranspSwitch1, p2)) ||
-            (misc_1.equal(innerTranspSwitch1, symbol_1.symbol(defs_1.NIL)) &&
-                misc_1.equal(innerTranspSwitch2, symbol_1.symbol(defs_1.NIL)) &&
-                ((is_1.isplusone(p3) && is_1.isplustwo(p2)) || (is_1.isplusone(p2) && is_1.isplustwo(p3))))) {
-            return defs_1.car(defs_1.cdr(p1));
+    if ((0, defs_js_1.istranspose)(p1)) {
+        const innerTranspSwitch1 = (0, defs_js_1.car)((0, defs_js_1.cdr)((0, defs_js_1.cdr)(p1)));
+        const innerTranspSwitch2 = (0, defs_js_1.car)((0, defs_js_1.cdr)((0, defs_js_1.cdr)((0, defs_js_1.cdr)(p1))));
+        if (((0, misc_js_1.equal)(innerTranspSwitch1, p3) && (0, misc_js_1.equal)(innerTranspSwitch2, p2)) ||
+            ((0, misc_js_1.equal)(innerTranspSwitch2, p3) && (0, misc_js_1.equal)(innerTranspSwitch1, p2)) ||
+            ((0, misc_js_1.equal)(innerTranspSwitch1, (0, symbol_js_1.symbol)(defs_js_1.NIL)) &&
+                (0, misc_js_1.equal)(innerTranspSwitch2, (0, symbol_js_1.symbol)(defs_js_1.NIL)) &&
+                (((0, is_js_1.isplusone)(p3) && (0, is_js_1.isplustwo)(p2)) || ((0, is_js_1.isplusone)(p2) && (0, is_js_1.isplustwo)(p3))))) {
+            return (0, defs_js_1.car)((0, defs_js_1.cdr)(p1));
         }
     }
     // if operand is a sum then distribute (if we are in expanding mode)
-    if (defs_1.defs.expanding && defs_1.isadd(p1)) {
+    if (defs_js_1.defs.expanding && (0, defs_js_1.isadd)(p1)) {
         // add the dimensions to switch but only if they are not the default ones.
         return p1
             .tail()
-            .reduce((a, b) => add_1.add(a, transpose(b, p2, p3)), defs_1.Constants.zero);
+            .reduce((a, b) => (0, add_js_1.add)(a, transpose(b, p2, p3)), defs_js_1.Constants.zero);
     }
     // if operand is a multiplication then distribute (if we are in expanding mode)
-    if (defs_1.defs.expanding && defs_1.ismultiply(p1)) {
+    if (defs_js_1.defs.expanding && (0, defs_js_1.ismultiply)(p1)) {
         // add the dimensions to switch but only if they are not the default ones.
         return p1
             .tail()
-            .reduce((a, b) => multiply_1.multiply(a, transpose(b, p2, p3)), defs_1.Constants.one);
+            .reduce((a, b) => (0, multiply_js_1.multiply)(a, transpose(b, p2, p3)), defs_js_1.Constants.one);
     }
     // distribute the transpose of a dot if in expanding mode
     // note that the distribution happens in reverse as per tranpose rules.
     // The dot operator is not commutative, so, it matters.
-    if (defs_1.defs.expanding && defs_1.isinnerordot(p1)) {
+    if (defs_js_1.defs.expanding && (0, defs_js_1.isinnerordot)(p1)) {
         const accumulator = [];
-        if (defs_1.iscons(p1)) {
+        if ((0, defs_js_1.iscons)(p1)) {
             accumulator.push(...p1.tail().map((p) => [p, p2, p3]));
         }
         accumulator.reverse();
-        return accumulator.reduce((acc, p) => inner_1.inner(acc, transpose(p[0], p[1], p[2])), symbol_1.symbol(defs_1.SYMBOL_IDENTITY_MATRIX));
+        return accumulator.reduce((acc, p) => (0, inner_js_1.inner)(acc, transpose(p[0], p[1], p[2])), (0, symbol_js_1.symbol)(defs_js_1.SYMBOL_IDENTITY_MATRIX));
     }
-    if (!defs_1.istensor(p1)) {
-        if (!is_1.isZeroAtomOrTensor(p1)) {
+    if (!(0, defs_js_1.istensor)(p1)) {
+        if (!(0, is_js_1.isZeroAtomOrTensor)(p1)) {
             //stop("transpose: tensor expected, 1st arg is not a tensor")
             // remove the default "dimensions to be switched"
             // parameters
-            if ((!is_1.isplusone(p2) || !is_1.isplustwo(p3)) &&
-                (!is_1.isplusone(p3) || !is_1.isplustwo(p2))) {
-                return list_1.makeList(symbol_1.symbol(defs_1.TRANSPOSE), p1, p2, p3);
+            if ((!(0, is_js_1.isplusone)(p2) || !(0, is_js_1.isplustwo)(p3)) &&
+                (!(0, is_js_1.isplusone)(p3) || !(0, is_js_1.isplustwo)(p2))) {
+                return (0, list_js_1.makeList)((0, symbol_js_1.symbol)(defs_js_1.TRANSPOSE), p1, p2, p3);
             }
-            return list_1.makeList(symbol_1.symbol(defs_1.TRANSPOSE), p1);
+            return (0, list_js_1.makeList)((0, symbol_js_1.symbol)(defs_js_1.TRANSPOSE), p1);
         }
-        return defs_1.Constants.zero;
+        return defs_js_1.Constants.zero;
     }
     const { ndim, nelem } = p1.tensor;
     // is it a vector?
@@ -106,14 +106,14 @@ function transpose(p1, p2, p3) {
     if (ndim === 1) {
         return p1;
     }
-    let l = bignum_1.nativeInt(p2);
-    let m = bignum_1.nativeInt(p3);
+    let l = (0, bignum_js_1.nativeInt)(p2);
+    let m = (0, bignum_js_1.nativeInt)(p3);
     if (l < 1 || l > ndim || m < 1 || m > ndim) {
-        run_1.stop('transpose: index out of range');
+        (0, run_js_1.stop)('transpose: index out of range');
     }
     l--;
     m--;
-    p2 = alloc_1.alloc_tensor(nelem);
+    p2 = (0, alloc_js_1.alloc_tensor)(nelem);
     p2.tensor.ndim = ndim;
     p2.tensor.dim = [...p1.tensor.dim];
     p2.tensor.dim[l] = p1.tensor.dim[m];

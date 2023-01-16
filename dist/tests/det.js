@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const test_harness_1 = require("../test-harness");
-test_harness_1.run_shardable_test([
+const test_harness_js_1 = require("../test-harness.js");
+(0, test_harness_js_1.run_shardable_test)([
     "det([[2,-(2),3],[1,-(1),-(2)],[-(3),1,5]])",
     "-14",
     "det([[(0+0),-(8),10],[3,4,1],[8,1,8]])",

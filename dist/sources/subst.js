@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.subst = void 0;
-const alloc_1 = require("../runtime/alloc");
-const defs_1 = require("../runtime/defs");
-const misc_1 = require("../sources/misc");
-const tensor_1 = require("./tensor");
-const symbol_1 = require("../runtime/symbol");
+const alloc_js_1 = require("../runtime/alloc.js");
+const defs_js_1 = require("../runtime/defs.js");
+const misc_js_1 = require("../sources/misc.js");
+const tensor_js_1 = require("./tensor.js");
+const symbol_js_1 = require("../runtime/symbol.js");
 /*
   Substitute new expr for old expr in expr.
 
@@ -16,25 +16,25 @@ const symbol_1 = require("../runtime/symbol");
   Output:  Result
 */
 function subst(expr, oldExpr, newExpr) {
-    if (oldExpr === symbol_1.symbol(defs_1.NIL) || newExpr === symbol_1.symbol(defs_1.NIL)) {
+    if (oldExpr === (0, symbol_js_1.symbol)(defs_js_1.NIL) || newExpr === (0, symbol_js_1.symbol)(defs_js_1.NIL)) {
         return expr;
     }
-    if (defs_1.istensor(expr)) {
-        const p4 = alloc_1.alloc_tensor(expr.tensor.nelem);
+    if ((0, defs_js_1.istensor)(expr)) {
+        const p4 = (0, alloc_js_1.alloc_tensor)(expr.tensor.nelem);
         p4.tensor.ndim = expr.tensor.ndim;
         p4.tensor.dim = Array.from(expr.tensor.dim);
         p4.tensor.elem = expr.tensor.elem.map((el) => {
             const result = subst(el, oldExpr, newExpr);
-            tensor_1.check_tensor_dimensions(p4);
+            (0, tensor_js_1.check_tensor_dimensions)(p4);
             return result;
         });
         return p4;
     }
-    if (misc_1.equal(expr, oldExpr)) {
+    if ((0, misc_js_1.equal)(expr, oldExpr)) {
         return newExpr;
     }
-    if (defs_1.iscons(expr)) {
-        return new defs_1.Cons(subst(defs_1.car(expr), oldExpr, newExpr), subst(defs_1.cdr(expr), oldExpr, newExpr));
+    if ((0, defs_js_1.iscons)(expr)) {
+        return new defs_js_1.Cons(subst((0, defs_js_1.car)(expr), oldExpr, newExpr), subst((0, defs_js_1.cdr)(expr), oldExpr, newExpr));
     }
     return expr;
 }

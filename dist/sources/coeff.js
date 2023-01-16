@@ -1,15 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.coeff = exports.Eval_coeff = void 0;
-const defs_1 = require("../runtime/defs");
-const symbol_1 = require("../runtime/symbol");
-const misc_1 = require("../sources/misc");
-const add_1 = require("./add");
-const eval_1 = require("./eval");
-const filter_1 = require("./filter");
-const multiply_1 = require("./multiply");
-const power_1 = require("./power");
-const subst_1 = require("./subst");
+const defs_js_1 = require("../runtime/defs.js");
+const symbol_js_1 = require("../runtime/symbol.js");
+const misc_js_1 = require("../sources/misc.js");
+const add_js_1 = require("./add.js");
+const eval_js_1 = require("./eval.js");
+const filter_js_1 = require("./filter.js");
+const multiply_js_1 = require("./multiply.js");
+const power_js_1 = require("./power.js");
+const subst_js_1 = require("./subst.js");
 /* coeff =====================================================================
 
 Tags
@@ -26,16 +26,16 @@ Returns the coefficient of x^n in polynomial p. The x argument can be omitted fo
 
 */
 function Eval_coeff(p1) {
-    let N = eval_1.Eval(defs_1.cadddr(p1));
-    let X = eval_1.Eval(defs_1.caddr(p1));
-    const P = eval_1.Eval(defs_1.cadr(p1));
-    if (N === symbol_1.symbol(defs_1.NIL)) {
+    let N = (0, eval_js_1.Eval)((0, defs_js_1.cadddr)(p1));
+    let X = (0, eval_js_1.Eval)((0, defs_js_1.caddr)(p1));
+    const P = (0, eval_js_1.Eval)((0, defs_js_1.cadr)(p1));
+    if (N === (0, symbol_js_1.symbol)(defs_js_1.NIL)) {
         // only 2 args?
         N = X;
-        X = symbol_1.symbol(defs_1.SYMBOL_X);
+        X = (0, symbol_js_1.symbol)(defs_js_1.SYMBOL_X);
     }
     // divide p by x^n, keep the constant part
-    return filter_1.filter(multiply_1.divide(P, power_1.power(X, N)), X);
+    return (0, filter_js_1.filter)((0, multiply_js_1.divide)(P, (0, power_js_1.power)(X, N)), X);
 }
 exports.Eval_coeff = Eval_coeff;
 //-----------------------------------------------------------------------------
@@ -54,13 +54,13 @@ exports.Eval_coeff = Eval_coeff;
 function coeff(p, x) {
     const coefficients = [];
     while (true) {
-        const c = eval_1.Eval(subst_1.subst(p, x, defs_1.Constants.zero));
+        const c = (0, eval_js_1.Eval)((0, subst_js_1.subst)(p, x, defs_js_1.Constants.zero));
         coefficients.push(c);
-        p = add_1.subtract(p, c);
-        if (misc_1.equal(p, defs_1.Constants.zero)) {
+        p = (0, add_js_1.subtract)(p, c);
+        if ((0, misc_js_1.equal)(p, defs_js_1.Constants.zero)) {
             return coefficients;
         }
-        p = defs_1.doexpand(multiply_1.divide, p, x);
+        p = (0, defs_js_1.doexpand)(multiply_js_1.divide, p, x);
     }
 }
 exports.coeff = coeff;
